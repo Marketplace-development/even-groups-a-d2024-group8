@@ -3,15 +3,15 @@
 <head>
     <title>Register</title>
     <script>
-        // This function shows the artist-related fields when 'artist' is selected
-        function showArtistOptions() {
+        // This function shows the musician-related fields when 'musician' is selected
+        function showMusicianOptions() {
             var profileType = document.getElementById("profile_type").value;
-            var artistOptions = document.getElementById("artist_options");
-            if (profileType === "artist") {
-                artistOptions.style.display = "block";
+            var musicianOptions = document.getElementById("musician_options");
+            if (profileType === "musician") {
+                musicianOptions.style.display = "block";
             } else {
-                artistOptions.style.display = "none";
-                // Reset fields when switching from artist to non-artist
+                musicianOptions.style.display = "none";
+                // Reset fields when switching from musician to non-musician
                 document.getElementById("band_name_field").style.display = "none";
                 document.getElementById("soloist_fields").style.display = "none";
                 document.getElementById("band_fields").style.display = "none";
@@ -20,16 +20,16 @@
             }
         }
 
-        // This function shows additional fields based on the artist type (soloist or band)
-        function handleArtistTypeChange() {
-            var artistType = document.getElementById("artist_type").value;
-            if (artistType === "soloist") {
+        // This function shows additional fields based on the musician type (soloist or band)
+        function handleMusicianTypeChange() {
+            var musicianType = document.getElementById("musician_type").value;
+            if (musicianType === "soloist") {
                 document.getElementById("soloist_fields").style.display = "block";
                 document.getElementById("band_fields").style.display = "none";
                 document.getElementById("band_name_field").style.display = "none";
                 document.getElementById("first_name_field").style.display = "block";
                 document.getElementById("last_name_field").style.display = "block";
-            } else if (artistType === "band") {
+            } else if (musicianType === "band") {
                 document.getElementById("band_fields").style.display = "block";
                 document.getElementById("soloist_fields").style.display = "none";
                 document.getElementById("band_name_field").style.display = "block";
@@ -43,22 +43,22 @@
     <h1>Register</h1>
     <form method="post" action="/register" enctype="multipart/form-data">
         <label for="profile_type">Profile Type:</label>
-        <select id="profile_type" name="profile_type" onchange="showArtistOptions()" required>
+        <select id="profile_type" name="profile_type" onchange="showMusicianOptions()" required>
             <option value="">Select...</option>
             <option value="venue">Venue</option>
-            <option value="artist">Artist</option>
+            <option value="musician">Musician</option>
         </select><br><br>
 
-        <!-- Artist Options, hidden by default -->
-        <div id="artist_options" style="display: none;">
-            <label for="artist_type">Are you a soloist or part of a band?</label>
-            <select id="artist_type" name="artist_type" onchange="handleArtistTypeChange()">
+        <!-- Musician Options, hidden by default -->
+        <div id="musician_options" style="display: none;">
+            <label for="musician_type">Are you a soloist or part of a band?</label>
+            <select id="musician_type" name="musician_type" onchange="handleMusicianTypeChange()">
                 <option value="">Select...</option>
                 <option value="soloist">Soloist</option>
                 <option value="band">Band</option>
             </select><br><br>
             
-            <!-- Band Name (visible only if artist type is "band") -->
+            <!-- Band Name (visible only if musician type is "band") -->
             <div id="band_name_field" style="display: none;">
                 <label for="band_name">Band Name:</label>
                 <input type="text" name="band_name" required><br><br>
@@ -78,8 +78,8 @@
 
         <!-- Name Fields (first and last name) -->
         <div id="first_name_field">
-            <label for="name">First Name:</label>
-            <input type="text" name="name" required><br><br>
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" required><br><br>
         </div>
 
         <div id="last_name_field">
@@ -109,3 +109,4 @@
     </form>
 </body>
 </html>
+

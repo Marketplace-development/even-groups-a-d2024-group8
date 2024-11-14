@@ -16,9 +16,9 @@ def index():
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        profile_type = request.form.get('profile_type')  # Get profile type from form
-        artist_type = request.form.get('artist_type') if profile_type == 'artist' else None  # Only get artist type if profile_type is "artist"
-        name = request.form['name']
+        profile_type = request.form.get('profile_type')
+        musician_type = request.form.get('musician_type') if profile_type == 'musician' else None
+        first_name = request.form['first_name']
         last_name = request.form['last_name'] if 'last_name' in request.form else None
         band_name = request.form['band_name'] if 'band_name' in request.form else None
         email = request.form['email']
@@ -30,36 +30,34 @@ def register():
         # Check if username already exists
         if Profile.query.filter_by(name=username).first() is None:
             new_user = Profile(
-                name=name,
-                last_name=last_name,  # Assuming last_name is part of the Profile model if soloist
-                band_name=band_name,  # Assuming band_name is part of the Profile model if band
+                first_name=first_name,
+                last_name=last_name,
+                band_name=band_name,
                 email=email,
                 address=address,
                 phone_number=phone_number,
                 bio=bio,
-                profile_picture=profile_picture.read() if profile_picture else None,
+                profile_picture=profile_picture.read() if profile_picture else None,  # Or save the image file path as needed
                 profile_type=profile_type,
-                artist_type=artist_type
+                musician_type=musician_type
             )
             db.session.add(new_user)
             db.session.commit()
 
-            # If the profile type is 'artist', create an entry in Musician table
-            if profile_type == 'artist':
+            # If the profile type is 'musician', create an entry in Musician table
+            if profile_type == 'musician':
                 new_musician = Musician(profile_id=new_user.profile_id)
                 db.session.add(new_musician)
                 db.session.commit()
 
-                # Add artist type specifics
-                if artist_type == 'soloist':
+                if musician_type == 'soloist':
                     new_soloist = Soloist(profile_id=new_user.profile_id, age=request.form['age'])
                     db.session.add(new_soloist)
-                elif artist_type == 'band':
+                elif musician_type == 'band':
                     new_band_member = BandMember(profile_id=new_user.profile_id, num_members_in_band=request.form['num_members'])
                     db.session.add(new_band_member)
                 db.session.commit()
 
-            # If the profile type is 'venue', create an entry in Venue table
             elif profile_type == 'venue':
                 new_venue = Venue(profile_id=new_user.profile_id, seating_capacity=request.form['seating_capacity'])
                 db.session.add(new_venue)
@@ -69,8 +67,9 @@ def register():
             return redirect(url_for('main.index'))
 
         return 'Username already registered'
-    
+
     return render_template('register.html')
+
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():

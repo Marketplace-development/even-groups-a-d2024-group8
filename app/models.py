@@ -7,7 +7,8 @@ class Profile(db.Model):
     __tablename__ = 'profile'
 
     profile_id = db.Column(db.String(7), primary_key=True)  # Char(7)
-    name = db.Column(db.String, nullable=False)  # Text
+    first_name = db.Column(db.String, nullable=False)  # Text
+    last_name = db.Column(db.String, nullable=False)
     address = db.Column(db.String)  # Text
     email = db.Column(db.String, nullable=False, unique=True)  # Text
     phone_number = db.Column(db.String)  # Text
@@ -15,8 +16,9 @@ class Profile(db.Model):
     profile_picture = db.Column(db.LargeBinary)  # BYTEA
     pictures = db.Column(db.LargeBinary)  # BYTEA
     rating = db.Column(db.Numeric(2, 1))  # Decimal(2,1)
-    profile_type = db.Column(db.String, nullable=False)  # 'venue' or 'artist'
-    artist_type = db.Column(db.String)
+    profile_type = db.Column(db.String, nullable=False)  # 'venue' or 'musician'
+    musician_type = db.Column(db.String)
+    band_name = db.Column(db.String)
 
     __table_args__ = (
         db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range'),
