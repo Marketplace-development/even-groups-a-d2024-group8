@@ -19,8 +19,10 @@ def register():
         profile_type = request.form.get('profile_type')  # Get profile type from form
         artist_type = request.form.get('artist_type') if profile_type == 'artist' else None  # Only get artist type if profile_type is "artist"
         name = request.form['name']
-        address = request.form['address']
+        last_name = request.form['last_name'] if 'last_name' in request.form else None
+        band_name = request.form['band_name'] if 'band_name' in request.form else None
         email = request.form['email']
+        address = request.form['address']
         phone_number = request.form['phone_number']
         bio = request.form['bio']
         profile_picture = request.files['profile_picture']
@@ -29,6 +31,8 @@ def register():
         if Profile.query.filter_by(name=username).first() is None:
             new_user = Profile(
                 name=name,
+                last_name=last_name,  # Assuming last_name is part of the Profile model if soloist
+                band_name=band_name,  # Assuming band_name is part of the Profile model if band
                 email=email,
                 address=address,
                 phone_number=phone_number,
