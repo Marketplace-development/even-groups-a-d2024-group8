@@ -44,7 +44,12 @@ class Soloist(db.Model):
     __tablename__ = 'soloist'
 
     profile_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id'), primary_key=True)
-    age = db.Column(db.Integer, check=db.CheckConstraint('age > 0'))  # Integer with check constraint
+    age = db.Column(db.Integer)  # Integer column without 'check' argument here
+
+    # Define the check constraint in __table_args__
+    __table_args__ = (
+        db.CheckConstraint('age > 0', name='check_age_positive'),
+    )
 
     # Relationship back to Musician
     musician = db.relationship('Musician', backref=db.backref('soloist', uselist=False))
