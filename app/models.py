@@ -61,13 +61,19 @@ class BandMember(db.Model):
     __tablename__ = 'band_member'
 
     profile_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id'), primary_key=True)
-    num_members_in_band = db.Column(db.Integer, check=db.CheckConstraint('num_members_in_band > 0'))  # Integer with check constraint
+    num_members_in_band = db.Column(db.Integer)  # No 'check' argument here
+
+    # Check constraint defined in __table_args__
+    __table_args__ = (
+        db.CheckConstraint('num_members_in_band > 0', name='check_num_members_positive'),
+    )
 
     # Relationship back to Musician
     musician = db.relationship('Musician', backref=db.backref('band_member', uselist=False))
 
     def __repr__(self):
         return f'<BandMember {self.profile_id}, Members: {self.num_members_in_band}>'
+
 
 class Venue(db.Model):
     __tablename__ = 'venue'
