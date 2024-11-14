@@ -16,8 +16,14 @@ def index():
 def register():
     if request.method == 'POST':
         username = request.form['username']
+        profile_type = request.form.get('profile_type')  # Get profile type from form
+        artist_type = request.form.get('artist_type') if profile_type == 'artist' else None  # Only get artist type if profile_type is "artist"
         if Profile.query.filter_by(name=username).first() is None:
-            new_user = Profile(name=username)
+            new_user = Profile(
+                name=username,
+                profile_type=profile_type,
+                artist_type=artist_type
+            )
             db.session.add(new_user)
             db.session.commit()
             session['user_id'] = new_user.profile_id

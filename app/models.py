@@ -15,6 +15,8 @@ class Profile(db.Model):
     profile_picture = db.Column(db.LargeBinary)  # BYTEA
     pictures = db.Column(db.LargeBinary)  # BYTEA
     rating = db.Column(db.Numeric(2, 1))  # Decimal(2,1)
+    profile_type = db.Column(db.String, nullable=False)  # 'venue' or 'artist'
+    artist_type = db.Column(db.String)
 
     __table_args__ = (
         db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range'),
