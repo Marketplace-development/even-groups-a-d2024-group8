@@ -4,63 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Musician Dashboard</title>
-    <style>
-        /* Add your custom styles here */
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .venue-profile {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        .venue-profile h3 {
-            margin-top: 0;
-        }
-
-        .profile-details {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .profile-details div {
-            width: 45%;
-        }
-
-        .profile-footer {
-            text-align: center;
-            margin-top: 30px;
-        }
-    </style>
 </head>
 <body>
     <h1>Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
     <h2>Available Venues:</h2>
 
     {% for venue in venues %}
-        <div class="venue-profile">
+        <div>
             <h3>{{ venue.profile.name }}</h3>
-            <div class="profile-details">
-                <div>
-                    <label>Seating Capacity:</label>
-                    <p>{{ venue.seating_capacity }}</p>
-                </div>
-                <div>
-                    <label>Address:</label>
-                    <p>{{ venue.profile.address }}</p>
-                </div>
-            </div>
-            <div class="profile-footer">
-                <a href="{{ url_for('book_venue', venue_id=venue.profile_id) }}">Book this Venue</a>
-            </div>
+            <p>Seating Capacity: {{ venue.seating_capacity }}</p>
+            <p>Address: {{ venue.profile.address }}</p>
+            <a href="{{ url_for('book_venue', venue_id=venue.profile_id) }}">Book this Venue</a>
         </div>
     {% endfor %}
 
-    <div class="profile-footer">
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
+    <a href="{{ url_for('logout') }}">Logout</a>
 </body>
 </html>
+

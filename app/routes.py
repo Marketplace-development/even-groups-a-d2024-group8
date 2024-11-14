@@ -64,6 +64,8 @@ def register():
                 db.session.commit()
 
             session['user_id'] = new_user.profile_id
+            session['username'] = new_user.username
+            session['profile_type'] = new_user.profile_type 
              
             if profile_type == 'venue':
                 return redirect(url_for('websitevenue'))
@@ -79,7 +81,7 @@ def register():
 def login():
     if request.method == 'POST':
         username = request.form['username']
-        user = Profile.query.filter_by(name=username).first()
+        user = Profile.query.filter_by(username=username).first()
         if user:
             session['user_id'] = user.profile_id
             session['username'] = user.username
