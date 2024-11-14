@@ -28,7 +28,7 @@ def register():
         profile_picture = request.files['profile_picture']
 
         # Check if username already exists
-        if Profile.query.filter_by(name=username).first() is None:
+        if Profile.query.filter_by(username=username).first() is None:
             new_user = Profile(
                 first_name=first_name,
                 last_name=last_name,
@@ -64,7 +64,11 @@ def register():
                 db.session.commit()
 
             session['user_id'] = new_user.profile_id
-            return redirect(url_for('main.index'))
+             
+            if profile_type == 'venue':
+                return redirect(url_for('websitevenue'))
+            else:
+                return redirect(url_for('websitemusician'))
 
         return 'Username already registered'
 
@@ -78,8 +82,17 @@ def login():
         user = Profile.query.filter_by(name=username).first()
         if user:
             session['user_id'] = user.profile_id
-            return redirect(url_for('main.index'))
-        return 'User not found'
+            session['username'] = user.username
+            session['profile_type'] = user.profile_type  # 'venue' or 'musician'
+            
+            # Redirect based on profile type
+            if user.profile_type == 'venue':
+                return redirect(url_for('websitevenue'))
+            else:
+                return redirect(url_for('websitemusician'))
+        else:
+            flash('User not found', 'error')
+
     return render_template('login.html')
 
 @main.route('/logout', methods=['POST'])
