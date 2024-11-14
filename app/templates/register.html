@@ -2,11 +2,22 @@
 <html>
 <head>
     <title>Register</title>
+    <script>
+        // This function shows the artist-related fields when 'artist' is selected
+        function showArtistOptions() {
+            var profileType = document.getElementById("profile_type").value;
+            var artistOptions = document.getElementById("artist_options");
+            if (profileType === "artist") {
+                artistOptions.style.display = "block";
+            } else {
+                artistOptions.style.display = "none";
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Register</h1>
-    <form method="post" action="/register">
-
+    <form method="post" action="/register" enctype="multipart/form-data">
         <label for="profile_type">Profile Type:</label>
         <select id="profile_type" name="profile_type" onchange="showArtistOptions()" required>
             <option value="">Select...</option>
@@ -22,6 +33,17 @@
                 <option value="soloist">Soloist</option>
                 <option value="band">Band</option>
             </select><br><br>
+            
+            <!-- Additional fields for Soloist/Band -->
+            <div id="soloist_fields" style="display: none;">
+                <label for="age">Age:</label>
+                <input type="number" name="age"><br><br>
+            </div>
+
+            <div id="band_fields" style="display: none;">
+                <label for="num_members">Number of Band Members:</label>
+                <input type="number" name="num_members"><br><br>
+            </div>
         </div>
 
         <label for="name">First Name:</label>
@@ -50,5 +72,19 @@
 
         <input type="submit" value="Register">
     </form>
+
+    <script>
+        // Show additional fields based on artist type
+        document.getElementById("artist_type").addEventListener("change", function() {
+            var artistType = this.value;
+            if (artistType === "soloist") {
+                document.getElementById("soloist_fields").style.display = "block";
+                document.getElementById("band_fields").style.display = "none";
+            } else if (artistType === "band") {
+                document.getElementById("band_fields").style.display = "block";
+                document.getElementById("soloist_fields").style.display = "none";
+            }
+        });
+    </script>
 </body>
 </html>
