@@ -86,3 +86,36 @@ def login():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('main.index'))
+
+@main.route('/website')
+def website():
+    # Check if the user is logged in
+    if 'user_id' in session:
+        user_id = session['user_id']
+        user = Profile.query.filter_by(profile_id=user_id).first()
+
+        if user:
+            if user.profile_type == 'venue':
+                # Venue user should see musician profiles
+                musicians = Musician.query.all()  # Get all musicians
+                return render_template('websitevenue.html', user=user, musicians=musicians)
+            elif user.profile_type == 'musician':
+                # Musician user should see venue profiles
+                venues = Venue.query.all()  # Get all venues
+                return render_template('websitemusician.html', user=user, venues=venues)
+        else:
+            return redirect(url_for('login'))  # Redirect to login if user not found
+    else:
+        return redirect(url_for('login'))  # Redirect to login if not logged in
+    
+@main.route('/book_musician/<musician_id>')
+def book_musician(musician_id):
+    # Your booking logic for musicians here
+    return f"Booking musician with ID: {musician_id}"
+
+@main.route('/book_venue/<venue_id>')
+def book_venue(venue_id):
+    # Your booking logic for venues here
+    return f"Booking venue with ID: {venue_id}"
+
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venue Dashboard</title>
+    <style>
+        /* Add your custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .musician-profile {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .musician-profile h3 {
+            margin-top: 0;
+        }
+
+        .musician-profile img {
+            max-width: 150px;
+            height: auto;
+            border-radius: 50%;
+        }
+
+        .profile-details {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile-details div {
+            width: 45%;
+        }
+
+        .profile-footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+    <h2>Available Musicians:</h2>
+
+    {% for musician in musicians %}
+        <div class="musician-profile">
+            <h3>{{ musician.profile.name }}</h3>
+            <div class="profile-details">
+                <div>
+                    <label>Genre:</label>
+                    <p>{{ musician.genre }}</p>
+                </div>
+                <div>
+                    <label>Price Per Hour:</label>
+                    <p>${{ musician.price_per_hour }}</p>
+                </div>
+            </div>
+            <div class="profile-footer">
+                <a href="{{ url_for('book_musician', musician_id=musician.profile_id) }}">Book this Musician</a>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="profile-footer">
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</body>
+</html>
