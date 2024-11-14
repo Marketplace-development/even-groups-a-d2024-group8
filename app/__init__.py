@@ -3,7 +3,7 @@ from .models import db
 from .config import Config
 
 def create_app():
-    app = Flask("MelodyMatch")
+    app = Flask("MelodyMatch", template_folder='app/templates')
     app.config.from_object(Config)
 
     db.init_app(app)
