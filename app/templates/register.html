@@ -6,13 +6,23 @@
 <body>
     <h1>Register</h1>
     <form method="post" action="/register">
-        
-        <label for="account_type">Register as:</label>
-        <select name="account_type" id="account_type" required>
+
+        <label for="profile_type">Profile Type:</label>
+        <select id="profile_type" name="profile_type" onchange="showArtistOptions()" required>
+            <option value="">Select...</option>
             <option value="venue">Venue</option>
             <option value="artist">Artist</option>
-        </select>
-        <br><br>
+        </select><br><br>
+
+        <!-- Artist Options, hidden by default -->
+        <div id="artist_options" style="display: none;">
+            <label for="artist_type">Are you a soloist or part of a band?</label>
+            <select id="artist_type" name="artist_type">
+                <option value="">Select...</option>
+                <option value="soloist">Soloist</option>
+                <option value="band">Band</option>
+            </select><br><br>
+        </div>
 
         <label for="name">First Name:</label>
         <input type="text" name="name" required><br><br>
