@@ -14,7 +14,12 @@ class Profile(db.Model):
     bio = db.Column(db.String)  # Text
     profile_picture = db.Column(db.LargeBinary)  # BYTEA
     pictures = db.Column(db.LargeBinary)  # BYTEA
-    rating = db.Column(db.Numeric(2, 1), check=db.CheckConstraint('rating >= 0.0 AND rating <= 5.0'))  # Decimal(2,1)
+    rating = db.Column(db.Numeric(2, 1))  # Decimal(2,1)
+
+    # Define the check constraint separately using __table_args__
+    __table_args__ = (
+        db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range'),
+    )
 
     def __repr__(self):
         return f'<Profile {self.profile_id}, {self.name}>'
