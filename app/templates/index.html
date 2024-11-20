@@ -4,7 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MelodyMatch - Welcome</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            background-color: #00FF00; /* Fluorescent green background */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff; /* White background for text box */
+            border: 5px solid #000; /* Black border around the box */
+            border-radius: 10px; /* Rounded corners for the box */
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for box */
+        }
+        .container h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .container h1 span {
+            color: #ff4500; /* Highlight MelodyMatch in orange */
+        }
+        .container p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -30,5 +71,6 @@
     </div>
 </body>
 </html>
+
 
 
