@@ -42,13 +42,30 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            # Add musician-specific data if needed
+            # Add musician-specific or venue-specific data
             if profile_type == 'musician':
                 musician = Musician(profile_id=new_user.profile_id, genre=genre, price_per_hour=price_per_hour)
                 db.session.add(musician)
-                db.session.commit()
+                if musician_role == 'soloist':
+                    date_of_birth = request.form.get('date_of_birth')
+                    if date_of_birth:
+                        soloist = Soloist(profile_id=new_user.profile_id, date_of_birth=date_of_birth)
+                        db.session.add(soloist)
+                elif musician_role == 'band':
+                    band_name = request.form.get('band_name')
+                    if band_name:
+                        band_member = BandMember(profile_id=new_user.profile_id)
+                        db.session.add(band_member)
 
-            # Save session and redirect
+            elif profile_type == 'venue':
+                venue_name = request.form.get('venue_name')
+                venue_style = request.form.get('venue_style', 'Not specified')
+                venue = Venue(profile_id=new_user.profile_id, name_event=venue_name, style=venue_style)
+                db.session.add(venue)
+
+            db.session.commit()
+
+            # Save session and redirect to upload_picture
             session['user_id'] = new_user.profile_id
             session['profile_type'] = new_user.profile_type
             flash("Registration successful! Please upload your profile picture.", "success")
@@ -62,7 +79,6 @@ def register():
 
     # Render registration page for GET request
     return render_template('register.html')
-
 
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -120,15 +136,17 @@ def upload_picture():
     user = Profile.query.get(session['user_id'])
 
     if request.method == 'POST':
-        # Handle profile picture upload
-        if 'profile_picture' in request.files:
+        if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
             profile_picture = request.files['profile_picture']
-            if profile_picture:
-                user.profile_picture = profile_picture.read()  # Save the binary data
-                db.session.commit()
-                flash("Profile picture uploaded successfully!", "success")
+            # Save the binary data to the user profile
+            user.profile_picture = profile_picture.read()
+            db.session.commit()
+            flash("Profile picture uploaded successfully!", "success")
+        else:
+            # Handle the "Skip" action or empty upload
+            flash("No profile picture uploaded. Proceeding without it.", "info")
 
-        # Handle "Skip" action or after upload
-        return redirect(url_for('main.website'))
+        return redirect(url_for('main.website'))  # Redirect to main website after upload or skip
 
     return render_template('upload_picture.html')
+

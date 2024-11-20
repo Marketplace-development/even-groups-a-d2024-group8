@@ -140,7 +140,7 @@
                     <option value="venue">Venue</option>
                 </select>
             </div>
-
+            
             <!-- Musician Role Dropdown -->
             <div class="dropdown-container" id="musician-role-dropdown-container">
                 <label for="musician-role-dropdown">Musician Role:</label>
@@ -150,16 +150,16 @@
                 </select>
             </div>
 
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" required>
+
+            <label for="last_name">Last Name:</label>
+            <input type="text" name="last_name" required>
+
             <!-- Venue Fields -->
             <div id="venue_fields" style="display: none;">
                 <label for="venue_name">Venue Name:</label>
                 <input type="text" name="venue_name">
-
-                <label for="first_name">Owner's First Name:</label>
-                <input type="text" name="first_name" required>
-
-                <label for="last_name">Owner's Last Name:</label>
-                <input type="text" name="last_name" required>
 
                 <label for="venue_style">Venue Style:</label>
                     <select id="venue_style" class="dropdown-select" name="venue_style">
@@ -184,27 +184,14 @@
                     <label for="artist_name">Artist Name:</label>
                     <input type="text" name="artist_name">
 
-                    <label for="first_name">First Name:</label>
-                    <input type="text" name="first_name" required>
-
-                    <label for="last_name">Last Name:</label>
-                    <input type="text" name="last_name" required>
-
                     <label for="date_of_birth">Date of Birth:</label>
-                    <input type="date" name="date_of_birth" required>
-                    
+                    <input type="date" name="date_of_birth" >    
                 </div>
 
                 <!-- Band Fields -->
                 <div id="band_fields" style="display: none;">
                     <label for="band_name">Band Name:</label>
                     <input type="text" name="band_name">
-
-                    <label for="first_name">Band Leader's First Name:</label>
-                    <input type="text" name="first_name">
-
-                    <label for="last_name">Band Leader's Last Name:</label>
-                    <input type="text" name="last_name" required>
                 </div>
                 
 
@@ -238,8 +225,6 @@
                     });
                 </script>
                 
-
-
                 <label for="link_to_songs">External Link to Your Songs:</label>
                 <input type="url" name="link_to_songs">
 
