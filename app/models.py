@@ -2,7 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-
 class Profile(db.Model):
     __tablename__ = 'profile'
 
@@ -33,43 +32,35 @@ class Musician(db.Model):
     __tablename__ = 'musician'
 
     profile_id = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    genre = db.Column(db.String)  # Optional
-    price_per_hour = db.Column(db.Numeric(10, 2))  # Optional
-    link_to_songs = db.Column(db.LargeBinary)  # Optional
-    availability = db.Column(db.LargeBinary)  # Optional
+    genre = db.Column(db.String, nullable=False)  # Genre is now required
+    price_per_hour = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)  # Default value for price
+    link_to_songs = db.Column(db.String)  # Optional (changed from LargeBinary to String for better URL support)
+    availability = db.Column(db.String)  # Optional
     equipment = db.Column(db.Boolean, default=False)  # Optional
 
     profile = db.relationship('Profile', backref=db.backref('musician', uselist=False))
 
     def __repr__(self):
-        return f'<Musician {self.profile_id}>'
+        return f'<Musician {self.profile_id}, Genre: {self.genre}>'
 
 
 class Soloist(db.Model):
     __tablename__ = 'soloist'
 
     profile_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    age = db.Column(db.Integer, nullable=True)  # Optional
-
-    __table_args__ = (
-        db.CheckConstraint('age > 0', name='check_age_positive'),
-    )
+    date_of_birth = db.Column(db.Date, nullable=False)  # Required field for soloists
 
     musician = db.relationship('Musician', backref=db.backref('soloist', uselist=False))
 
     def __repr__(self):
-        return f'<Soloist {self.profile_id}, Age: {self.age}>'
+        return f'<Soloist {self.profile_id}, DOB: {self.date_of_birth}>'
 
 
 class BandMember(db.Model):
     __tablename__ = 'band_member'
 
     profile_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    num_members_in_band = db.Column(db.Integer, nullable=True)  # Optional
-
-    __table_args__ = (
-        db.CheckConstraint('num_members_in_band > 0', name='check_num_members_positive'),
-    )
+    num_members_in_band = db.Column(db.Integer, nullable=False, default=1)  # Default is 1
 
     musician = db.relationship('Musician', backref=db.backref('band_member', uselist=False))
 
@@ -83,16 +74,19 @@ class Venue(db.Model):
     profile_id = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
     seating_capacity = db.Column(db.Integer, nullable=True)  # Optional
     name_event = db.Column(db.String)  # Optional
-    style = db.Column(db.String)  # Optional, venue style
-
-    __table_args__ = (
-        db.CheckConstraint('seating_capacity > 0', name='check_seating_capacity_positive'),
+    style = db.Column(
+        db.String,
+        nullable=False,
+        default='Not specified',
+        check_constraint=db.CheckConstraint(
+            "style IN ('Traditional Pub', 'Modern Cocktailbar', 'Jazz Lounge', 'Industrial Bar', 'Beach Bar', 'Art Café', 'Dance Club', 'Restaurant', 'Wine Bar', 'Other', 'Not specified')"
+        )
     )
 
     profile = db.relationship('Profile', backref=db.backref('venue', uselist=False))
 
     def __repr__(self):
-        return f'<Venue {self.profile_id}, Seating Capacity: {self.seating_capacity}>'
+        return f'<Venue {self.profile_id}, Style: {self.style}>'
 
 
 class Booking(db.Model):
@@ -107,8 +101,10 @@ class Booking(db.Model):
     booked_by = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
     booked_in = db.Column(db.String(7), db.ForeignKey('venue.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
 
+    # Relationships with explicit foreign_keys
     musician = db.relationship('Musician', backref=db.backref('bookings', lazy=True))
-    venue = db.relationship('Venue', backref=db.backref('bookings', lazy=True))
+    venue = db.relationship('Venue', backref=db.backref('venue_bookings', lazy=True), foreign_keys=[venue_id])
+    venue_booking = db.relationship('Venue', backref=db.backref('booked_venues', lazy=True), foreign_keys=[booked_in])
     profile_booked_by = db.relationship('Profile', foreign_keys=[booked_by], backref=db.backref('bookings_made', lazy=True))
 
     __table_args__ = (
@@ -127,14 +123,14 @@ class Payment(db.Model):
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     method = db.Column(db.String, nullable=False)
     date_payment = db.Column(db.TIMESTAMP(timezone=True), default=db.func.current_timestamp())
-    status = db.Column(db.String, nullable=False)
+    status = db.Column(db.String, nullable=False, default='Processing')
+
+    booking = db.relationship('Booking', backref=db.backref('payments', lazy=True))
 
     __table_args__ = (
         db.CheckConstraint("method IN ('Cash', 'Mobile payment', 'Credit card', 'Bancontact', 'Other')", name='check_method_valid'),
         db.CheckConstraint("status IN ('Completed', 'Processing', 'Failed')", name='check_status_valid_payment'),
     )
-
-    booking = db.relationship('Booking', backref=db.backref('payments', lazy=True))
 
     def __repr__(self):
         return f'<Payment {self.payment_id}, Amount: {self.amount}>'
@@ -149,12 +145,12 @@ class Review(db.Model):
     comment = db.Column(db.String, nullable=True)  # Optional
     role_reviewer = db.Column(db.String, nullable=False)
 
+    booking = db.relationship('Booking', backref=db.backref('reviews', lazy=True))
+
     __table_args__ = (
         db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range_review'),
         db.CheckConstraint("role_reviewer IN ('Musician', 'Venue Owner')", name='check_role_reviewer_valid'),
     )
-
-    booking = db.relationship('Booking', backref=db.backref('reviews', lazy=True))
 
     def __repr__(self):
         return f'<Review {self.review_id}, Rating: {self.rating}>'
