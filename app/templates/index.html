@@ -20,15 +20,22 @@
         }
         .welcome-section {
             width: 50%; /* Occupies half of the screen */
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center vertically */
+            text-align: left;
+            padding-left: 100px; /* Shift text closer to the middle */
         }
         .welcome-section h1 {
             font-size: 3rem;
-            margin: 0;
+            margin: 0 0 10px 0;
         }
         .welcome-section p {
             font-size: 1.5rem;
             color: #ccc;
+            white-space: normal; /* Allow text to break to the next line if needed */
+            overflow: visible; /* Ensure no hidden content */
+            text-overflow: clip; /* Ensure no ellipses */
         }
         .auth-section {
             width: 40%; /* Slightly smaller than the welcome section */
@@ -110,6 +117,3 @@
     </div>
 </body>
 </html>
-
-
-

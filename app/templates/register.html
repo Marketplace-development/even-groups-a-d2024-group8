@@ -54,7 +54,6 @@
             margin-bottom: 5px;
         }
         .register-box input,
-        .register-box select,
         .register-box textarea {
             width: 100%;
             padding: 10px;
@@ -82,26 +81,57 @@
         .register-box input[type="submit"]:hover {
             background-color: #4e008f;
         }
+        .dropdown-container {
+            margin: 20px 0;
+            position: relative;
+            width: 100%;
+        }
+        .dropdown-select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            appearance: none; /* Removes default dropdown arrow */
+            background-color: #fff;
+            color: #000;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .dropdown-select:hover {
+            background-color: #f0f0f0;
+            border-color: #6a00b5;
+        }
+        .dropdown-select:focus {
+            border-color: #6a00b5;
+            outline: none;
+            box-shadow: 0 0 10px rgba(106, 0, 181, 0.3);
+        }
     </style>
     <script>
-        // Show/hide venue and musician-related fields
-        function handleProfileTypeChange() {
-            const profileType = document.getElementById("profile_type").value;
-            const musicianFields = document.getElementById("musician_fields");
-            const venueFields = document.getElementById("venue_fields");
-            if (profileType === "venue") {
-                musicianFields.style.display = "none";
-                venueFields.style.display = "block";
-            } else {
-                musicianFields.style.display = "block";
-                venueFields.style.display = "none";
-            }
+        function handleDropdownChange() {
+            const profileType = document.getElementById('profile-type-dropdown').value;
+            const musicianRoleDropdownContainer = document.getElementById('musician-role-dropdown-container');
+            const venueFields = document.getElementById('venue_fields');
+            const musicianFields = document.getElementById('musician_fields');
+
+            musicianRoleDropdownContainer.style.display = profileType === 'musician' ? 'block' : 'none';
+            musicianFields.style.display = profileType === 'musician' ? 'block' : 'none';
+            venueFields.style.display = profileType === 'venue' ? 'block' : 'none';
         }
 
-        function handleMusicianTypeChange() {
-            const musicianType = document.getElementById("musician_type").value;
-            document.getElementById("soloist_fields").style.display = musicianType === "soloist" ? "block" : "none";
-            document.getElementById("band_fields").style.display = musicianType === "band" ? "block" : "none";
+        function handleMusicianRoleChange() {
+            const musicianRole = document.getElementById('musician-role-dropdown').value;
+            const soloistFields = document.getElementById('soloist_fields');
+            const bandFields = document.getElementById('band_fields');
+
+            if (musicianRole === 'soloist') {
+                soloistFields.style.display = 'block';
+                bandFields.style.display = 'none';
+            } else if (musicianRole === 'band') {
+                soloistFields.style.display = 'none';
+                bandFields.style.display = 'block';
+            }
         }
     </script>
 </head>
@@ -110,60 +140,63 @@
         <h1>Register</h1>
         <hr>
         <form method="post" action="/register">
-            <label for="profile_type">Profile Type:</label>
-            <select id="profile_type" name="profile_type" onchange="handleProfileTypeChange()" required>
-                <option value="musician" selected>Musician</option>
-                <option value="venue">Venue</option>
-            </select>
-
-            <!-- Venue-Specific Fields -->
-            <div id="venue_fields" style="display: none;">
-                <label for="venue_name">Venue Name:</label>
-                <input type="text" name="venue_name" required>
-
-                <label for="first_name">Owner's First Name:</label>
-                <input type="text" name="first_name" required>
-
-                <label for="last_name">Owner's Last Name:</label>
-                <input type="text" name="last_name" required>
+            <div class="dropdown-container">
+                <label for="profile-type-dropdown">Profile Type:</label>
+                <select id="profile-type-dropdown" class="dropdown-select" onchange="handleDropdownChange()" name="profile_type">
+                    <option value="musician" selected>Musician</option>
+                    <option value="venue">Venue</option>
+                </select>
             </div>
 
-            <!-- Musician-Specific Fields -->
-            <div id="musician_fields" style="display: block;">
-                <label for="musician_type">Are you a soloist or part of a band?</label>
-                <select id="musician_type" name="musician_type" onchange="handleMusicianTypeChange()" required>
-                    <option value="soloist">Soloist</option>
+            <!-- Musician Role Dropdown -->
+            <div class="dropdown-container" id="musician-role-dropdown-container">
+                <label for="musician-role-dropdown">Musician Role:</label>
+                <select id="musician-role-dropdown" class="dropdown-select" onchange="handleMusicianRoleChange()" name="musician_role">
+                    <option value="soloist" selected>Soloist</option>
                     <option value="band">Band</option>
                 </select>
+            </div>
 
+            <!-- Venue Fields -->
+            <div id="venue_fields" style="display: none;">
+                <label for="venue_name">Venue Name:</label>
+                <input type="text" name="venue_name">
+
+                <label for="first_name">Owner's First Name:</label>
+                <input type="text" name="first_name">
+
+                <label for="last_name">Owner's Last Name:</label>
+                <input type="text" name="last_name">
+            </div>
+
+            <!-- Soloist Fields -->
+            <div id="musician_fields">
                 <div id="soloist_fields">
                     <label for="artist_name">Artist Name:</label>
-                    <input type="text" name="artist_name" required>
+                    <input type="text" name="artist_name">
 
                     <label for="first_name">First Name:</label>
-                    <input type="text" name="first_name" required>
+                    <input type="text" name="first_name">
 
                     <label for="last_name">Last Name:</label>
-                    <input type="text" name="last_name" required>
-
-                    <label for="age">Age:</label>
-                    <input type="number" name="age">
+                    <input type="text" name="last_name">
                 </div>
 
+                <!-- Band Fields -->
                 <div id="band_fields" style="display: none;">
                     <label for="band_name">Band Name:</label>
                     <input type="text" name="band_name">
 
-                    <label for="first_name">Band Leader's First Name:</label>
-                    <input type="text" name="first_name" required>
+                    <label for="leader_first_name">Band Leader's First Name:</label>
+                    <input type="text" name="leader_first_name">
 
-                    <label for="last_name">Band Leader's Last Name:</label>
-                    <input type="text" name="last_name" required>
+                    <label for="leader_last_name">Band Leader's Last Name:</label>
+                    <input type="text" name="leader_last_name">
                 </div>
             </div>
 
             <label for="email">Email:</label>
-            <input type="email" name="email" required>
+            <input type="email" name="email">
 
             <label for="address">Address:</label>
             <input type="text" name="address">
@@ -172,12 +205,10 @@
             <input type="text" name="phone_number">
 
             <label for="bio">Bio (Max 500 characters):</label>
-            <textarea name="bio" maxlength="500" required></textarea>
+            <textarea name="bio" maxlength="500"></textarea>
 
             <input type="submit" value="Register">
         </form>
     </div>
 </body>
 </html>
-
-
