@@ -1,112 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <!-- Import DM Sans font -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #3a007d, #6a00b5); /* Dark purple gradient background */
+            font-family: 'DM Sans', sans-serif; /* Use DM Sans font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+        .register-box {
+            background-color: #fff; /* White background for the box */
+            color: #000; /* Black text inside the box */
+            border-radius: 15px; /* Rounded edges */
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Subtle shadow around the box */
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+        .register-box::before {
+            content: '';
+            position: absolute;
+            inset: 10px; /* Adds a thin border inside the box */
+            border: 1px solid #6a00b5; /* Color matching the gradient */
+            border-radius: 15px; /* Match the border-radius */
+            pointer-events: none; /* Allows clicking on elements inside the box */
+        }
+        .register-box h1 {
+            font-size: 2.5rem;
+            color: #6a00b5; /* Matching the gradient background */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .register-box hr {
+            border: none;
+            border-top: 1px solid #6a00b5; /* Matching the gradient */
+            margin: 20px 0;
+        }
+        .register-box label {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        .register-box input,
+        .register-box select,
+        .register-box textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Ensures padding is included in width */
+        }
+        .register-box textarea {
+            max-width: 100%;
+            max-height: 150px;
+            resize: none;
+        }
+        .register-box input[type="submit"] {
+            background-color: #6a00b5; /* Matching the gradient background */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .register-box input[type="submit"]:hover {
+            background-color: #4e008f;
+        }
+    </style>
     <script>
-        // This function shows the musician-related fields when 'musician' is selected
-        function showMusicianOptions() {
-            var profileType = document.getElementById("profile_type").value;
-            var musicianOptions = document.getElementById("musician_options");
-            if (profileType === "musician") {
-                musicianOptions.style.display = "block";
+        // Show/hide venue and musician-related fields
+        function handleProfileTypeChange() {
+            const profileType = document.getElementById("profile_type").value;
+            const musicianFields = document.getElementById("musician_fields");
+            const venueFields = document.getElementById("venue_fields");
+            if (profileType === "venue") {
+                musicianFields.style.display = "none";
+                venueFields.style.display = "block";
             } else {
-                musicianOptions.style.display = "none";
-                // Reset fields when switching from musician to non-musician
-                document.getElementById("band_name_field").style.display = "none";
-                document.getElementById("soloist_fields").style.display = "none";
-                document.getElementById("band_fields").style.display = "none";
-                document.getElementById("first_name_field").style.display = "block";
-                document.getElementById("last_name_field").style.display = "block";
+                musicianFields.style.display = "block";
+                venueFields.style.display = "none";
             }
         }
 
-        // This function shows additional fields based on the musician type (soloist or band)
         function handleMusicianTypeChange() {
-            var musicianType = document.getElementById("musician_type").value;
-            if (musicianType === "soloist") {
-                document.getElementById("soloist_fields").style.display = "block";
-                document.getElementById("band_fields").style.display = "none";
-                document.getElementById("band_name_field").style.display = "none";
-                document.getElementById("first_name_field").style.display = "block";
-                document.getElementById("last_name_field").style.display = "block";
-            } else if (musicianType === "band") {
-                document.getElementById("band_fields").style.display = "block";
-                document.getElementById("soloist_fields").style.display = "none";
-                document.getElementById("band_name_field").style.display = "block";
-                document.getElementById("first_name_field").style.display = "none";
-                document.getElementById("last_name_field").style.display = "none";
-            }
+            const musicianType = document.getElementById("musician_type").value;
+            document.getElementById("soloist_fields").style.display = musicianType === "soloist" ? "block" : "none";
+            document.getElementById("band_fields").style.display = musicianType === "band" ? "block" : "none";
         }
     </script>
 </head>
 <body>
-    <h1>Register</h1>
-    <form method="post" action="/register" enctype="multipart/form-data">
-        <label for="profile_type">Profile Type:</label>
-        <select id="profile_type" name="profile_type" onchange="showMusicianOptions()" required>
-            <option value="">Select...</option>
-            <option value="venue">Venue</option>
-            <option value="musician">Musician</option>
-        </select><br><br>
+    <div class="register-box">
+        <h1>Register</h1>
+        <hr>
+        <form method="post" action="/register">
+            <label for="profile_type">Profile Type:</label>
+            <select id="profile_type" name="profile_type" onchange="handleProfileTypeChange()" required>
+                <option value="musician" selected>Musician</option>
+                <option value="venue">Venue</option>
+            </select>
 
-        <!-- Musician Options, hidden by default -->
-        <div id="musician_options" style="display: none;">
-            <label for="musician_type">Are you a soloist or part of a band?</label>
-            <select id="musician_type" name="musician_type" onchange="handleMusicianTypeChange()">
-                <option value="">Select...</option>
-                <option value="soloist">Soloist</option>
-                <option value="band">Band</option>
-            </select><br><br>
-            
-            <!-- Band Name (visible only if musician type is "band") -->
-            <div id="band_name_field" style="display: none;">
-                <label for="band_name">Band Name:</label>
-                <input type="text" name="band_name" required><br><br>
+            <!-- Venue-Specific Fields -->
+            <div id="venue_fields" style="display: none;">
+                <label for="venue_name">Venue Name:</label>
+                <input type="text" name="venue_name" required>
+
+                <label for="first_name">Owner's First Name:</label>
+                <input type="text" name="first_name" required>
+
+                <label for="last_name">Owner's Last Name:</label>
+                <input type="text" name="last_name" required>
             </div>
 
-            <!-- Additional fields for Soloist/Band -->
-            <div id="soloist_fields" style="display: none;">
-                <label for="age">Age:</label>
-                <input type="number" name="age"><br><br>
+            <!-- Musician-Specific Fields -->
+            <div id="musician_fields" style="display: block;">
+                <label for="musician_type">Are you a soloist or part of a band?</label>
+                <select id="musician_type" name="musician_type" onchange="handleMusicianTypeChange()" required>
+                    <option value="soloist">Soloist</option>
+                    <option value="band">Band</option>
+                </select>
+
+                <div id="soloist_fields">
+                    <label for="artist_name">Artist Name:</label>
+                    <input type="text" name="artist_name" required>
+
+                    <label for="first_name">First Name:</label>
+                    <input type="text" name="first_name" required>
+
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" name="last_name" required>
+
+                    <label for="age">Age:</label>
+                    <input type="number" name="age">
+                </div>
+
+                <div id="band_fields" style="display: none;">
+                    <label for="band_name">Band Name:</label>
+                    <input type="text" name="band_name">
+
+                    <label for="first_name">Band Leader's First Name:</label>
+                    <input type="text" name="first_name" required>
+
+                    <label for="last_name">Band Leader's Last Name:</label>
+                    <input type="text" name="last_name" required>
+                </div>
             </div>
 
-            <div id="band_fields" style="display: none;">
-                <label for="num_members">Number of Band Members:</label>
-                <input type="number" name="num_members"><br><br>
-            </div>
-        </div>
+            <label for="email">Email:</label>
+            <input type="email" name="email" required>
 
-        <!-- Name Fields (first and last name) -->
-        <div id="first_name_field">
-            <label for="first_name">First Name:</label>
-            <input type="text" name="first_name" required><br><br>
-        </div>
+            <label for="address">Address:</label>
+            <input type="text" name="address">
 
-        <div id="last_name_field">
-            <label for="last_name">Last Name:</label>
-            <input type="text" name="last_name" required><br><br>
-        </div>
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" name="phone_number">
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" required><br><br>
+            <label for="bio">Bio (Max 500 characters):</label>
+            <textarea name="bio" maxlength="500" required></textarea>
 
-        <label for="address">Address:</label>
-        <input type="text" name="address"><br><br>
-
-        <label for="phone_number">Phone Number:</label>
-        <input type="text" name="phone_number"><br><br>
-
-        <label for="bio">Bio:</label>
-        <textarea name="bio"></textarea><br><br>
-
-        <label for="profile_picture">Profile Picture (optional):</label>
-        <input type="file" name="profile_picture"><br><br>
-
-        <label for="username">Username:</label>
-        <input type="text" name="username" required><br><br>
-
-        <input type="submit" value="Register">
-    </form>
+            <input type="submit" value="Register">
+        </form>
+    </div>
 </body>
 </html>
+
 

@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MelodyMatch - Welcome</title>
+    <!-- Import DM Sans font -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(135deg, #3a007d, #6a00b5); /* Dark purple gradient background */
-            font-family: Arial, sans-serif;
+            font-family: 'DM Sans', sans-serif; /* Use DM Sans font */
             display: flex;
             justify-content: space-between; /* Space between left text and right box */
             align-items: center;
@@ -43,11 +45,25 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Subtle shadow around the box */
             width: 100%;
             max-width: 350px;
+            position: relative;
+        }
+        .auth-box::before {
+            content: '';
+            position: absolute;
+            inset: 10px; /* Adds a thin border inside the box */
+            border: 1px solid #6a00b5; /* Color matching the gradient */
+            border-radius: 15px; /* Match the border-radius */
+            pointer-events: none; /* Allows clicking on elements inside the box */
         }
         .auth-box h2 {
             font-size: 2rem;
             color: #6a00b5; /* Matching the gradient background */
             margin-bottom: 20px;
+        }
+        .auth-box hr {
+            border: none;
+            border-top: 1px solid #6a00b5; /* Matching the gradient */
+            margin: 20px 0;
         }
         .auth-box p {
             font-size: 1.2rem;
@@ -61,6 +77,7 @@
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
+            font-weight: 500; /* Slightly bold buttons */
         }
         .btn:hover {
             background-color: #4e008f;
@@ -78,6 +95,7 @@
     <div class="auth-section">
         <div class="auth-box">
             <h2>Get Started</h2>
+            <hr> <!-- Horizontal line separating the header -->
             {% if username %}
                 <form action="{{ url_for('main.logout') }}" method="post">
                     <button type="submit" class="btn">Logout</button>
@@ -92,5 +110,6 @@
     </div>
 </body>
 </html>
+
 
 
