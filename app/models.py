@@ -35,7 +35,6 @@ class Musician(db.Model):
     genre = db.Column(db.String, nullable=False)  # Genre is now required
     price_per_hour = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)  # Default value for price
     link_to_songs = db.Column(db.String)  # Optional (changed from LargeBinary to String for better URL support)
-    availability = db.Column(db.String)  # Optional
     equipment = db.Column(db.Boolean, default=False)  # Optional
 
     profile = db.relationship('Profile', backref=db.backref('musician', uselist=False))
@@ -72,7 +71,6 @@ class Venue(db.Model):
     __tablename__ = 'venue'
 
     profile_id = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    seating_capacity = db.Column(db.Integer, nullable=True)  # Optional
     name_event = db.Column(db.String)  # Optional
     style = db.Column(db.String, nullable=False, default='Not specified')
 

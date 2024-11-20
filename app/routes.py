@@ -68,14 +68,24 @@ def register():
             # Save session and redirect to upload_picture
             session['user_id'] = new_user.profile_id
             session['profile_type'] = new_user.profile_type
-            flash("Registration successful! Please upload your profile picture.", "success")
+
+            # Conditional redirection
+            if profile_type == 'musician':
+                if musician_role == 'soloist':
+                    flash("Welcome, Soloist! Please upload your profile picture.", "success")
+                elif musician_role == 'band':
+                    flash("Welcome, Band! Please upload your profile picture.", "success")
+            elif profile_type == 'venue':
+                flash("Welcome, Venue! Please upload your profile picture.", "success")
+
             return redirect(url_for('main.upload_picture'))
 
         except Exception as e:
-            # Catch unexpected errors and rollback changes
             db.session.rollback()
+            print(f"Registration error: {e}")  # Debugging line
             flash(f"An error occurred: {str(e)}", "error")
             return redirect(url_for('main.register'))
+
 
     # Render registration page for GET request
     return render_template('register.html')
