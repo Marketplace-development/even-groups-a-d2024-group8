@@ -6,71 +6,91 @@
     <title>MelodyMatch - Welcome</title>
     <style>
         body {
-            background-color: #00FF00; /* Fluorescent green background */
+            background: linear-gradient(135deg, #3a007d, #6a00b5); /* Dark purple gradient background */
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            justify-content: space-between; /* Space between left text and right box */
             align-items: center;
             min-height: 100vh;
             margin: 0;
-        }
-        .container {
-            background-color: #fff; /* White background for text box */
-            border: 5px solid #000; /* Black border around the box */
-            border-radius: 10px; /* Rounded corners for the box */
             padding: 20px;
+            color: #fff;
+        }
+        .welcome-section {
+            width: 50%; /* Occupies half of the screen */
             text-align: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for box */
         }
-        .container h1 {
+        .welcome-section h1 {
+            font-size: 3rem;
+            margin: 0;
+        }
+        .welcome-section p {
+            font-size: 1.5rem;
+            color: #ccc;
+        }
+        .auth-section {
+            width: 40%; /* Slightly smaller than the welcome section */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .auth-box {
+            background-color: #fff; /* White background for the box */
+            color: #000; /* Black text inside the box */
+            border-radius: 15px; /* Rounded edges */
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Subtle shadow around the box */
+            width: 100%;
+            max-width: 350px;
+        }
+        .auth-box h2 {
             font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .container h1 span {
-            color: #ff4500; /* Highlight MelodyMatch in orange */
-        }
-        .container p {
+            color: #6a00b5; /* Matching the gradient background */
             margin-bottom: 20px;
+        }
+        .auth-box p {
             font-size: 1.2rem;
+            margin: 10px 0;
         }
         .btn {
             display: inline-block;
             margin: 10px;
             padding: 10px 20px;
-            background-color: #000;
+            background-color: #6a00b5; /* Matching the gradient background */
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
         }
         .btn:hover {
-            background-color: #555;
+            background-color: #4e008f;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="welcome-section">
-            <h1>Welcome to <span>MelodyMatch</span></h1>
-            <p>Your gateway to connecting with amazing local music experiences.</p>
-        </div>
-        <div class="auth-section">
-            <div class="auth-box">
-                <h2>Get Started</h2>
-                {% if username %}
-                    <form action="{{ url_for('main.logout') }}" method="post">
-                        <button type="submit" class="btn">Logout</button>
-                    </form>
-                {% else %}
-                    <p>Already have an account?</p>
-                    <a href="{{ url_for('main.login') }}" class="btn">Login</a>
-                    <p>Don't have an account yet?</p>
-                    <a href="{{ url_for('main.register') }}" class="btn">Register</a>
-                {% endif %}
-            </div>
+    <!-- Left Section: Welcome Text -->
+    <div class="welcome-section">
+        <h1>Welcome to MelodyMatch</h1>
+        <p>Your gateway to connecting with amazing local music experiences.</p>
+    </div>
+
+    <!-- Right Section: Authentication Box -->
+    <div class="auth-section">
+        <div class="auth-box">
+            <h2>Get Started</h2>
+            {% if username %}
+                <form action="{{ url_for('main.logout') }}" method="post">
+                    <button type="submit" class="btn">Logout</button>
+                </form>
+            {% else %}
+                <p>Already have an account?</p>
+                <a href="{{ url_for('main.login') }}" class="btn">Login</a>
+                <p>Don't have an account yet?</p>
+                <a href="{{ url_for('main.register') }}" class="btn">Register</a>
+            {% endif %}
         </div>
     </div>
 </body>
 </html>
-
 
 
