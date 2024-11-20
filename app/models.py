@@ -74,13 +74,13 @@ class Venue(db.Model):
     profile_id = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
     seating_capacity = db.Column(db.Integer, nullable=True)  # Optional
     name_event = db.Column(db.String)  # Optional
-    style = db.Column(
-        db.String,
-        nullable=False,
-        default='Not specified',
-        check_constraint=db.CheckConstraint(
-            "style IN ('Traditional Pub', 'Modern Cocktailbar', 'Jazz Lounge', 'Industrial Bar', 'Beach Bar', 'Art Café', 'Dance Club', 'Restaurant', 'Wine Bar', 'Other', 'Not specified')"
-        )
+    style = db.Column(db.String, nullable=False, default='Not specified')
+
+    __table_args__ = (
+        db.CheckConstraint(
+            "style IN ('Traditional Pub', 'Modern Cocktailbar', 'Jazz Lounge', 'Industrial Bar', 'Beach Bar', 'Art Café', 'Dance Club', 'Restaurant', 'Wine Bar', 'Other', 'Not specified')",
+            name='check_style_valid'
+        ),
     )
 
     profile = db.relationship('Profile', backref=db.backref('venue', uselist=False))
@@ -154,4 +154,3 @@ class Review(db.Model):
 
     def __repr__(self):
         return f'<Review {self.review_id}, Rating: {self.rating}>'
-
