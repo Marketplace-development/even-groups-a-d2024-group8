@@ -13,84 +13,57 @@ def index():
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        email = request.form['email']
         profile_type = request.form.get('profile_type')
         musician_role = request.form.get('musician_role') if profile_type == 'musician' else None
-        email = request.form['email']
-        address = request.form['address']
-        phone_number = request.form['phone_number']
-        bio = request.form['bio']
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name', None)
+        band_name = request.form.get('band_name', None)
+        address = request.form.get('address', None)
+        phone_number = request.form.get('phone_number', None)
+        bio = request.form.get('bio', None)
 
-        # For soloist
-        artist_name = request.form.get('artist_name') if musician_role == 'soloist' else None
-        first_name = request.form.get('first_name') if musician_role == 'soloist' else None
-        last_name = request.form.get('last_name') if musician_role == 'soloist' else None
+        # Check if email already exists
+        if Profile.query.filter_by(email=email).first() is None:
+            new_user = Profile(
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                band_name=band_name,
+                address=address,
+                phone_number=phone_number,
+                bio=bio,
+                profile_type=profile_type,
+                musician_type=musician_role
+            )
+            db.session.add(new_user)
+            db.session.commit()
 
-        # For band
-        band_name = request.form.get('band_name') if musician_role == 'band' else None
-        leader_first_name = request.form.get('leader_first_name') if musician_role == 'band' else None
-        leader_last_name = request.form.get('leader_last_name') if musician_role == 'band' else None
+            # Add musician-specific or venue-specific records
+            if profile_type == 'musician':
+                musician = Musician(profile_id=new_user.profile_id)
+                db.session.add(musician)
+                if musician_role == 'soloist':
+                    soloist = Soloist(profile_id=new_user.profile_id, age=request.form.get('age'))
+                    db.session.add(soloist)
+                elif musician_role == 'band':
+                    band_member = BandMember(profile_id=new_user.profile_id, num_members_in_band=request.form.get('num_members'))
+                    db.session.add(band_member)
+            elif profile_type == 'venue':
+                venue = Venue(profile_id=new_user.profile_id, seating_capacity=request.form.get('seating_capacity'))
+                db.session.add(venue)
 
-        # For venue
-        venue_name = request.form.get('venue_name') if profile_type == 'venue' else None
-        owner_first_name = request.form.get('first_name') if profile_type == 'venue' else None
-        owner_last_name = request.form.get('last_name') if profile_type == 'venue' else None
+            db.session.commit()
 
-        # Ensure email is unique
-        if Profile.query.filter_by(email=email).first():
-            flash('Email is already registered.', 'error')
-            return redirect(url_for('main.register'))
+            # Save user session and redirect to upload picture
+            session['user_id'] = new_user.profile_id
+            session['profile_type'] = new_user.profile_type
+            return redirect(url_for('main.upload_picture'))
 
-        # Create profile
-        new_profile = Profile(
-            email=email,
-            address=address,
-            phone_number=phone_number,
-            bio=bio,
-            profile_type=profile_type
-        )
-
-        if profile_type == 'musician':
-            new_profile.musician_type = musician_role
-            if musician_role == 'soloist':
-                new_profile.first_name = first_name
-                new_profile.last_name = last_name
-            elif musician_role == 'band':
-                new_profile.band_name = band_name
-                new_profile.first_name = leader_first_name
-                new_profile.last_name = leader_last_name
-        elif profile_type == 'venue':
-            new_profile.first_name = owner_first_name
-            new_profile.last_name = owner_last_name
-
-        db.session.add(new_profile)
-        db.session.commit()
-
-        # Add musician or venue details
-        if profile_type == 'musician':
-            musician = Musician(profile_id=new_profile.profile_id)
-            db.session.add(musician)
-            if musician_role == 'soloist':
-                soloist = Soloist(profile_id=new_profile.profile_id, age=request.form.get('age'))
-                db.session.add(soloist)
-            elif musician_role == 'band':
-                band_member = BandMember(profile_id=new_profile.profile_id, num_members_in_band=request.form.get('num_members'))
-                db.session.add(band_member)
-        elif profile_type == 'venue':
-            venue = Venue(profile_id=new_profile.profile_id, seating_capacity=request.form.get('seating_capacity'))
-            db.session.add(venue)
-
-        db.session.commit()
-
-        # Log in the user after successful registration
-        session['user_id'] = new_profile.profile_id
-        session['profile_type'] = new_profile.profile_type
-
-        if profile_type == 'venue':
-            return redirect(url_for('main.website'))
-        else:
-            return redirect(url_for('main.website'))
+        return 'Email already registered', 400
 
     return render_template('register.html')
+
 
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -137,4 +110,25 @@ def website():
 
     return redirect(url_for('main.index'))
 
+@main.route('/upload_picture', methods=['GET', 'POST'])
+def upload_picture():
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))  # Redirect to login if user isn't logged in
+
+    if request.method == 'POST':
+        # Handle the case where a picture is uploaded
+        if 'profile_picture' in request.files:
+            profile_picture = request.files['profile_picture']
+            if profile_picture:
+                user = Profile.query.get(session['user_id'])
+                user.profile_picture = profile_picture.read()  # Save the binary data
+                db.session.commit()
+        
+        # Redirect to the appropriate dashboard after uploading or skipping
+        if session.get('profile_type') == 'musician':
+            return redirect(url_for('websitemusician'))
+        else:
+            return redirect(url_for('websitevenue'))
+
+    return render_template('upload_picture.html')
 
