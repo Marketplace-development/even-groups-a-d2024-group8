@@ -1,23 +1,25 @@
 from flask_sqlalchemy import SQLAlchemy
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 db = SQLAlchemy()
 
 class Profile(db.Model):
     __tablename__ = 'profile'
 
-    profile_id = db.Column(db.String(7), primary_key=True)  # Char(7)
-    first_name = db.Column(db.String, nullable=True)  # Nullable for bands/venues
-    last_name = db.Column(db.String, nullable=True)  # Nullable for bands/venues
-    address = db.Column(db.String)  # Optional
-    email = db.Column(db.String, nullable=False, unique=True)  # Unique email for login
-    phone_number = db.Column(db.String)  # Optional
-    bio = db.Column(db.String)  # Optional
-    profile_picture = db.Column(db.LargeBinary)  # Optional
-    pictures = db.Column(db.LargeBinary)  # Optional
-    rating = db.Column(db.Numeric(2, 1), default=0.0, nullable=True)  # Default rating
-    profile_type = db.Column(db.String, nullable=False)  # 'musician' or 'venue'
-    musician_type = db.Column(db.String, nullable=True)  # 'soloist' or 'band', only for musicians
-    band_name = db.Column(db.String, nullable=True)  # Only for bands
+    profile_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    first_name = db.Column(db.String, nullable=True)
+    last_name = db.Column(db.String, nullable=True)
+    address = db.Column(db.String)
+    email = db.Column(db.String, nullable=False, unique=True)
+    phone_number = db.Column(db.String)
+    bio = db.Column(db.String)
+    profile_picture = db.Column(db.LargeBinary)
+    pictures = db.Column(db.LargeBinary)
+    rating = db.Column(db.Numeric(2, 1), default=0.0, nullable=True)
+    profile_type = db.Column(db.String, nullable=False)
+    musician_type = db.Column(db.String, nullable=True)
+    band_name = db.Column(db.String, nullable=True)
 
     __table_args__ = (
         db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range'),
@@ -31,11 +33,11 @@ class Profile(db.Model):
 class Musician(db.Model):
     __tablename__ = 'musician'
 
-    profile_id = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    genre = db.Column(db.String, nullable=False)  # Genre is now required
-    price_per_hour = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)  # Default value for price
-    link_to_songs = db.Column(db.String)  # Optional (changed from LargeBinary to String for better URL support)
-    equipment = db.Column(db.Boolean, default=False)  # Optional
+    profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
+    genre = db.Column(db.String, nullable=False)
+    price_per_hour = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)
+    link_to_songs = db.Column(db.String)
+    equipment = db.Column(db.Boolean, default=False)
 
     profile = db.relationship('Profile', backref=db.backref('musician', uselist=False))
 
@@ -46,8 +48,8 @@ class Musician(db.Model):
 class Soloist(db.Model):
     __tablename__ = 'soloist'
 
-    profile_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    date_of_birth = db.Column(db.Date, nullable=False)  # Required field for soloists
+    profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
+    date_of_birth = db.Column(db.Date, nullable=False)
 
     musician = db.relationship('Musician', backref=db.backref('soloist', uselist=False))
 
@@ -58,8 +60,8 @@ class Soloist(db.Model):
 class BandMember(db.Model):
     __tablename__ = 'band_member'
 
-    profile_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    num_members_in_band = db.Column(db.Integer, nullable=False, default=1)  # Default is 1
+    profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
+    num_members_in_band = db.Column(db.Integer, nullable=False, default=1)
 
     musician = db.relationship('Musician', backref=db.backref('band_member', uselist=False))
 
@@ -70,8 +72,8 @@ class BandMember(db.Model):
 class Venue(db.Model):
     __tablename__ = 'venue'
 
-    profile_id = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
-    name_event = db.Column(db.String)  # Optional
+    profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
+    name_event = db.Column(db.String)
     style = db.Column(db.String, nullable=False, default='Not specified')
 
     __table_args__ = (
@@ -90,16 +92,15 @@ class Venue(db.Model):
 class Booking(db.Model):
     __tablename__ = 'booking'
 
-    booking_id = db.Column(db.String(7), primary_key=True)
-    musician_id = db.Column(db.String(7), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
-    venue_id = db.Column(db.String(7), db.ForeignKey('venue.profile_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
+    booking_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    musician_id = db.Column(UUID(as_uuid=True), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
+    venue_id = db.Column(UUID(as_uuid=True), db.ForeignKey('venue.profile_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
     status = db.Column(db.String, nullable=False)
     duration = db.Column(db.Interval)
     date_booking = db.Column(db.TIMESTAMP(timezone=True))
-    booked_by = db.Column(db.String(7), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
-    booked_in = db.Column(db.String(7), db.ForeignKey('venue.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
+    booked_by = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
+    booked_in = db.Column(UUID(as_uuid=True), db.ForeignKey('venue.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
 
-    # Relationships with explicit foreign_keys
     musician = db.relationship('Musician', backref=db.backref('bookings', lazy=True))
     venue = db.relationship('Venue', backref=db.backref('venue_bookings', lazy=True), foreign_keys=[venue_id])
     venue_booking = db.relationship('Venue', backref=db.backref('booked_venues', lazy=True), foreign_keys=[booked_in])
@@ -116,8 +117,8 @@ class Booking(db.Model):
 class Payment(db.Model):
     __tablename__ = 'payment'
 
-    payment_id = db.Column(db.String(7), primary_key=True)
-    booking_id = db.Column(db.String(7), db.ForeignKey('booking.booking_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
+    payment_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    booking_id = db.Column(UUID(as_uuid=True), db.ForeignKey('booking.booking_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     method = db.Column(db.String, nullable=False)
     date_payment = db.Column(db.TIMESTAMP(timezone=True), default=db.func.current_timestamp())
@@ -137,10 +138,10 @@ class Payment(db.Model):
 class Review(db.Model):
     __tablename__ = 'review'
 
-    review_id = db.Column(db.String(7), primary_key=True)
-    booking_id = db.Column(db.String(7), db.ForeignKey('booking.booking_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
+    review_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    booking_id = db.Column(UUID(as_uuid=True), db.ForeignKey('booking.booking_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
     rating = db.Column(db.Numeric(2, 1), nullable=False)
-    comment = db.Column(db.String, nullable=True)  # Optional
+    comment = db.Column(db.String, nullable=True)
     role_reviewer = db.Column(db.String, nullable=False)
 
     booking = db.relationship('Booking', backref=db.backref('reviews', lazy=True))
