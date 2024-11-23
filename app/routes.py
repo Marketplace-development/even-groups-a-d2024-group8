@@ -322,4 +322,62 @@ def venue_profile(user_id):
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
     return render_template('venue_profile.html', user=user, venue=venue, profile_picture=profile_picture)
+@main.route('/edit_band_profile/<user_id>')
+def edit_band_profile(user_id):
+    # Fetch user and band data
+    user = Profile.query.get(user_id)
+    band = Band.query.get(user_id)
+
+    # Handle cases where the user or band is not found
+    if not user or not band:
+        flash("Profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Convert the profile picture to Base64 if it exists
+    profile_picture = None
+    if user.profile_picture:
+        profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+    # Render the edit_band_profile.html with all necessary data
+    return render_template('edit_band_profile.html', user=user, band=band, profile_picture=profile_picture)
+
+
+@main.route('/update_band_profile/<user_id>', methods=['POST'])
+def update_band_profile(user_id):
+    # Fetch user and band data
+    user = Profile.query.get(user_id)
+    band = Band.query.get(user_id)
+
+    # Handle cases where the user or band is not found
+    if not user or not band:
+        flash("Profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Update text fields from the form
+    user.bio = request.form.get('bio', user.bio)
+    user.musician.genre = request.form.get('genre', user.musician.genre)
+    user.musician.price_per_hour = request.form.get('price_per_hour', user.musician.price_per_hour)
+    user.musician.link_to_songs = request.form.get('link_to_songs', user.musician.link_to_songs)
+    user.musician.equipment = request.form.get('equipment', 'false') == 'true'
+    user.country = request.form.get('country', user.country)
+    user.city = request.form.get('city', user.city)
+    user.street_name = request.form.get('street_name', user.street_name)
+    user.house_number = request.form.get('house_number', user.house_number)
+    user.first_name = request.form.get('first_name', user.first_name)
+    user.last_name = request.form.get('last_name', user.last_name)
+    user.phone_number = request.form.get('phone_number', user.phone_number)
+    user.email = request.form.get('email', user.email)
+
+    # Update profile picture if a new one is uploaded
+    if 'profile_picture' in request.files:
+        profile_picture = request.files['profile_picture']
+        if profile_picture:
+            user.profile_picture = profile_picture.read()
+
+    # Commit changes to the database
+    db.session.commit()
+
+    # Provide feedback and redirect to the updated profile page
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('main.band_profile', user_id=user_id))
 
