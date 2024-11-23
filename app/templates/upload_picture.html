@@ -49,6 +49,7 @@
             justify-content: center;
             overflow: hidden;
             transition: background-color 0.3s;
+            cursor: move; /* Indicates that the image can be moved */
         }
         .file-input-container:hover {
             background-color: #e0d0f0; /* Light purple background */
@@ -63,10 +64,11 @@
             cursor: pointer;
         }
         .file-preview {
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-radius: 50%;
+            position: absolute;
         }
         .upload-box button {
             background-color: #6a00b5; /* Matching the gradient background */
@@ -87,7 +89,7 @@
     <div class="upload-box">
         <h1>Upload Profile Picture</h1>
         <form method="POST" enctype="multipart/form-data" onsubmit="return checkFile()">
-            <div class="file-input-container">
+            <div class="file-input-container" onmousedown="startDrag(event)" onmouseup="endDrag()">
                 <img id="preview" class="file-preview" src="path/to/default/profile/image.png"> <!-- Add your path to a default image -->
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()">
             </div>
@@ -96,19 +98,54 @@
         </form>
     </div>
     <script>
+        let dragging = false;
+
         function previewFile() {
             const preview = document.getElementById('preview');
             const file = document.querySelector('input[type="file"]').files[0];
             const reader = new FileReader();
 
             reader.addEventListener("load", function () {
-                // convert image file to base64 string and display it
+                // Convert image file to base64 string and display it
                 preview.src = reader.result;
+                preview.style.left = '0px'; // Reset position
+                preview.style.top = '0px'; // Reset position
             }, false);
 
             if (file) {
                 reader.readAsDataURL(file);
             }
+        }
+
+        function startDrag(e) {
+            dragging = true;
+            let preview = document.getElementById('preview');
+            preview.style.position = 'relative';
+            let shiftX = e.clientX - preview.getBoundingClientRect().left;
+            let shiftY = e.clientY - preview.getBoundingClientRect().top;
+
+            function moveAt(pageX, pageY) {
+                preview.style.left = pageX - shiftX - preview.parentNode.getBoundingClientRect().left + 'px';
+                preview.style.top = pageY - shiftY - preview.parentNode.getBoundingClientRect().top + 'px';
+            }
+
+            function onMouseMove(event) {
+                if (dragging) {
+                    moveAt(event.pageX, event.pageY);
+                }
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            preview.onmouseup = function() {
+                document.removeEventListener('mousemove', onMouseMove);
+                preview.onmouseup = null;
+                dragging = false;
+            };
+        }
+
+        function endDrag() {
+            dragging = false;
         }
 
         function checkFile() {
