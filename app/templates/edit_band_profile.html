@@ -22,15 +22,36 @@
             margin: 50px auto;
             color: #000;
         }
+        .profile-picture-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
         .profile-picture {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background-color: #ccc; /* Placeholder for image */
-            margin: 20px auto;
+            background-color: #ccc;
+            margin: 0 auto 10px;
             background-image: url("data:image/jpeg;base64,{{ profile_picture }}");
             background-size: cover;
             background-position: center;
+        }
+        .image-container {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 5px solid #6a00b5;
+        }
+        .image-container img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            max-width: none;
         }
         h1 {
             text-align: center;
@@ -56,35 +77,31 @@
             padding: 15px;
             background-color: #f9f9f9;
         }
-        .separator {
-            border-top: 2px solid #6a00b5;
-            margin: 20px 0;
-        }
         button {
             display: block;
             margin: 20px auto;
             background-color: #6a00b5;
             color: #fff;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         button:hover {
             background-color: #4e008f;
         }
-        input, select, textarea {
-            width: 90%; /* Keep inputs within parent boxes */
+        input, select {
+            width: 90%;
             padding: 10px;
             margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-sizing: border-box;
-            display: block; /* Stack the input below the label */
+            display: block;
         }
         label {
-            display: block; /* Ensure labels appear above inputs */
+            display: block;
             margin-top: 10px;
         }
     </style>
@@ -92,8 +109,16 @@
 <body>
     <form action="{{ url_for('main.update_band_profile', user_id=band.profile_id) }}" method="post" enctype="multipart/form-data">
         <div class="profile-box">
-            <div class="profile-picture"></div>
             <h1>Edit {{ band.band_name }}</h1>
+
+            <!-- Profile Picture Upload -->
+            <div class="profile-picture-container">
+                <div class="image-container" id="image-container">
+                    <img id="preview" src="" alt="Profile Preview" style="display: none;">
+                    <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
+                </div>
+                <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
+            </div>
 
             <!-- Band Information -->
             <p class="field">
@@ -162,13 +187,26 @@
                 </div>
             </div>
 
-            <p class="field">
-                <label for="profile_picture">Profile Picture:</label>
-                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-            </p>
-
             <button type="submit">Save Changes</button>
         </div>
     </form>
+    <script>
+        const container = document.getElementById('image-container');
+        const preview = document.getElementById('preview');
+
+        function previewFile() {
+            const file = document.querySelector('input[type="file"]').files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
 </body>
 </html>
