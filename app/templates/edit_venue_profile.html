@@ -112,14 +112,11 @@
         <div class="profile-box">
             <!-- Profile Picture -->
             <div class="image-container" id="image-container">
-                <img id="preview" 
-                     src="data:image/jpeg;base64,{{ profile_picture }}" 
-                     alt="Profile Preview" 
-                     style="display: block;">
+                <img id="preview" src="" alt="Profile Preview" style="display: none;">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
-            
+
             <!-- Venue Name -->
             <p class="field">
                 <label for="name_event"><strong>Venue Name:</strong></label>

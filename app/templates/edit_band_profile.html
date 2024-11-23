@@ -76,6 +76,11 @@
             border-radius: 5px;
             display: block;
         }
+        select:hover {
+            border: 2px solid #6a00b5; /* Purple border on hover */
+            outline: none;
+            transition: border 0.3s ease; /* Smooth transition */
+        }
         textarea {
             resize: none; /* Prevent resizing */
         }
@@ -112,11 +117,14 @@
         <div class="profile-box">
             <!-- Profile Picture -->
             <div class="image-container" id="image-container">
-                <img id="preview" src="" alt="Profile Preview" style="display: none;">
+                <img 
+                    id="preview"
+                    src="data:image/jpeg;base64,{{ profile_picture or '' }}" 
+                    alt="Profile Preview" 
+                    style="{{ 'display: block;' if profile_picture else 'display: none;' }}">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
-
             <!-- Band Name -->
             <p class="field">
                 <label for="band_name"><strong>Band Name:</strong></label>
@@ -124,9 +132,23 @@
             </p>
 
             <!-- Band Information -->
+            <!-- Band Information -->
             <p class="field">
                 <label for="genre"><strong>Genre:</strong></label>
-                <input type="text" id="genre" name="genre" value="{{ user.musician.genre or '' }}">
+                <select id="genre" class="dropdown-select" name="genre">
+                    <option value="" {% if not user.musician.genre %}selected{% endif %}>Choose a Genre</option>
+                    <option value="Pop" {% if user.musician.genre == 'Pop' %}selected{% endif %}>Pop</option>
+                    <option value="Rock" {% if user.musician.genre == 'Rock' %}selected{% endif %}>Rock</option>
+                    <option value="Hip-Hop/Rap" {% if user.musician.genre == 'Hip-Hop/Rap' %}selected{% endif %}>Hip-Hop/Rap</option>
+                    <option value="Jazz" {% if user.musician.genre == 'Jazz' %}selected{% endif %}>Jazz</option>
+                    <option value="Electronic Dance Music (EDM)" {% if user.musician.genre == 'Electronic Dance Music (EDM)' %}selected{% endif %}>Electronic Dance Music (EDM)</option>
+                    <option value="Classical" {% if user.musician.genre == 'Classical' %}selected{% endif %}>Classical</option>
+                    <option value="Reggae" {% if user.musician.genre == 'Reggae' %}selected{% endif %}>Reggae</option>
+                    <option value="Blues" {% if user.musician.genre == 'Blues' %}selected{% endif %}>Blues</option>
+                    <option value="Country" {% if user.musician.genre == 'Country' %}selected{% endif %}>Country</option>
+                    <option value="R&B" {% if user.musician.genre == 'R&B' %}selected{% endif %}>R&B</option>
+                    <option value="Other" {% if user.musician.genre == 'Other' %}selected{% endif %}>Other</option>
+                </select>
             </p>
             <p class="field">
                 <label for="price_per_hour"><strong>Price per Hour (€):</strong></label>
@@ -155,7 +177,10 @@
                 <div class="box">
                     <p class="field">
                         <label for="country"><strong>Country:</strong></label>
-                        <input type="text" id="country" name="country" value="{{ user.country or '' }}">
+                        <select id="country" class="dropdown-select" name="country">
+                            <option value="" {% if not user.country %}selected{% endif %}>Select Country</option>
+                            <option value="Belgium" {% if user.country == 'Belgium' %}selected{% endif %}>Belgium</option>
+                        </select>
                     </p>
                     <p class="field">
                         <label for="city"><strong>City:</strong></label>
