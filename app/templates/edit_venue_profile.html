@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Band Profile - MelodyMatch</title>
+    <title>Edit Venue Profile - MelodyMatch</title>
     <!-- Import DM Sans font -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -108,45 +108,41 @@
     </style>
 </head>
 <body>
-    <form action="{{ url_for('main.update_band_profile', user_id=band.profile_id) }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url_for('main.update_venue_profile', user_id=venue.profile_id) }}" method="post" enctype="multipart/form-data">
         <div class="profile-box">
             <!-- Profile Picture -->
             <div class="image-container" id="image-container">
-                <img id="preview" src="" alt="Profile Preview" style="display: none;">
+                <img id="preview" 
+                     src="data:image/jpeg;base64,{{ profile_picture }}" 
+                     alt="Profile Preview" 
+                     style="display: block;">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
-
-            <!-- Band Name -->
+            
+            <!-- Venue Name -->
             <p class="field">
-                <label for="band_name"><strong>Band Name:</strong></label>
-                <input type="text" id="band_name" name="band_name" value="{{ band.band_name or '' }}" required>
+                <label for="name_event"><strong>Venue Name:</strong></label>
+                <input type="text" id="name_event" name="name_event" value="{{ venue.name_event or '' }}" required>
             </p>
 
-            <!-- Band Information -->
+            <!-- Venue Style -->
             <p class="field">
-                <label for="genre"><strong>Genre:</strong></label>
-                <input type="text" id="genre" name="genre" value="{{ user.musician.genre or '' }}">
-            </p>
-            <p class="field">
-                <label for="price_per_hour"><strong>Price per Hour (€):</strong></label>
-                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01">
-            </p>
-            <p class="field">
-                <label for="link_to_songs"><strong>Link to Songs:</strong></label>
-                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ user.musician.link_to_songs or '' }}">
-            </p>
-            <p class="field">
-                <label for="equipment"><strong>Has Equipment:</strong></label>
-                <select id="equipment" name="equipment">
-                    <option value="true" {% if user.musician.equipment %}selected{% endif %}>Yes</option>
-                    <option value="false" {% if not user.musician.equipment %}selected{% endif %}>No</option>
+                <label for="venue_style"><strong>Venue Style:</strong></label>
+                <select id="venue_style" class="dropdown-select" name="venue_style">
+                    <option value="" {% if not venue.style %}selected{% endif %}>Choose a Style</option>
+                    <option value="Traditional Pub" {% if venue.style == 'Traditional Pub' %}selected{% endif %}>Traditional Pub</option>
+                    <option value="Modern Cocktailbar" {% if venue.style == 'Modern Cocktailbar' %}selected{% endif %}>Modern Cocktailbar</option>
+                    <option value="Jazz Lounge" {% if venue.style == 'Jazz Lounge' %}selected{% endif %}>Jazz Lounge</option>
+                    <option value="Industrial Bar" {% if venue.style == 'Industrial Bar' %}selected{% endif %}>Industrial Bar</option>
+                    <option value="Beach Bar" {% if venue.style == 'Beach Bar' %}selected{% endif %}>Beach Bar</option>
+                    <option value="Art Café" {% if venue.style == 'Art Café' %}selected{% endif %}>Art Café</option>
+                    <option value="Dance Club" {% if venue.style == 'Dance Club' %}selected{% endif %}>Dance Club</option>
+                    <option value="Restaurant" {% if venue.style == 'Restaurant' %}selected{% endif %}>Restaurant</option>
+                    <option value="Wine Bar" {% if venue.style == 'Wine Bar' %}selected{% endif %}>Wine Bar</option>
+                    <option value="Other" {% if venue.style == 'Other' %}selected{% endif %}>Other</option>
+                    <option value="Not specified" {% if venue.style == 'Not specified' %}selected{% endif %}>Not specified</option>
                 </select>
-            </p>
-            <p class="field">
-                <label for="num_members_in_band"><strong>Number of Band Members:</strong></label>
-                <input type="number" id="num_members_in_band" name="num_members_in_band" 
-                       value="{{ band.num_members_in_band or '' }}" min="1" required>
             </p>
 
             <!-- Address Section -->
@@ -155,7 +151,10 @@
                 <div class="box">
                     <p class="field">
                         <label for="country"><strong>Country:</strong></label>
-                        <input type="text" id="country" name="country" value="{{ user.country or '' }}">
+                        <select id="country" class="dropdown-select" name="country">
+                            <option value="" {% if not user.country %}selected{% endif %}>Select Country</option>
+                            <option value="Belgium" {% if user.country == 'Belgium' %}selected{% endif %}>Belgium</option>
+                        </select>
                     </p>
                     <p class="field">
                         <label for="city"><strong>City:</strong></label>
@@ -198,7 +197,7 @@
             <!-- Buttons -->
             <div class="button-group">
                 <button type="submit">Save Changes</button>
-                <a href="{{ url_for('main.band_profile', user_id=band.profile_id) }}" class="button">Return</a>
+                <a href="{{ url_for('main.venue_profile', user_id=venue.profile_id) }}" class="button">Return</a>
             </div>
         </div>
     </form>

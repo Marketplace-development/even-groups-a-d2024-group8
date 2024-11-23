@@ -103,13 +103,14 @@
             {{ user.bio or 'No bio provided.' }}
         </div>
 
-        <!-- Band Information -->
+        <!-- Band Information --><!-- Band Information -->
         <p class="field"><strong>Genre:</strong> {{ user.musician.genre or 'Not Specified' }}</p>
         <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }}</p>
         <p class="field"><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(user.musician.price_per_hour) if user.musician.price_per_hour else 'Not Specified' }}</p>
         <p class="field"><strong>Link to Songs:</strong> <a href="{{ user.musician.link_to_songs }}" target="_blank">{{ user.musician.link_to_songs or 'Not Specified' }}</a></p>
         <p class="field"><strong>Has Equipment:</strong> {{ 'Yes' if user.musician.equipment else 'No' }}</p>
-
+        <p class="field"><strong>Number of Band Members:</strong> {{ band.num_members_in_band or 'Not Specified' }}</p>
+        
         <!-- Address Section -->
         <div class="section">
             <h2>Address</h2>
