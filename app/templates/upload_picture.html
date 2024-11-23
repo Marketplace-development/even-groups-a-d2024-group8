@@ -38,16 +38,21 @@
             margin-bottom: 20px;
         }
         .image-container {
-            width: 300px; /* Larger viewable area */
+            width: 300px;
             height: 300px;
             position: relative;
             overflow: hidden; /* Ensures the image stays within the bounds */
             border-radius: 50%; /* Creates a circular mask */
             margin-bottom: 20px;
+            background: #f0f0f0; /* Light background for placeholder */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .image-container img {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%; 
+            left: 50%;
             transform: translate(-50%, -50%);
             cursor: grab; /* Indicates the image can be moved */
             max-width: none; /* Ensures the image's dimensions are not restricted */
@@ -72,7 +77,7 @@
         <h1>Upload Profile Picture</h1>
         <form method="POST" enctype="multipart/form-data" onsubmit="return checkFile()">
             <div class="image-container">
-                <img id="preview" src="path/to/default/profile/image.png"> <!-- Default image path -->
+                <img id="preview" src="path/to/default/profile/image.png" style="width: auto; height: 100%;"> <!-- Default image path -->
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
@@ -81,6 +86,10 @@
         </form>
     </div>
     <script>
+        let scale = 1; // Initialize zoom level
+        const MIN_SCALE = 1; // Minimum zoom level
+        const MAX_SCALE = 3; // Maximum zoom level
+
         function previewFile() {
             const preview = document.getElementById('preview');
             const file = document.querySelector('input[type="file"]').files[0];
@@ -88,35 +97,44 @@
 
             reader.onload = function (e) {
                 preview.src = e.target.result;
-                preview.style.width = "auto"; // Reset width
-                preview.style.height = "100%"; // Fit height to container initially
 
-                // Allow user to move image inside the container
+                // Reset styles for new image
+                scale = 1;
+                preview.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
                 let isDragging = false;
-                let startX, startY, origX, origY;
+                let startX, startY;
 
+                // Dragging functionality
                 preview.addEventListener('mousedown', function(e) {
                     isDragging = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    origX = preview.offsetLeft;
-                    origY = preview.offsetTop;
+                    startX = e.clientX - preview.offsetLeft;
+                    startY = e.clientY - preview.offsetTop;
                     window.addEventListener('mousemove', move, false);
-                }, false);
+                });
 
                 window.addEventListener('mouseup', function() {
                     isDragging = false;
                     window.removeEventListener('mousemove', move, false);
-                }, false);
+                });
 
                 function move(e) {
                     if (isDragging) {
-                        let diffX = e.clientX - startX;
-                        let diffY = e.clientY - startY;
-                        preview.style.left = (origX + diffX) + 'px';
-                        preview.style.top = (origY + diffY) + 'px';
+                        preview.style.left = `${e.clientX - startX}px`;
+                        preview.style.top = `${e.clientY - startY}px`;
                     }
                 }
+
+                // Zoom functionality
+                document.querySelector('.image-container').addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    if (e.deltaY < 0 && scale < MAX_SCALE) {
+                        scale += 0.1;
+                    } else if (e.deltaY > 0 && scale > MIN_SCALE) {
+                        scale -= 0.1;
+                    }
+                    preview.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                });
             };
 
             if (file) {

@@ -18,6 +18,23 @@
             padding: 20px;
             color: #fff;
         }
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #6a00b5;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .logout-button:hover {
+            background-color: #4e008f;
+        }
         .main-box {
             background-color: #fff;
             color: #000;
@@ -55,6 +72,10 @@
     </style>
 </head>
 <body>
+    <!-- Logout Button -->
+    <a href="{{ url_for('main.logout') }}" class="logout-button">Logout</a>
+    
+    <!-- Main Content -->
     <div class="main-box">
         <h1>Welcome to MelodyMatch!</h1>
         <p>Your gateway to connecting with amazing local music experiences.</p>

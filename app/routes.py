@@ -194,12 +194,11 @@ def login():
             return redirect(url_for('main.login'))
     return render_template('login.html')
 
-@main.route('/logout', methods=['POST'])
+@main.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop('user_id', None)
     session.pop('profile_type', None)
     flash("You have been logged out.", "success")
-    # Redirect to the index which will take them to the login page if not logged in
     return redirect(url_for('main.index'))
 
 @main.route('/website')
