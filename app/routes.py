@@ -2,6 +2,7 @@ from flask import Blueprint, request, redirect, url_for, render_template, sessio
 from app.models import db, Profile, Musician, Soloist, Band, Venue  # Import db and models from app.models
 import uuid
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 main = Blueprint('main', __name__)
 
@@ -23,7 +24,10 @@ def register():
             profile_type = request.form.get('profile_type')
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
-            address = request.form.get('address')
+            country = request.form.get('country')
+            city = request.form.get('city')
+            street_name = request.form.get('street_name')
+            house_number = request.form.get('house_number')
             phone_number = request.form.get('phone_number')
             bio = request.form.get('bio')
 
@@ -43,10 +47,13 @@ def register():
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
-                profile_type=profile_type,
-                address=address,
+                country=country,
+                city=city,
+                street_name=street_name,
+                house_number=house_number,
                 phone_number=phone_number,
-                bio=bio
+                bio=bio,
+                profile_type=profile_type
             )
             db.session.add(new_user)
             db.session.commit()
@@ -160,11 +167,17 @@ def register():
             flash("Registration successful! Please upload your profile picture.", "success")
             return redirect(url_for('main.upload_picture'))
 
+        except IntegrityError as e:
+            db.session.rollback()
+            flash("This email has already been registered. Please use a different email.", "error")
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash("A database error occurred. Please try again.", "error")
+            print(f"SQLAlchemy error: {e}")  # This will print the error to your server logs, which can help in debugging.
         except Exception as e:
             db.session.rollback()
-            print(f"Registration error: {e}")  # Debugging line
-            flash(f"An error occurred during registration. Please try again.", "error")
-            return redirect(url_for('main.register'))
+            flash(f"An unexpected error occurred: {str(e)}. Please try again.", "error")
+            print(f"Unexpected error: {e}")  # Debugging line
 
     # Render registration page for GET request
     return render_template('register.html')

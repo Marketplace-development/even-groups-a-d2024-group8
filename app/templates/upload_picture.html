@@ -26,25 +26,47 @@
             text-align: center;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Subtle shadow around the box */
             width: 100%;
-            max-width: 400px;
+            max-width: 600px; /* Increased width */
             position: relative;
-        }
-        .upload-box::before {
-            content: '';
-            position: absolute;
-            inset: 10px; /* Adds a thin border inside the box */
-            border: 1px solid #6a00b5; /* Color matching the gradient */
-            border-radius: 15px; /* Match the border-radius */
-            pointer-events: none; /* Allows clicking on elements inside the box */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .upload-box h1 {
             font-size: 2.5rem;
             color: #6a00b5; /* Matching the gradient background */
             margin-bottom: 20px;
         }
-        .upload-box input[type="file"] {
-            display: block;
-            margin: 20px auto;
+        .file-input-container {
+            margin: 20px;
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+        .file-input-container:hover {
+            background-color: #e0d0f0; /* Light purple background */
+        }
+        .file-input-container input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-preview {
+            width: 90%;
+            height: 90%;
+            object-fit: cover;
+            border-radius: 50%;
         }
         .upload-box button {
             background-color: #6a00b5; /* Matching the gradient background */
@@ -64,13 +86,39 @@
 <body>
     <div class="upload-box">
         <h1>Upload Profile Picture</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="profile_picture" accept="image/*">
-            <div>
-                <button type="submit">Upload</button>
-                <button type="submit" formaction="{{ url_for('main.upload_picture') }}">Skip</button>
+        <form method="POST" enctype="multipart/form-data" onsubmit="return checkFile()">
+            <div class="file-input-container">
+                <img id="preview" class="file-preview" src="path/to/default/profile/image.png"> <!-- Add your path to a default image -->
+                <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()">
             </div>
+            <button type="submit">Upload</button>
+            <button type="submit" formaction="{{ url_for('main.upload_picture') }}">Skip</button>
         </form>
     </div>
+    <script>
+        function previewFile() {
+            const preview = document.getElementById('preview');
+            const file = document.querySelector('input[type="file"]').files[0];
+            const reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                // convert image file to base64 string and display it
+                preview.src = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function checkFile() {
+            const file = document.querySelector('input[type="file"]').files[0];
+            if (!file) {
+                alert("Please select a file before uploading.");
+                return false; // Prevent form submission
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>
