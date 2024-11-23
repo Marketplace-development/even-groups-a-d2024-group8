@@ -1,15 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
-import uuid
 from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 db = SQLAlchemy()
 
 class Profile(db.Model):
     __tablename__ = 'profile'
-
     profile_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    first_name = db.Column(db.String, nullable=True)
-    last_name = db.Column(db.String, nullable=True)
+    first_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(db.String, nullable=False)
     address = db.Column(db.String)
     email = db.Column(db.String, nullable=False, unique=True)
     phone_number = db.Column(db.String)
@@ -19,7 +18,6 @@ class Profile(db.Model):
     rating = db.Column(db.Numeric(2, 1), default=0.0, nullable=True)
     profile_type = db.Column(db.String, nullable=False)
     musician_type = db.Column(db.String, nullable=True)
-    band_name = db.Column(db.String, nullable=True)
 
     __table_args__ = (
         db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range'),
@@ -29,44 +27,40 @@ class Profile(db.Model):
     def __repr__(self):
         return f'<Profile {self.profile_id}, {self.email}>'
 
-
 class Musician(db.Model):
     __tablename__ = 'musician'
-
     profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
     genre = db.Column(db.String, nullable=False)
-    price_per_hour = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)
+    price_per_hour = db.Column(db.Numeric(10, 2), nullable=False)
     link_to_songs = db.Column(db.String)
-    equipment = db.Column(db.Boolean, default=False)
+    equipment = db.Column(db.Boolean, nullable=False)
 
     profile = db.relationship('Profile', backref=db.backref('musician', uselist=False))
 
     def __repr__(self):
         return f'<Musician {self.profile_id}, Genre: {self.genre}>'
 
-
 class Soloist(db.Model):
     __tablename__ = 'soloist'
-
     profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
     date_of_birth = db.Column(db.Date, nullable=False)
+    artist_name = db.Column(db.String)  # Optional
 
     musician = db.relationship('Musician', backref=db.backref('soloist', uselist=False))
 
     def __repr__(self):
         return f'<Soloist {self.profile_id}, DOB: {self.date_of_birth}>'
 
-
-class BandMember(db.Model):
-    __tablename__ = 'band_member'
-
+class Band(db.Model):
+    __tablename__ = 'band'
     profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
+    band_name = db.Column(db.String, nullable=False)
     num_members_in_band = db.Column(db.Integer, nullable=False, default=1)
 
-    musician = db.relationship('Musician', backref=db.backref('band_member', uselist=False))
+    musician = db.relationship('Musician', backref=db.backref('band', uselist=False))
 
     def __repr__(self):
-        return f'<BandMember {self.profile_id}, Members: {self.num_members_in_band}>'
+        return f'<Band {self.profile_id}, Members: {self.num_members_in_band}>'
 
 
 class Venue(db.Model):

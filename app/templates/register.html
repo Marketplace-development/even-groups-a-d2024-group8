@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,6 +120,20 @@
             musicianRoleDropdownContainer.style.display = profileType === 'musician' ? 'block' : 'none';
             musicianFields.style.display = profileType === 'musician' ? 'block' : 'none';
             venueFields.style.display = profileType === 'venue' ? 'block' : 'none';
+
+            // Adjust required attributes for venue
+            const venueNameInput = document.querySelector('input[name="venue_name"]');
+            if (profileType === 'venue') {
+                venueNameInput.required = true;
+
+                // Remove required attributes from musician fields
+                setMusicianFieldsRequired(false);
+            } else {
+                venueNameInput.required = false;
+
+                // Set required attributes for musician fields
+                setMusicianFieldsRequired(true);
+            }
         }
 
         function handleMusicianRoleChange() {
@@ -121,18 +144,55 @@
             if (musicianRole === 'soloist') {
                 soloistFields.style.display = 'block';
                 bandFields.style.display = 'none';
+
+                // Adjust required attributes for soloist
+                document.querySelector('input[name="date_of_birth"]').required = true;
+                document.querySelector('input[name="band_name"]').required = false;
+                document.querySelector('input[name="num_members_in_band"]').required = false;
             } else if (musicianRole === 'band') {
                 soloistFields.style.display = 'none';
                 bandFields.style.display = 'block';
+
+                // Adjust required attributes for band
+                document.querySelector('input[name="band_name"]').required = true;
+                document.querySelector('input[name="num_members_in_band"]').required = true;
+                document.querySelector('input[name="date_of_birth"]').required = false;
             }
         }
+
+        function setMusicianFieldsRequired(isRequired) {
+            // Set or remove 'required' attribute for musician fields
+            document.querySelector('input[name="price_per_hour"]').required = isRequired;
+            document.querySelector('select[name="equipment"]').required = isRequired;
+
+            // For soloist fields
+            const dateOfBirthInput = document.querySelector('input[name="date_of_birth"]');
+            if (dateOfBirthInput) {
+                dateOfBirthInput.required = isRequired && document.getElementById('musician-role-dropdown').value === 'soloist';
+            }
+
+            // For band fields
+            const bandNameInput = document.querySelector('input[name="band_name"]');
+            const numMembersInput = document.querySelector('input[name="num_members_in_band"]');
+            if (bandNameInput && numMembersInput) {
+                const isBand = document.getElementById('musician-role-dropdown').value === 'band';
+                bandNameInput.required = isRequired && isBand;
+                numMembersInput.required = isRequired && isBand;
+            }
+        }
+
+        // Initialize required attributes on page load
+        window.onload = function() {
+            handleDropdownChange();
+            handleMusicianRoleChange();
+        };
     </script>
 </head>
 <body>
     <div class="register-box">
         <h1>Register</h1>
         <hr>
-        <form method="post" action="/register">
+        <form method="post" action="{{ url_for('main.register') }}">
             <div class="dropdown-container">
                 <label for="profile-type-dropdown">Profile Type:</label>
                 <select id="profile-type-dropdown" class="dropdown-select" onchange="handleDropdownChange()" name="profile_type">
@@ -140,7 +200,7 @@
                     <option value="venue">Venue</option>
                 </select>
             </div>
-            
+
             <!-- Musician Role Dropdown -->
             <div class="dropdown-container" id="musician-role-dropdown-container">
                 <label for="musician-role-dropdown">Musician Role:</label>
@@ -160,43 +220,45 @@
             <div id="venue_fields" style="display: none;">
                 <label for="venue_name">Venue Name:</label>
                 <input type="text" name="venue_name">
-
-                <label for="venue_style">Venue Style:</label>
-                    <select id="venue_style" class="dropdown-select" name="venue_style">
-                        <option value="" selected>Choose a Style</option>
-                        <option value="Traditional Pub">Traditional Pub</option>
-                        <option value="Modern Cocktailbar">Modern Cocktailbar</option>
-                        <option value="Jazz Lounge">Jazz Lounge</option>
-                        <option value="Industrial Bar">Industrial Bar</option>
-                        <option value="Beach Bar">Beach Bar</option>
-                        <option value="Art Café">Art Café</option>
-                        <option value="Dance Club">Dance Club</option>
-                        <option value="Restaurant">Restaurant</option>
-                        <option value="Wine Bar">Wine Bar</option>
-                        <option value="Other">Other</option>
-                        <option value="Not specified">Not specified</option>
-                    </select>
+                <label for="venue_style">Venue Style (Optional):</label>
+                <select id="venue_style" class="dropdown-select" name="venue_style">
+                    <option value="" selected>Choose a Style</option>
+                    <option value="Traditional Pub">Traditional Pub</option>
+                    <option value="Modern Cocktailbar">Modern Cocktailbar</option>
+                    <option value="Jazz Lounge">Jazz Lounge</option>
+                    <option value="Industrial Bar">Industrial Bar</option>
+                    <option value="Beach Bar">Beach Bar</option>
+                    <option value="Art Café">Art Café</option>
+                    <option value="Dance Club">Dance Club</option>
+                    <option value="Restaurant">Restaurant</option>
+                    <option value="Wine Bar">Wine Bar</option>
+                    <option value="Other">Other</option>
+                    <option value="Not specified">Not specified</option>
+                </select>
             </div>
 
-            <!-- Soloist Fields -->
+            <!-- Musician Fields -->
             <div id="musician_fields">
+                <!-- Soloist Fields -->
                 <div id="soloist_fields">
-                    <label for="artist_name">Artist Name:</label>
+                    <label for="artist_name">Artist Name (Optional):</label>
                     <input type="text" name="artist_name">
 
                     <label for="date_of_birth">Date of Birth:</label>
-                    <input type="date" name="date_of_birth" >    
+                    <input type="date" name="date_of_birth">
                 </div>
 
                 <!-- Band Fields -->
                 <div id="band_fields" style="display: none;">
                     <label for="band_name">Band Name:</label>
                     <input type="text" name="band_name">
+
+                    <label for="num_members_in_band">Number of Members in Band:</label>
+                    <input type="number" name="num_members_in_band" min="1">
                 </div>
-                
 
                 <!-- Additional Musician Fields -->
-                <label for="genre">Genre:</label>
+                <label for="genre">Genre (Optional):</label>
                 <select id="genre" class="dropdown-select" name="genre">
                     <option value="" selected>Choose a Genre</option>
                     <option value="Pop">Pop</option>
@@ -213,8 +275,8 @@
                 </select>
 
                 <label for="price_per_hour">Price Per Hour:</label>
-                <input type="number" step="0.01" name="price_per_hour" id="price_per_hour" min="0" required>
-                
+                <input type="number" step="0.01" name="price_per_hour" id="price_per_hour" min="0">
+
                 <script>
                     document.querySelector("form").addEventListener("submit", function (event) {
                         const pricePerHour = document.getElementById("price_per_hour").value;
@@ -224,27 +286,27 @@
                         }
                     });
                 </script>
-                
-                <label for="link_to_songs">External Link to Your Songs:</label>
+
+                <label for="link_to_songs">External Link to Your Songs (Optional):</label>
                 <input type="url" name="link_to_songs">
 
                 <label for="equipment">Do You Own the Necessary Equipment To Perform?</label>
                 <select id="equipment" class="dropdown-select" name="equipment">
-                    <option value="no">Yes</option>
-                    <option value="yes">No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
                 </select>
             </div>
 
             <label for="email">Email:</label>
             <input type="email" name="email" required>
 
-            <label for="address">Address:</label>
+            <label for="address">Address (Optional):</label>
             <input type="text" name="address">
 
-            <label for="phone_number">Phone Number:</label>
+            <label for="phone_number">Phone Number (Optional):</label>
             <input type="text" name="phone_number">
 
-            <label for="bio">Bio (Max 500 characters):</label>
+            <label for="bio">Bio (Max 500 characters) (Optional):</label>
             <textarea name="bio" maxlength="500"></textarea>
 
             <input type="submit" value="Register">
