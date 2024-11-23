@@ -9,10 +9,8 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def index():
     if 'user_id' in session:
-        # Redirect to the main page if user is logged in
-        return redirect(url_for('main.main_page'))
-    # If not logged in, show the welcome page
-    return render_template('index.html', username=None)
+        return redirect(url_for('main.main_page'))  # Redirect to main page if already logged in
+    return render_template('index.html')  # Show the index page if not logged in
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -187,16 +185,13 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         user = Profile.query.filter_by(email=email).first()
-
         if user:
             session['user_id'] = str(user.profile_id)
             session['profile_type'] = user.profile_type
-
-            return redirect(url_for('main.website'))
+            return redirect(url_for('main.main_page'))  # Redirect to main_page.html after login
         else:
             flash('Invalid email. Please try again.', 'error')
             return redirect(url_for('main.login'))
-
     return render_template('login.html')
 
 @main.route('/logout', methods=['POST'])
@@ -230,22 +225,16 @@ def upload_picture():
         flash("You must be logged in to access this page.", "error")
         return redirect(url_for('main.login'))
 
-    user_id = uuid.UUID(session['user_id'])
-    user = Profile.query.get(user_id)
-
     if request.method == 'POST':
         if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
             profile_picture = request.files['profile_picture']
-            # Save the binary data to the user profile
+            user = Profile.query.get(uuid.UUID(session['user_id']))
             user.profile_picture = profile_picture.read()
             db.session.commit()
             flash("Profile picture uploaded successfully!", "success")
         else:
-            # Handle the "Skip" action or empty upload
             flash("No profile picture uploaded. Proceeding without it.", "info")
-
-        return redirect(url_for('main.website'))
-
+        return redirect(url_for('main.main_page'))  # Redirect to main_page.html after uploading
     return render_template('upload_picture.html')
 
 @main.route('/main_page')

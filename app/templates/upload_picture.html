@@ -37,38 +37,20 @@
             color: #6a00b5; /* Matching the gradient background */
             margin-bottom: 20px;
         }
-        .file-input-container {
-            margin: 20px;
+        .image-container {
+            width: 300px; /* Larger viewable area */
+            height: 300px;
             position: relative;
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: background-color 0.3s;
-            cursor: move; /* Indicates that the image can be moved */
+            overflow: hidden; /* Ensures the image stays within the bounds */
+            border-radius: 50%; /* Creates a circular mask */
+            margin-bottom: 20px;
         }
-        .file-input-container:hover {
-            background-color: #e0d0f0; /* Light purple background */
-        }
-        .file-input-container input[type="file"] {
+        .image-container img {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .file-preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab; /* Indicates the image can be moved */
+            max-width: none; /* Ensures the image's dimensions are not restricted */
         }
         .upload-box button {
             background-color: #6a00b5; /* Matching the gradient background */
@@ -89,63 +71,57 @@
     <div class="upload-box">
         <h1>Upload Profile Picture</h1>
         <form method="POST" enctype="multipart/form-data" onsubmit="return checkFile()">
-            <div class="file-input-container" onmousedown="startDrag(event)" onmouseup="endDrag()">
-                <img id="preview" class="file-preview" src="path/to/default/profile/image.png"> <!-- Add your path to a default image -->
-                <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()">
+            <div class="image-container">
+                <img id="preview" src="path/to/default/profile/image.png"> <!-- Default image path -->
+                <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
+            <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
             <button type="submit">Upload</button>
             <button type="submit" formaction="{{ url_for('main.upload_picture') }}">Skip</button>
         </form>
     </div>
     <script>
-        let dragging = false;
-
         function previewFile() {
             const preview = document.getElementById('preview');
             const file = document.querySelector('input[type="file"]').files[0];
             const reader = new FileReader();
 
-            reader.addEventListener("load", function () {
-                // Convert image file to base64 string and display it
-                preview.src = reader.result;
-                preview.style.left = '0px'; // Reset position
-                preview.style.top = '0px'; // Reset position
-            }, false);
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.width = "auto"; // Reset width
+                preview.style.height = "100%"; // Fit height to container initially
+
+                // Allow user to move image inside the container
+                let isDragging = false;
+                let startX, startY, origX, origY;
+
+                preview.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    origX = preview.offsetLeft;
+                    origY = preview.offsetTop;
+                    window.addEventListener('mousemove', move, false);
+                }, false);
+
+                window.addEventListener('mouseup', function() {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', move, false);
+                }, false);
+
+                function move(e) {
+                    if (isDragging) {
+                        let diffX = e.clientX - startX;
+                        let diffY = e.clientY - startY;
+                        preview.style.left = (origX + diffX) + 'px';
+                        preview.style.top = (origY + diffY) + 'px';
+                    }
+                }
+            };
 
             if (file) {
                 reader.readAsDataURL(file);
             }
-        }
-
-        function startDrag(e) {
-            dragging = true;
-            let preview = document.getElementById('preview');
-            preview.style.position = 'relative';
-            let shiftX = e.clientX - preview.getBoundingClientRect().left;
-            let shiftY = e.clientY - preview.getBoundingClientRect().top;
-
-            function moveAt(pageX, pageY) {
-                preview.style.left = pageX - shiftX - preview.parentNode.getBoundingClientRect().left + 'px';
-                preview.style.top = pageY - shiftY - preview.parentNode.getBoundingClientRect().top + 'px';
-            }
-
-            function onMouseMove(event) {
-                if (dragging) {
-                    moveAt(event.pageX, event.pageY);
-                }
-            }
-
-            document.addEventListener('mousemove', onMouseMove);
-
-            preview.onmouseup = function() {
-                document.removeEventListener('mousemove', onMouseMove);
-                preview.onmouseup = null;
-                dragging = false;
-            };
-        }
-
-        function endDrag() {
-            dragging = false;
         }
 
         function checkFile() {
