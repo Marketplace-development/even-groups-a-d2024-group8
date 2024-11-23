@@ -29,6 +29,9 @@
             border-radius: 50%;
             background-color: #ccc; /* Placeholder for image */
             margin: 20px auto;
+            background-image: url("data:image/jpeg;base64,{{ user.profile_picture | b64encode | decode('utf-8') }}");
+            background-size: cover;
+            background-position: center;
         }
         .field {
             margin: 10px 0;
@@ -50,7 +53,9 @@
 </head>
 <body>
     <div class="profile-box">
-        <div class="profile-picture"></div>
+        <div class="profile-picture"
+            style="background-image: url('data:image/jpeg;base64,{{ user.profile_picture | b64encode }}');">
+        </div>
         <h1>Soloist Profile</h1>
         <p class="field"><strong>Artist Name:</strong> {{ user.artist_name or 'Not Specified' }}</p>
         <p class="field"><strong>Date of Birth:</strong> {{ user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else 'Not Specified' }}</p>

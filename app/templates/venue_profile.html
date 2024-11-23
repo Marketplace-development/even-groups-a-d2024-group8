@@ -53,11 +53,20 @@
 </head>
 <body>
     <div class="profile-box">
-        <div class="profile-picture"></div>
+        <div class="profile-picture"
+            style="background-image: url('data:image/jpeg;base64,{{ user.profile_picture | b64encode }}');">
+        </div>
         <h1>Venue Profile</h1>
-        <p class="field"><strong>Venue Name:</strong> [Venue Name]</p>
-        <p class="field"><strong>Style:</strong> [Style]</p>
-        <p class="field"><strong>City:</strong> [City]</p>
+        <p class="field"><strong>Venue Name:</strong> {{ venue.name_event or 'Not Specified' }}</p>
+        <p class="field"><strong>Style:</strong> {{ venue.style or 'Not Specified' }}</p>
+        <p class="field"><strong>City:</strong> {{ user.city or 'Not Specified' }}</p>
+        <p class="field"><strong>Country:</strong> {{ user.country or 'Not Specified' }}</p>
+        <p class="field"><strong>Street Name:</strong> {{ user.street_name or 'Not Specified' }}</p>
+        <p class="field"><strong>House Number:</strong> {{ user.house_number or 'Not Specified' }}</p>
+        <p class="field"><strong>Phone Number:</strong> {{ user.phone_number or 'Not Specified' }}</p>
+        <p class="field"><strong>Email:</strong> {{ user.email or 'Not Specified' }}</p>
+        <p class="field"><strong>Bio:</strong> {{ user.bio or 'Not Specified' }}</p>
+        <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }}</p>
         <button>Edit Profile</button>
     </div>
 </body>

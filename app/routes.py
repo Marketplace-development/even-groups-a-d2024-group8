@@ -3,8 +3,9 @@ from app.models import db, Profile, Musician, Soloist, Band, Venue  # Import db 
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-
+import base64
 main = Blueprint('main', __name__)
+
 
 @main.route('/')
 def index():
@@ -276,46 +277,49 @@ def search_musicians():
         'equipment_needed': musician.equipment_needed
     } for musician in results])
 
+
 @main.route('/profile')
 def profile():
-    print("Accessing profile")
     if 'user_id' not in session:
-        print("No user in session")
         return redirect(url_for('main.login'))
 
     user_id = session['user_id']
     user = Profile.query.get(user_id)
 
     if not user:
-        print("User not found")
         return redirect(url_for('main.main_page'))
 
-    print(f"User profile type: {user.profile_type}, Musician type: {user.musician_type if user.profile_type == 'musician' else 'N/A'}")
-    
     if user.profile_type == 'musician':
         if user.musician_type == 'soloist':
             return render_template('soloist_profile.html', user=user)
         elif user.musician_type == 'band':
-            return redirect(url_for('band_profile.html', user_id=user_id))
-        else:
-            print("Musician type detail not found or not applicable")
-            return redirect(url_for('main.main_page'))
+            return redirect(url_for('main.band_profile', user_id=user_id))
     elif user.profile_type == 'venue':
-        return redirect(url_for('venue_profile.html', user_id=user_id))
-    else:
-        print("Invalid profile type")
-        return redirect(url_for('main.main_page'))
+        return redirect(url_for('main.venue_profile', user_id=user_id))
+    
+    return redirect(url_for('main.main_page'))
 
-# Placeholder routes for band and venue profiles
 @main.route('/band_profile/<user_id>')
 def band_profile(user_id):
     user = Profile.query.get(user_id)
-    return render_template('band_profile.html', user=user)
+    band = Band.query.get(user_id)
+
+    # Convert profile picture to Base64 if it exists
+    profile_picture = None
+    if user and user.profile_picture:
+        profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+    return render_template('band_profile.html', user=user, band=band, profile_picture=profile_picture)
 
 @main.route('/venue_profile/<user_id>')
 def venue_profile(user_id):
     user = Profile.query.get(user_id)
-    return render_template('venue_profile.html', user=user)
-@main.route('/test_redirect')
-def test_redirect():
-    return redirect(url_for('main.soloist_profile'))  # Adjust with the correct Blueprint prefix if needed
+    venue = Venue.query.get(user_id)
+
+    # Convert profile picture to Base64 if it exists
+    profile_picture = None
+    if user and user.profile_picture:
+        profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+    return render_template('venue_profile.html', user=user, venue=venue, profile_picture=profile_picture)
+
