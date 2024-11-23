@@ -40,14 +40,6 @@
             margin: 10px 0;
             font-size: 1.2rem;
         }
-        .field input, .field select, .field textarea {
-            width: 90%; /* Stay inside parent boxes */
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
         .section {
             margin-top: 20px;
         }
@@ -64,6 +56,10 @@
             padding: 15px;
             background-color: #f9f9f9;
         }
+        .separator {
+            border-top: 2px solid #6a00b5;
+            margin: 20px 0;
+        }
         button {
             display: block;
             margin: 20px auto;
@@ -78,6 +74,19 @@
         button:hover {
             background-color: #4e008f;
         }
+        input, select, textarea {
+            width: 90%; /* Keep inputs within parent boxes */
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            display: block; /* Stack the input below the label */
+        }
+        label {
+            display: block; /* Ensure labels appear above inputs */
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -85,7 +94,7 @@
         <div class="profile-box">
             <div class="profile-picture"></div>
             <h1>Edit {{ band.band_name }}</h1>
-    
+
             <!-- Band Information -->
             <p class="field">
                 <label for="genre"><strong>Genre:</strong></label>
@@ -106,7 +115,7 @@
                     <option value="false" {% if not user.musician.equipment %}selected{% endif %}>No</option>
                 </select>
             </p>
-    
+
             <!-- Address Section -->
             <div class="section">
                 <h2>Address</h2>
@@ -116,7 +125,7 @@
                         <input type="text" id="country" name="country" value="{{ user.country or '' }}" required>
                     </p>
                     <p class="field">
-                        <label for="city"><strong>City:   </strong></label>
+                        <label for="city"><strong>City:</strong></label>
                         <input type="text" id="city" name="city" value="{{ user.city or '' }}" required>
                     </p>
                     <p class="field">
@@ -129,7 +138,7 @@
                     </p>
                 </div>
             </div>
-    
+
             <!-- Contact Information Section -->
             <div class="section">
                 <h2>Contact Info</h2>
@@ -152,12 +161,12 @@
                     </p>
                 </div>
             </div>
-    
+
             <p class="field">
                 <label for="profile_picture">Profile Picture:</label>
                 <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
             </p>
-    
+
             <button type="submit">Save Changes</button>
         </div>
     </form>
