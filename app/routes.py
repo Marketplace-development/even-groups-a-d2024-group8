@@ -245,3 +245,66 @@ def main_page():
     user_id = uuid.UUID(session['user_id'])
     user = Profile.query.get(user_id)
     return render_template('main_page.html', username=user.first_name)
+
+@main.route('/search_musicians', methods=['POST'])
+def search_musicians():
+    data = request.get_json()
+    query = db.session.query(Musician)
+    
+    if data.get('musician_type'):
+        query = query.filter(Musician.type == data['musician_type'])
+    if data.get('city'):
+        query = query.filter(Musician.city == data['city'])
+    if data.get('style'):
+        query = query.filter(Musician.style == data['style'])
+    if data.get('rating'):
+        query = query.filter(Musician.rating >= int(data['rating']))
+    if data.get('max_price'):
+        query = query.filter(Musician.price_per_hour <= float(data['max_price']))
+    if 'equipment' in data:
+        equipment_needed = True if data['equipment'] == 'Yes' else False
+        query = query.filter(Musician.equipment_needed == equipment_needed)
+
+    results = query.all()
+    return jsonify([{
+        'first_name': musician.first_name,
+        'last_name': musician.last_name,
+        'style': musician.style,
+        'city': musician.city,
+        'rating': musician.rating,
+        'price_per_hour': musician.price_per_hour,
+        'equipment_needed': musician.equipment_needed
+    } for musician in results])
+
+@main.route('/update_soloist_profile', methods=['POST'])
+def update_soloist_profile():
+    user_id = session.get('user_id')
+    soloist = Soloist.query.filter_by(profile_id=user_id).first()
+    if not soloist:
+        return "Soloist not found", 404
+
+    soloist.first_name = request.form['first_name']
+    soloist.last_name = request.form['last_name']
+    soloist.date_of_birth = request.form['date_of_birth']
+    soloist.genre = request.form['genre']
+    soloist.price_per_hour = request.form['price_per_hour']
+    
+    db.session.commit()
+    flash("Profile updated successfully.")
+    return redirect(url_for('main.soloist_profile'))
+
+@main.route('/profile')
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+    user_id = session['user_id']
+    user = Profile.query.get(user_id)
+
+    if user.profile_type == 'soloist':
+        return render_template('soloist_profile.html', user=user)
+    elif user.profile_type == 'band':
+        return redirect(url_for('band_profile', user_id=user_id))
+    elif user.profile_type == 'venue':
+        return redirect(url_for('venue_profile', user_id=user_id))
+    else:
+        return redirect(url_for('main.main_page'))
