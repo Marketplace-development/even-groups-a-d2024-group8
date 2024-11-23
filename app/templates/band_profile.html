@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soloist Profile - MelodyMatch</title>
+    <title>Band Profile - MelodyMatch</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -29,6 +29,9 @@
             border-radius: 50%;
             background-color: #ccc; /* Placeholder for image */
             margin: 20px auto;
+            background-image: url('path/to/profile-picture.png');
+            background-size: cover;
+            background-position: center;
         }
         .field {
             margin: 10px 0;
@@ -51,19 +54,12 @@
 <body>
     <div class="profile-box">
         <div class="profile-picture"></div>
-        <h1>Soloist Profile</h1>
-        <p class="field"><strong>Artist Name:</strong> {{ user.artist_name or 'Not Specified' }}</p>
-        <p class="field"><strong>Date of Birth:</strong> {{ user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else 'Not Specified' }}</p>
-        <p class="field"><strong>Genre:</strong> {{ user.genre or 'Not Specified' }}</p>
-        <p class="field"><strong>City:</strong> {{ user.city or 'Not Specified' }}</p>
-        <p class="field"><strong>Country:</strong> {{ user.country or 'Not Specified' }}</p>
-        <p class="field"><strong>Street Name:</strong> {{ user.street_name or 'Not Specified' }}</p>
-        <p class="field"><strong>House Number:</strong> {{ user.house_number or 'Not Specified' }}</p>
-        <p class="field"><strong>Phone Number:</strong> {{ user.phone_number or 'Not Specified' }}</p>
-        <p class="field"><strong>Email:</strong> {{ user.email or 'Not Specified' }}</p>
-        <p class="field"><strong>Bio:</strong> {{ user.bio or 'Not Specified' }}</p>
-        <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }}</p>
-        <p class="field"><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(user.price_per_hour) if user.price_per_hour else 'Not Specified' }}</p>
+        <h1>Band Profile</h1>
+        <p class="field"><strong>Band Name:</strong> [Band Name]</p>
+        <p class="field"><strong>Number of Members:</strong> [Number of Members]</p>
+        <p class="field"><strong>Genre:</strong> [Genre]</p>
+        <p class="field"><strong>City:</strong> [City]</p>
+        <p class="field"><strong>Price per Hour:</strong> €[Price]</p>
         <button>Edit Profile</button>
     </div>
 </body>

@@ -276,35 +276,46 @@ def search_musicians():
         'equipment_needed': musician.equipment_needed
     } for musician in results])
 
-@main.route('/update_soloist_profile', methods=['POST'])
-def update_soloist_profile():
-    user_id = session.get('user_id')
-    soloist = Soloist.query.filter_by(profile_id=user_id).first()
-    if not soloist:
-        return "Soloist not found", 404
-
-    soloist.first_name = request.form['first_name']
-    soloist.last_name = request.form['last_name']
-    soloist.date_of_birth = request.form['date_of_birth']
-    soloist.genre = request.form['genre']
-    soloist.price_per_hour = request.form['price_per_hour']
-    
-    db.session.commit()
-    flash("Profile updated successfully.")
-    return redirect(url_for('main.soloist_profile'))
-
 @main.route('/profile')
 def profile():
+    print("Accessing profile")
     if 'user_id' not in session:
+        print("No user in session")
         return redirect(url_for('main.login'))
+
     user_id = session['user_id']
     user = Profile.query.get(user_id)
 
-    if user.profile_type == 'soloist':
-        return render_template('soloist_profile.html', user=user)
-    elif user.profile_type == 'band':
-        return redirect(url_for('band_profile', user_id=user_id))
-    elif user.profile_type == 'venue':
-        return redirect(url_for('venue_profile', user_id=user_id))
-    else:
+    if not user:
+        print("User not found")
         return redirect(url_for('main.main_page'))
+
+    print(f"User profile type: {user.profile_type}, Musician type: {user.musician_type if user.profile_type == 'musician' else 'N/A'}")
+    
+    if user.profile_type == 'musician':
+        if user.musician_type == 'soloist':
+            return render_template('soloist_profile.html', user=user)
+        elif user.musician_type == 'band':
+            return redirect(url_for('band_profile.html', user_id=user_id))
+        else:
+            print("Musician type detail not found or not applicable")
+            return redirect(url_for('main.main_page'))
+    elif user.profile_type == 'venue':
+        return redirect(url_for('venue_profile.html', user_id=user_id))
+    else:
+        print("Invalid profile type")
+        return redirect(url_for('main.main_page'))
+
+# Placeholder routes for band and venue profiles
+@main.route('/band_profile/<user_id>')
+def band_profile(user_id):
+    user = Profile.query.get(user_id)
+    return render_template('band_profile.html', user=user)
+
+@main.route('/venue_profile/<user_id>')
+def venue_profile(user_id):
+    user = Profile.query.get(user_id)
+    return render_template('venue_profile.html', user=user)
+@main.route('/test_redirect')
+def test_redirect():
+    return redirect(url_for('main.soloist_profile'))  # Adjust with the correct Blueprint prefix if needed
