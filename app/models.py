@@ -1,8 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
+from . import db
 import uuid
-
-db = SQLAlchemy()
 
 class Profile(db.Model):
     __tablename__ = 'profile'
