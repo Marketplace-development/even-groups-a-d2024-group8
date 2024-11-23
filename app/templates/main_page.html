@@ -8,79 +8,79 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #3a007d, #6a00b5);
+            background: #fff;
             font-family: 'DM Sans', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            color: #fff;
+            padding: 0;
+            color: #000;
         }
-        .logout-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .top-bar {
+            width: 100%;
+            background: #fff;
+            border-bottom: 2px solid #6a00b5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .button {
             background-color: #6a00b5;
             color: #fff;
             border: none;
             border-radius: 5px;
             padding: 10px 20px;
+            margin: 0 10px; /* Add spacing between buttons */
             font-size: 1rem;
             cursor: pointer;
             text-decoration: none;
             transition: background-color 0.3s ease;
         }
-        .logout-button:hover {
+        .button:hover {
             background-color: #4e008f;
         }
+        .left-buttons {
+            display: flex;
+        }
+        .right-buttons {
+            display: flex;
+        }
         .main-box {
-            background-color: #fff;
-            color: #000;
-            border-radius: 15px;
+            width: auto; /* Adjusted width */
+            max-width: 960px; /* Control maximum width */
+            margin: 20px auto;
             padding: 30px;
-            text-align: center;
+            background-color: #fff;
+            border-radius: 15px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 600px;
-            position: relative;
+            text-align: center;
         }
         .main-box h1 {
-            font-size: 2.5rem;
             color: #6a00b5;
+            font-size: 2.5rem;
             margin-bottom: 20px;
         }
         .main-box p {
             font-size: 1.2rem;
             margin-bottom: 20px;
         }
-        .main-box a {
-            display: inline-block;
-            background-color: #6a00b5;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-        .main-box a:hover {
-            background-color: #4e008f;
-        }
     </style>
 </head>
 <body>
-    <!-- Logout Button -->
-    <a href="{{ url_for('main.logout') }}" class="logout-button">Logout</a>
-    
-    <!-- Main Content -->
+    <div class="top-bar">
+        <div class="left-buttons">
+            <a href="/profile" class="button">Profile</a>
+            <a href="/bookings" class="button">My Bookings</a>
+            <a href="/reviews" class="button">My Reviews</a>
+        </div>
+        <div class="right-buttons">
+            <a href="{{ url_for('main.logout') }}" class="button">Logout</a>
+        </div>
+    </div>
     <div class="main-box">
         <h1>Welcome to MelodyMatch!</h1>
         <p>Your gateway to connecting with amazing local music experiences.</p>
-        <a href="/explore">Explore Music</a>
-        <a href="/create">Create Event</a>
+        <a href="/explore" class="button">Explore Music</a>
+        <a href="/create" class="button">Create Event</a>
     </div>
 </body>
 </html>
