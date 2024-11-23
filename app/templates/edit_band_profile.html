@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit {{ band.band_name or 'Band Profile' }} - MelodyMatch</title>
+    <title>Edit Band Profile - MelodyMatch</title>
+    <!-- Import DM Sans font -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #3a007d, #6a00b5);
+            background: linear-gradient(135deg, #3a007d, #6a00b5); /* Gradient background */
             font-family: 'DM Sans', sans-serif;
             color: #fff;
             margin: 0;
             padding: 0;
         }
         .profile-box {
-            background-color: #fff;
+            background-color: #fff; /* White box */
             border-radius: 15px;
             padding: 20px;
             width: 80%;
@@ -22,40 +23,16 @@
             margin: 50px auto;
             color: #000;
         }
-        .profile-picture-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
         .profile-picture {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background-color: #ccc;
-            margin: 0 auto 10px;
+            background-color: #ccc; /* Placeholder */
+            margin: 20px auto;
             background-image: url("data:image/jpeg;base64,{{ profile_picture }}");
             background-size: cover;
             background-position: center;
-        }
-        .image-container {
-            width: 300px;
-            height: 300px;
             position: relative;
-            overflow: hidden;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            border: 5px solid #6a00b5;
-        }
-        .image-container img {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: grab;
-            max-width: none;
-        }
-        h1 {
-            text-align: center;
-            margin: 20px 0;
         }
         .field {
             margin: 10px 0;
@@ -85,49 +62,64 @@
             border: none;
             border-radius: 5px;
             padding: 10px 20px;
-            font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 1rem;
         }
         button:hover {
             background-color: #4e008f;
         }
-        input, select {
-            width: 90%;
+        input, select, textarea {
+            width: 100%;
             padding: 10px;
-            margin: 5px 0;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-            display: block;
         }
-        label {
-            display: block;
-            margin-top: 10px;
+        textarea {
+            resize: none; /* Prevent resizing */
+        }
+        .image-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            overflow: hidden; /* Ensures image stays within circle */
+            border-radius: 50%;
+            border: 5px solid #6a00b5; /* Purple border */
+            margin: 0 auto 20px;
+        }
+        .image-container img {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            max-width: none;
         }
     </style>
 </head>
 <body>
     <form action="{{ url_for('main.update_band_profile', user_id=band.profile_id) }}" method="post" enctype="multipart/form-data">
         <div class="profile-box">
-            <h1>Edit {{ band.band_name }}</h1>
-
-            <!-- Profile Picture Upload -->
-            <div class="profile-picture-container">
-                <div class="image-container" id="image-container">
-                    <img id="preview" src="" alt="Profile Preview" style="display: none;">
-                    <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
-                </div>
-                <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
+            <!-- Profile Picture -->
+            <div class="image-container" id="image-container">
+                <img id="preview" src="" alt="Profile Preview" style="display: none;">
+                <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
+            <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
+
+            <!-- Band Name -->
+            <p class="field">
+                <label for="band_name"><strong>Band Name:</strong></label>
+                <input type="text" id="band_name" name="band_name" value="{{ band.band_name or '' }}" required>
+            </p>
 
             <!-- Band Information -->
             <p class="field">
                 <label for="genre"><strong>Genre:</strong></label>
-                <input type="text" id="genre" name="genre" value="{{ user.musician.genre or '' }}" required>
+                <input type="text" id="genre" name="genre" value="{{ user.musician.genre or '' }}">
             </p>
             <p class="field">
                 <label for="price_per_hour"><strong>Price per Hour (€):</strong></label>
-                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01" required>
+                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01">
             </p>
             <p class="field">
                 <label for="link_to_songs"><strong>Link to Songs:</strong></label>
@@ -135,7 +127,7 @@
             </p>
             <p class="field">
                 <label for="equipment"><strong>Has Equipment:</strong></label>
-                <select id="equipment" name="equipment" required>
+                <select id="equipment" name="equipment">
                     <option value="true" {% if user.musician.equipment %}selected{% endif %}>Yes</option>
                     <option value="false" {% if not user.musician.equipment %}selected{% endif %}>No</option>
                 </select>
@@ -147,24 +139,24 @@
                 <div class="box">
                     <p class="field">
                         <label for="country"><strong>Country:</strong></label>
-                        <input type="text" id="country" name="country" value="{{ user.country or '' }}" required>
+                        <input type="text" id="country" name="country" value="{{ user.country or '' }}">
                     </p>
                     <p class="field">
                         <label for="city"><strong>City:</strong></label>
-                        <input type="text" id="city" name="city" value="{{ user.city or '' }}" required>
+                        <input type="text" id="city" name="city" value="{{ user.city or '' }}">
                     </p>
                     <p class="field">
                         <label for="street_name"><strong>Street Name:</strong></label>
-                        <input type="text" id="street_name" name="street_name" value="{{ user.street_name or '' }}" required>
+                        <input type="text" id="street_name" name="street_name" value="{{ user.street_name or '' }}">
                     </p>
                     <p class="field">
                         <label for="house_number"><strong>House Number:</strong></label>
-                        <input type="text" id="house_number" name="house_number" value="{{ user.house_number or '' }}" required>
+                        <input type="text" id="house_number" name="house_number" value="{{ user.house_number or '' }}">
                     </p>
                 </div>
             </div>
 
-            <!-- Contact Information Section -->
+            <!-- Contact Information -->
             <div class="section">
                 <h2>Contact Info</h2>
                 <div class="box">
@@ -178,7 +170,7 @@
                     </p>
                     <p class="field">
                         <label for="phone_number"><strong>Phone Number:</strong></label>
-                        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number or '' }}" required>
+                        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number or '' }}">
                     </p>
                     <p class="field">
                         <label for="email"><strong>Email:</strong></label>
@@ -193,6 +185,7 @@
     <script>
         const container = document.getElementById('image-container');
         const preview = document.getElementById('preview');
+        let scale = 1;
 
         function previewFile() {
             const file = document.querySelector('input[type="file"]').files[0];
@@ -201,10 +194,45 @@
             reader.onload = function (e) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
+                preview.style.transform = 'translate(-50%, -50%) scale(1)';
+                scale = 1; // Reset scale
             };
 
             if (file) {
                 reader.readAsDataURL(file);
+            }
+        }
+
+        container.addEventListener('wheel', function (e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            scale = Math.min(Math.max(0.5, scale + delta), 2); // Limit zoom between 0.5x and 2x
+            preview.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        });
+
+        let isDragging = false;
+        let startX, startY, origX, origY;
+
+        preview.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            origX = preview.offsetLeft;
+            origY = preview.offsetTop;
+            window.addEventListener('mousemove', moveImage, false);
+        });
+
+        window.addEventListener('mouseup', function () {
+            isDragging = false;
+            window.removeEventListener('mousemove', moveImage, false);
+        });
+
+        function moveImage(e) {
+            if (isDragging) {
+                const diffX = e.clientX - startX;
+                const diffY = e.clientY - startY;
+                preview.style.left = `${origX + diffX}px`;
+                preview.style.top = `${origY + diffY}px`;
             }
         }
     </script>

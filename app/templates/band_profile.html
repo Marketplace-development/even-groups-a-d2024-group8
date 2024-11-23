@@ -69,19 +69,27 @@
             border-top: 2px solid #6a00b5;
             margin: 20px 0;
         }
-        button {
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between buttons */
+            margin-top: 20px;
+        }
+        .button {
             display: block;
-            margin: 20px auto;
-            background-color: #6a00b5;
+            text-align: center;
+            background-color: #6a00b5; /* Purple color */
             color: #fff;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none; /* Remove underline */
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #4e008f;
+        .button:hover {
+            background-color: #4e008f; /* Darker purple */
         }
     </style>
 </head>
@@ -101,7 +109,6 @@
         <p class="field"><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(user.musician.price_per_hour) if user.musician.price_per_hour else 'Not Specified' }}</p>
         <p class="field"><strong>Link to Songs:</strong> <a href="{{ user.musician.link_to_songs }}" target="_blank">{{ user.musician.link_to_songs or 'Not Specified' }}</a></p>
         <p class="field"><strong>Has Equipment:</strong> {{ 'Yes' if user.musician.equipment else 'No' }}</p>
-
 
         <!-- Address Section -->
         <div class="section">
@@ -125,7 +132,11 @@
             </div>
         </div>
 
-        <a href="{{ url_for('main.edit_band_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
+        <!-- Button Group -->
+        <div class="button-group">
+            <a href="{{ url_for('main.edit_band_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
+            <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+        </div>
     </div>
 </body>
 </html>
