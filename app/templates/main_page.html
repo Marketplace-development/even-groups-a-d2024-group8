@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MelodyMatch - Main</title>
-    <!-- Import DM Sans font -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -18,7 +17,7 @@
             width: 100%;
             background: #fff;
             border-bottom: 2px solid #6a00b5;
-            padding: 10px 20px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -28,8 +27,7 @@
             color: #fff;
             border: none;
             border-radius: 5px;
-            padding: 10px 20px;
-            margin: 0 10px; /* Add spacing between buttons */
+            padding: 10px 15px;
             font-size: 1rem;
             cursor: pointer;
             text-decoration: none;
@@ -38,30 +36,38 @@
         .button:hover {
             background-color: #4e008f;
         }
-        .left-buttons {
+        .search-bar {
+            width: 80%; /* Adjusted overall width */
+            background: #6a00b5;
+            padding: 10px;
+            border-radius: 5px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px auto; /* Increased spacing from the top bar */
+            box-sizing: border-box;
         }
-        .right-buttons {
-            display: flex;
-        }
-        .main-box {
-            width: auto; /* Adjusted width */
-            max-width: 960px; /* Control maximum width */
-            margin: 20px auto;
-            padding: 30px;
+        .search-bar select, .search-bar input, .search-bar button {
+            padding: 10px;
+            border-radius: 5px;
             background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            margin-right: 2%; /* Space between elements */
         }
-        .main-box h1 {
-            color: #6a00b5;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+        .search-bar button {
+            background-color: #4e008f;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .main-box p {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
+        .search-results {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -76,11 +82,63 @@
             <a href="{{ url_for('main.logout') }}" class="button">Logout</a>
         </div>
     </div>
-    <div class="main-box">
-        <h1>Welcome to MelodyMatch!</h1>
-        <p>Your gateway to connecting with amazing local music experiences.</p>
-        <a href="/explore" class="button">Explore Music</a>
-        <a href="/create" class="button">Create Event</a>
+    <div class="search-bar">
+        <select name="musician_type">
+            <option value="soloist">Soloist</option>
+            <option value="band">Band</option>
+        </select>
+        <input type="text" placeholder="City" name="city">
+        <select name="style">
+            <option value="" selected>Choose a Genre</option>
+            <option value="Pop">Pop</option>
+            <option value="Rock">Rock</option>
+            <option value="Hip-Hop/Rap">Hip-Hop/Rap</option>
+            <option value="Jazz">Jazz</option>
+            <option value="Electronic Dance Music (EDM)">Electronic Dance Music (EDM)</option>
+            <option value="Classical">Classical</option>
+            <option value="Reggae">Reggae</option>
+            <option value="Blues">Blues</option>
+            <option value="Country">Country</option>
+            <option value="R&B">R&B</option>
+            <option value="Other">Other</option>
+        </select>
+        <select name="rating">
+            <option value="">Minimum Rating</option>
+            <option value="1">★☆☆☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="4">★★★★☆</option>
+            <option value="5">★★★★★</option>
+        </select>
+        <input type="number" placeholder="Max price per hour (€)" name="max_price" step="0.01">
+        <select name="equipment">
+            <option value="">Equipment Needed</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+        <button onclick="searchMusicians()">Search</button>
     </div>
+    <div class="search-results" id="search-results">
+        <!-- Search results will be displayed here -->
+    </div>
+    <script>
+        function searchMusicians() {
+            const formData = new FormData(document.querySelector('.search-bar')); // Adjust selector if needed
+            const searchData = Object.fromEntries(formData.entries());
+            fetch('/search_musicians', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(searchData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Handle the response data
+                // Update the page with the results
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
 </body>
 </html>
