@@ -9,9 +9,9 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def index():
     if 'user_id' in session:
-        user_id = uuid.UUID(session['user_id'])
-        user = Profile.query.get(user_id)
-        return render_template('index.html', username=user.first_name)
+        # Redirect to the main page if user is logged in
+        return redirect(url_for('main.main_page'))
+    # If not logged in, show the welcome page
     return render_template('index.html', username=None)
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -204,6 +204,7 @@ def logout():
     session.pop('user_id', None)
     session.pop('profile_type', None)
     flash("You have been logged out.", "success")
+    # Redirect to the index which will take them to the login page if not logged in
     return redirect(url_for('main.index'))
 
 @main.route('/website')
@@ -246,3 +247,13 @@ def upload_picture():
         return redirect(url_for('main.website'))
 
     return render_template('upload_picture.html')
+
+@main.route('/main_page')
+def main_page():
+    if 'user_id' not in session:
+        # If user is not logged in, redirect to login page
+        return redirect(url_for('main.login'))
+    # If logged in, render the main page
+    user_id = uuid.UUID(session['user_id'])
+    user = Profile.query.get(user_id)
+    return render_template('main_page.html', username=user.first_name)
