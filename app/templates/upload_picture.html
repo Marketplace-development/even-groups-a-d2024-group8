@@ -45,13 +45,16 @@
             border-radius: 50%; /* Creates a circular mask */
             margin: 0 auto 20px; /* Center it horizontally and add spacing below */
             border: 5px solid #6a00b5; /* Purple border around the circle */
+            background-color: #f3f3f3; /* Default background color */
         }
         .image-container img {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%; 
+            left: 50%;
             transform: translate(-50%, -50%);
             cursor: grab; /* Indicates the image can be moved */
-            max-width: none; /* Ensures the image's dimensions are not restricted */
+            max-width: none;
+            display: block;
         }
         .upload-box button {
             background-color: #6a00b5; /* Matching the gradient background */
@@ -73,7 +76,7 @@
         <h1>Upload Profile Picture</h1>
         <form method="POST" enctype="multipart/form-data" onsubmit="return checkFile()">
             <div class="image-container" id="image-container">
-                <img id="preview" src="" alt="Profile Preview" style="display: none;">
+                <img id="preview" src="" alt="Profile Preview">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
@@ -84,7 +87,9 @@
     <script>
         const container = document.getElementById('image-container');
         const preview = document.getElementById('preview');
-        let scale = 1;
+        let scale = 1; // Zoom scale
+        let isDragging = false;
+        let startX, startY, offsetX = 0, offsetY = 0;
 
         function previewFile() {
             const file = document.querySelector('input[type="file"]').files[0];
@@ -93,59 +98,42 @@
             reader.onload = function (e) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
-                preview.style.position = 'absolute';
-                preview.style.width = 'auto';
-                preview.style.height = '100%';
-                preview.style.top = '50%';
-                preview.style.left = '50%';
-                preview.style.transform = 'translate(-50%, -50%) scale(1)';
-                scale = 1; // Reset scale
-                container.style.background = 'none'; // Remove default background
+                preview.style.transform = `translate(-50%, -50%) scale(${scale})`;
             };
 
             if (file) {
                 reader.readAsDataURL(file);
             }
-
-            enableDragAndZoom();
         }
 
-        function enableDragAndZoom() {
-            let isDragging = false;
-            let startX, startY, origX, origY;
+        // Enable drag functionality
+        preview.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            startX = e.clientX - offsetX;
+            startY = e.clientY - offsetY;
+            preview.style.cursor = 'grabbing';
+        });
 
-            // Enable drag functionality
-            preview.addEventListener('mousedown', function (e) {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                origX = preview.offsetLeft;
-                origY = preview.offsetTop;
-                window.addEventListener('mousemove', move, false);
-            }, false);
+        window.addEventListener('mouseup', function () {
+            isDragging = false;
+            preview.style.cursor = 'grab';
+        });
 
-            window.addEventListener('mouseup', function () {
-                isDragging = false;
-                window.removeEventListener('mousemove', move, false);
-            }, false);
-
-            function move(e) {
-                if (isDragging) {
-                    let diffX = e.clientX - startX;
-                    let diffY = e.clientY - startY;
-                    preview.style.left = (origX + diffX) + 'px';
-                    preview.style.top = (origY + diffY) + 'px';
-                }
+        window.addEventListener('mousemove', function (e) {
+            if (isDragging) {
+                offsetX = e.clientX - startX;
+                offsetY = e.clientY - startY;
+                preview.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
             }
+        });
 
-            // Enable zoom functionality
-            container.addEventListener('wheel', function (e) {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -0.1 : 0.1;
-                scale = Math.min(Math.max(0.5, scale + delta), 2); // Limit zoom between 0.5x and 2x
-                preview.style.transform = translate(-50%, -50%) scale(${scale});
-            });
-        }
+        // Enable zoom functionality
+        container.addEventListener('wheel', function (e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            scale = Math.min(Math.max(0.5, scale + delta), 3); // Limit zoom between 0.5x and 3x
+            preview.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
+        });
 
         function checkFile() {
             const file = document.querySelector('input[type="file"]').files[0];
