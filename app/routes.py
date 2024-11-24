@@ -225,16 +225,21 @@ def upload_picture():
         flash("You must be logged in to access this page.", "error")
         return redirect(url_for('main.login'))
 
+    user = Profile.query.get(uuid.UUID(session['user_id']))
+
     if request.method == 'POST':
-        if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
-            profile_picture = request.files['profile_picture']
-            user = Profile.query.get(uuid.UUID(session['user_id']))
-            user.profile_picture = profile_picture.read()
-            db.session.commit()
-            flash("Profile picture uploaded successfully!", "success")
-        else:
-            flash("No profile picture uploaded.", "info")
-        return redirect(url_for('main.main_page'))
+        if 'submit' in request.form:  # Submit button was pressed
+            if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
+                profile_picture = request.files['profile_picture']
+                user.profile_picture = profile_picture.read()  # Save the image to the database
+                db.session.commit()
+                flash("Profile picture uploaded successfully!", "success")
+            else:
+                flash("No profile picture uploaded.", "error")
+        elif 'skip' in request.form:  # Skip button was pressed
+            flash("Skipped uploading profile picture.", "info")
+        
+        return redirect(url_for('main.main_page'))  # Redirect to the main page
 
     return render_template('upload_picture.html')
 

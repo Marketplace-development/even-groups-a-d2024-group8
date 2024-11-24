@@ -74,14 +74,14 @@
 <body>
     <div class="upload-box">
         <h1>Upload Profile Picture</h1>
-        <form method="POST" enctype="multipart/form-data" onsubmit="return checkFile()">
+        <form method="POST" enctype="multipart/form-data">
             <div class="image-container" id="image-container">
-                <img id="preview" src="" alt="Profile Preview">
+                <img id="preview" src="" alt="Profile Preview" style="display: none;">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
-            <button type="submit">Upload</button>
-            <button type="submit" formaction="{{ url_for('main.upload_picture') }}">Skip</button>
+            <button type="submit" name="submit">Upload</button>
+            <button type="submit" name="skip">Skip</button>
         </form>
     </div>
     <script>
