@@ -107,7 +107,7 @@ def register():
                     soloist = Soloist(
                         profile_id=new_user.profile_id,
                         date_of_birth=date_of_birth,
-                        artist_name=artist_name  # This can be None (optional)
+                        artist_name=artist_name
                     )
                     db.session.add(soloist)
                 elif musician_role == 'band':
@@ -134,7 +134,7 @@ def register():
                     flash("Invalid musician role selected.", "error")
                     return redirect(url_for('main.register'))
 
-                # Update the musician_type
+                # Update musician type and commit
                 new_user.musician_type = musician_role
                 db.session.commit()
 
@@ -162,7 +162,7 @@ def register():
             session['user_id'] = str(new_user.profile_id)
             session['profile_type'] = new_user.profile_type
 
-            # Redirect to upload_picture
+            # Redirect to upload_picture for both musicians and venues
             flash("Registration successful! Please upload your profile picture.", "success")
             return redirect(url_for('main.upload_picture'))
 
@@ -177,8 +177,8 @@ def register():
             db.session.rollback()
             flash(f"An unexpected error occurred: {str(e)}. Please try again.", "error")
             print(f"Unexpected error: {e}")  # Debugging line
+            return redirect(url_for('main.register'))
 
-    # Render registration page for GET request
     return render_template('register.html')
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -318,7 +318,6 @@ def band_profile(user_id):
 
     return render_template('band_profile.html', user=user, band=band, profile_picture=profile_picture)
 
-    return render_template('venue_profile.html', user=user, venue=venue, profile_picture=profile_picture)
 @main.route('/edit_band_profile/<user_id>')
 def edit_band_profile(user_id):
     # Fetch user and band data
@@ -551,13 +550,3 @@ def update_soloist_profile(user_id):
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
-    # Commit changes to the database
-    try:
-        db.session.commit()
-        flash("Profile updated successfully!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"An error occurred while saving changes: {str(e)}", "error")
-        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
-
-    return redirect(url_for('main.soloist_profile', user_id=user_id))

@@ -47,6 +47,14 @@
             border: 5px solid #6a00b5; /* Purple border around the circle */
             background-color: #f3f3f3; /* Default background color */
         }
+        .image-container svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Make the SVG fill the entire container */
+            height: 100%; /* Make the SVG fill the entire container */
+            fill: #f3f3f3; /* Dark grey color for the SVG */
+        }
         .image-container img {
             position: absolute;
             top: 50%; 
@@ -76,6 +84,10 @@
         <h1>Upload Profile Picture</h1>
         <form method="POST" enctype="multipart/form-data">
             <div class="image-container" id="image-container">
+                <!-- SVG Icon placed here inside the image container -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
                 <img id="preview" src="" alt="Profile Preview" style="display: none;">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>

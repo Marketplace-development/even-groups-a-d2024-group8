@@ -133,7 +133,7 @@
                     id="preview"
                     src="data:image/jpeg;base64,{{ profile_picture or '' }}" 
                     alt="Profile Preview" 
-                    style="{{ 'display: block;' if profile_picture else 'display: none;' }}">
+                    style="display: block; width: 150px; height: 150px;">
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>

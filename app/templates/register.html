@@ -202,15 +202,15 @@
             </div>
 
             <label for="first_name">First Name:</label>
-            <input type="text" name="first_name" required>
+            <input type="text" name="first_name" required placeholder="Enter Your First Name">
 
             <label for="last_name">Last Name:</label>
-            <input type="text" name="last_name" required>
+            <input type="text" name="last_name" required placeholder="Enter Your Last Name">
 
             <!-- Venue Fields -->
             <div id="venue_fields" style="display: none;">
                 <label for="venue_name">Venue Name:</label>
-                <input type="text" name="venue_name">
+                <input type="text" name="venue_name" placeholder="Enter Your Venue Name">
                 <label for="venue_style">Venue Style (Optional):</label>
                 <select id="venue_style" class="dropdown-select" name="venue_style">
                     <option value="" selected>Choose a Style</option>
@@ -233,7 +233,7 @@
                 <!-- Soloist Fields -->
                 <div id="soloist_fields">
                     <label for="artist_name">Artist Name (Optional):</label>
-                    <input type="text" id="artist_name" name="artist_name">
+                    <input type="text" id="artist_name" name="artist_name" placeholder="Enter Your Artist Name">
 
                     <label for="date_of_birth">Date of Birth:</label>
                     <input type="date" id="date_of_birth" name="date_of_birth">
@@ -242,10 +242,10 @@
                 <!-- Band Fields -->
                 <div id="band_fields" style="display: none;">
                     <label for="band_name">Band Name:</label>
-                    <input type="text" id="band_name" name="band_name">
+                    <input type="text" id="band_name" name="band_name" placeholder="Enter Your Band Name">
 
                     <label for="num_members_in_band">Number of Members in Band:</label>
-                    <input type="number" id="num_members_in_band" name="num_members_in_band" min="1">
+                    <input type="number" id="num_members_in_band" name="num_members_in_band" min="1" placeholder="0">
                 </div>
 
                 <!-- Additional Musician Fields -->
@@ -266,10 +266,10 @@
                 </select>
 
                 <label for="price_per_hour">Price Per Hour (Euro):</label>
-                <input type="number" id="price_per_hour" name="price_per_hour" step="0.01" min="0">
+                <input type="number" id="price_per_hour" name="price_per_hour" step="0.01" min="0" placeholder="0">
 
                 <label for="link_to_songs">External Link to Your Songs (Optional):</label>
-                <input type="url" id="link_to_songs" name="link_to_songs">
+                <input type="url" id="link_to_songs" name="link_to_songs" placeholder="Enter A Link">
 
                 <label for="equipment">Do You Own the Necessary Equipment To Perform?</label>
                 <select id="equipment" class="dropdown-select" name="equipment">
@@ -279,7 +279,7 @@
             </div>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" required placeholder="Enter Your Email">
 
             <!-- Expanded Address Input -->
             <div class="address-fields">
@@ -291,20 +291,20 @@
                 </select>
             
                 <label for="city">City (Optional):</label>
-                <input type="text" id="city" name="city" placeholder="Enter your city">
+                <input type="text" id="city" name="city" placeholder="Enter Your City">
             
                 <label for="street_name">Street Name (Optional):</label>
-                <input type="text" id="street_name" name="street_name" placeholder="Street name">
+                <input type="text" id="street_name" name="street_name" placeholder="Enter Your Street Name">
             
                 <label for="house_number">House Number (Optional):</label>
-                <input type="text" id="house_number" name="house_number" placeholder="House number">
+                <input type="text" id="house_number" name="house_number" placeholder="Enter Your House Number">
             </div>
 
             <label for="phone_number">Phone Number (Optional):</label>
-            <input type="text" id="phone_number" name="phone_number">
+            <input type="text" id="phone_number" name="phone_number" placeholder="Enter Your Phone Number">
 
             <label for="bio">Bio (Max 500 characters) (Optional):</label>
-            <textarea id="bio" name="bio" maxlength="500"></textarea>
+            <textarea id="bio" name="bio" maxlength="500" placeholder="Enter Your Bio"></textarea>
 
             <input type="submit" value="Register">
         </form>
