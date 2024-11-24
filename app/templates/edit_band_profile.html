@@ -168,7 +168,7 @@
             </p>
             <p class="field">
                 <label for="price_per_hour"><strong>Price per Hour (€):</strong></label>
-                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01">
+                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01" required>
             </p>
             <p class="field">
                 <label for="equipment"><strong>Has Equipment:</strong></label>
