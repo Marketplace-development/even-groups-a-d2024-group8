@@ -54,6 +54,18 @@
             padding: 15px;
             background-color: #f9f9f9;
         }
+        textarea {
+            width: 100%;
+            max-width: calc(100% - 30px); /* Prevents overflow of the bio box */
+            min-height: 100px; /* Reasonable height for bio input */
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none; /* Prevent resizing */
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+        }
         button, a.button {
             background-color: #6a00b5;
             color: #fff;
@@ -115,18 +127,6 @@
 <body>
     <form action="{{ url_for('main.update_soloist_profile', user_id=soloist.profile_id) }}" method="post" enctype="multipart/form-data">
         <div class="profile-box">
-            <!-- Display error messages -->
-            {% with messages = get_flashed_messages(category_filter=["error"]) %}
-            {% if messages %}
-            <div class="error-message">
-                <ul>
-                    {% for message in messages %}
-                    <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-            {% endwith %}
             <!-- Profile Picture -->
             <div class="image-container" id="image-container">
                 <img id="preview" 
@@ -136,7 +136,11 @@
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
-
+            <!-- Bio -->
+            <p class="field">
+                <label for="bio"><strong>Bio:</strong></label>
+                <textarea id="bio" name="bio" placeholder="Write about your venue...">{{ user.bio or '' }}</textarea>
+            </p>
             <!-- Artist Name -->
             <p class="field">
                 <label for="artist_name"><strong>Artist Name:</strong></label>
@@ -149,38 +153,37 @@
                 <input type="date" id="date_of_birth" name="date_of_birth" value="{{ soloist.date_of_birth or '' }}" required>
             </p>
 
-            <!-- Soloist Information -->
             <p class="field">
                 <label for="genre"><strong>Genre:</strong></label>
                 <select id="genre" class="dropdown-select" name="genre">
-                    <option value="" {% if not soloist.genre %}selected{% endif %}>Choose a Genre</option>
-                    <option value="Pop" {% if soloist.genre == 'Pop' %}selected{% endif %}>Pop</option>
-                    <option value="Rock" {% if soloist.genre == 'Rock' %}selected{% endif %}>Rock</option>
-                    <option value="Hip-Hop/Rap" {% if soloist.genre == 'Hip-Hop/Rap' %}selected{% endif %}>Hip-Hop/Rap</option>
-                    <option value="Jazz" {% if soloist.genre == 'Jazz' %}selected{% endif %}>Jazz</option>
-                    <option value="Electronic Dance Music (EDM)" {% if soloist.genre == 'Electronic Dance Music (EDM)' %}selected{% endif %}>Electronic Dance Music (EDM)</option>
-                    <option value="Classical" {% if soloist.genre == 'Classical' %}selected{% endif %}>Classical</option>
-                    <option value="Reggae" {% if soloist.genre == 'Reggae' %}selected{% endif %}>Reggae</option>
-                    <option value="Blues" {% if soloist.genre == 'Blues' %}selected{% endif %}>Blues</option>
-                    <option value="Country" {% if soloist.genre == 'Country' %}selected{% endif %}>Country</option>
-                    <option value="R&B" {% if soloist.genre == 'R&B' %}selected{% endif %}>R&B</option>
-                    <option value="Other" {% if soloist.genre == 'Other' %}selected{% endif %}>Other</option>
+                    <option value="" {% if not user.musician.genre %}selected{% endif %}>Choose a Genre</option>
+                    <option value="Pop" {% if user.musician.genre == 'Pop' %}selected{% endif %}>Pop</option>
+                    <option value="Rock" {% if user.musician.genre == 'Rock' %}selected{% endif %}>Rock</option>
+                    <option value="Hip-Hop/Rap" {% if user.musician.genre == 'Hip-Hop/Rap' %}selected{% endif %}>Hip-Hop/Rap</option>
+                    <option value="Jazz" {% if user.musician.genre == 'Jazz' %}selected{% endif %}>Jazz</option>
+                    <option value="Electronic Dance Music (EDM)" {% if user.musician.genre == 'Electronic Dance Music (EDM)' %}selected{% endif %}>Electronic Dance Music (EDM)</option>
+                    <option value="Classical" {% if user.musician.genre == 'Classical' %}selected{% endif %}>Classical</option>
+                    <option value="Reggae" {% if user.musician.genre == 'Reggae' %}selected{% endif %}>Reggae</option>
+                    <option value="Blues" {% if user.musician.genre == 'Blues' %}selected{% endif %}>Blues</option>
+                    <option value="Country" {% if user.musician.genre == 'Country' %}selected{% endif %}>Country</option>
+                    <option value="R&B" {% if user.musician.genre == 'R&B' %}selected{% endif %}>R&B</option>
+                    <option value="Other" {% if user.musician.genre == 'Other' %}selected{% endif %}>Other</option>
                 </select>
             </p>
             <p class="field">
                 <label for="price_per_hour"><strong>Price per Hour (€):</strong></label>
-                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ soloist.price_per_hour or '' }}" step="0.01">
+                <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01" required>
             </p>
             <p class="field">
                 <label for="equipment"><strong>Has Equipment:</strong></label>
                 <select id="equipment" name="equipment">
-                    <option value="true" {% if soloist.equipment %}selected{% endif %}>Yes</option>
-                    <option value="false" {% if not soloist.equipment %}selected{% endif %}>No</option>
+                    <option value="true" {% if user.musician.equipment %}selected{% endif %}>Yes</option>
+                    <option value="false" {% if not user.musician.equipment %}selected{% endif %}>No</option>
                 </select>
             </p>
             <p class="field">
                 <label for="link_to_songs"><strong>Link to Songs:</strong></label>
-                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ soloist.link_to_songs or '' }}">
+                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ user.musician.link_to_songs or '' }}">
             </p>
 
             <!-- Address Section -->

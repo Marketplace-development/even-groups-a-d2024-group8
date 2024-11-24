@@ -54,6 +54,18 @@
             padding: 15px;
             background-color: #f9f9f9;
         }
+        textarea {
+            width: 100%;
+            max-width: calc(100% - 30px); /* Prevents overflow of the bio box */
+            min-height: 100px; /* Reasonable height for bio input */
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none; /* Prevent resizing */
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+        }
         button, a.button {
             background-color: #6a00b5;
             color: #fff;
@@ -125,13 +137,17 @@
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
+            <!-- Bio -->
+            <p class="field">
+                <label for="bio"><strong>Bio:</strong></label>
+                <textarea id="bio" name="bio" placeholder="Write about your venue...">{{ user.bio or '' }}</textarea>
+            </p>
             <!-- Band Name -->
             <p class="field">
                 <label for="band_name"><strong>Band Name:</strong></label>
                 <input type="text" id="band_name" name="band_name" value="{{ band.band_name or '' }}" required>
             </p>
 
-            <!-- Band Information -->
             <!-- Band Information -->
             <p class="field">
                 <label for="genre"><strong>Genre:</strong></label>
@@ -155,15 +171,15 @@
                 <input type="number" id="price_per_hour" name="price_per_hour" value="{{ user.musician.price_per_hour or '' }}" step="0.01">
             </p>
             <p class="field">
-                <label for="link_to_songs"><strong>Link to Songs:</strong></label>
-                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ user.musician.link_to_songs or '' }}">
-            </p>
-            <p class="field">
                 <label for="equipment"><strong>Has Equipment:</strong></label>
                 <select id="equipment" name="equipment">
                     <option value="true" {% if user.musician.equipment %}selected{% endif %}>Yes</option>
                     <option value="false" {% if not user.musician.equipment %}selected{% endif %}>No</option>
                 </select>
+            </p>
+            <p class="field">
+                <label for="link_to_songs"><strong>Link to Songs:</strong></label>
+                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ user.musician.link_to_songs or '' }}">
             </p>
             <p class="field">
                 <label for="num_members_in_band"><strong>Number of Band Members:</strong></label>
