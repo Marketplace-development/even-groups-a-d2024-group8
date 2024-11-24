@@ -143,7 +143,7 @@
                 e.preventDefault();
                 const delta = e.deltaY > 0 ? -0.1 : 0.1;
                 scale = Math.min(Math.max(0.5, scale + delta), 2); // Limit zoom between 0.5x and 2x
-                preview.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                preview.style.transform = translate(-50%, -50%) scale(${scale});
             });
         }
 

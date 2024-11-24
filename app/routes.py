@@ -233,8 +233,9 @@ def upload_picture():
             db.session.commit()
             flash("Profile picture uploaded successfully!", "success")
         else:
-            flash("No profile picture uploaded. Proceeding without it.", "info")
-        return redirect(url_for('main.main_page'))  # Redirect to main_page.html after uploading
+            flash("No profile picture uploaded.", "info")
+        return redirect(url_for('main.main_page'))
+
     return render_template('upload_picture.html')
 
 @main.route('/main_page')
@@ -278,7 +279,7 @@ def search_musicians():
     } for musician in results])
 
 
-@main.route('/profile')
+
 @main.route('/profile')
 def profile():
     if 'user_id' not in session:
@@ -292,7 +293,7 @@ def profile():
 
     if user.profile_type == 'musician':
         if user.musician_type == 'soloist':
-            return render_template('soloist_profile.html', user=user)
+            return redirect(url_for('main.soloist_profile', user_id=user_id))
         elif user.musician_type == 'band':
             return redirect(url_for('main.band_profile', user_id=user_id))
     elif user.profile_type == 'venue':
@@ -335,17 +336,15 @@ def edit_band_profile(user_id):
 
 @main.route('/update_band_profile/<user_id>', methods=['POST'])
 def update_band_profile(user_id):
-    # Fetch user and band data
     user = Profile.query.get(user_id)
     band = Band.query.get(user_id)
 
-    # Handle cases where the user or band is not found
     if not user or not band:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update text fields from the form
-    user.bio = request.form.get('bio', user.bio)
+    # Update fields
+    band.band_name = request.form.get('band_name', band.band_name)
     user.musician.genre = request.form.get('genre', user.musician.genre)
     user.musician.price_per_hour = request.form.get('price_per_hour', user.musician.price_per_hour)
     user.musician.link_to_songs = request.form.get('link_to_songs', user.musician.link_to_songs)
@@ -359,7 +358,7 @@ def update_band_profile(user_id):
     user.phone_number = request.form.get('phone_number', user.phone_number)
     user.email = request.form.get('email', user.email)
 
-    # Update profile picture if a new one is uploaded
+    # Handle profile picture
     if 'profile_picture' in request.files:
         profile_picture = request.files['profile_picture']
         if profile_picture:
@@ -368,7 +367,6 @@ def update_band_profile(user_id):
     # Commit changes to the database
     db.session.commit()
 
-    # Provide feedback and redirect to the updated profile page
     flash("Profile updated successfully!", "success")
     return redirect(url_for('main.band_profile', user_id=user_id))
 
@@ -447,3 +445,86 @@ def update_venue_profile(user_id):
     # Provide feedback and redirect to the updated profile page
     flash("Profile updated successfully!", "success")
     return redirect(url_for('main.venue_profile', user_id=user_id))
+
+@main.route('/soloist_profile/<user_id>')
+def soloist_profile(user_id):
+    # Fetch the user profile and soloist details
+    user = Profile.query.get(user_id)
+    soloist = Soloist.query.get(user_id)
+
+    # Handle cases where the user or soloist is not found
+    if not user or not soloist:
+        flash("Soloist profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Convert profile picture to Base64 if it exists
+    profile_picture = None
+    if user.profile_picture:
+        profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+    # Render the soloist_profile.html template with necessary data
+    return render_template('soloist_profile.html', user=user, soloist=soloist, profile_picture=profile_picture)
+
+
+@main.route('/edit_soloist_profile/<user_id>')
+def edit_soloist_profile(user_id):
+    """
+    Route to display the edit page for soloist profiles.
+    """
+    user = Profile.query.get(user_id)
+    soloist = Soloist.query.get(user_id)
+
+    if not user or not soloist:
+        flash("Soloist profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Convert profile picture to Base64 if it exists
+    profile_picture = None
+    if user.profile_picture:
+        profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+    # Render edit_soloist_profile.html
+    return render_template('edit_soloist_profile.html', user=user, soloist=soloist, profile_picture=profile_picture)
+
+
+@main.route('/update_soloist_profile/<user_id>', methods=['POST'])
+def update_soloist_profile(user_id):
+    """
+    Route to handle updating the soloist profile.
+    """
+    user = Profile.query.get(user_id)
+    soloist = Soloist.query.get(user_id)
+
+    if not user or not soloist:
+        flash("Profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Update text fields from the form
+    soloist.artist_name = request.form.get('artist_name', soloist.artist_name)
+    soloist.date_of_birth = request.form.get('date_of_birth', soloist.date_of_birth)
+    user.musician.genre = request.form.get('genre', user.musician.genre)
+    user.musician.price_per_hour = request.form.get('price_per_hour', user.musician.price_per_hour)
+    user.musician.link_to_songs = request.form.get('link_to_songs', user.musician.link_to_songs)
+    user.musician.equipment = request.form.get('equipment', 'false') == 'true'
+    user.bio = request.form.get('bio', user.bio)
+    user.country = request.form.get('country', user.country)
+    user.city = request.form.get('city', user.city)
+    user.street_name = request.form.get('street_name', user.street_name)
+    user.house_number = request.form.get('house_number', user.house_number)
+    user.first_name = request.form.get('first_name', user.first_name)
+    user.last_name = request.form.get('last_name', user.last_name)
+    user.phone_number = request.form.get('phone_number', user.phone_number)
+    user.email = request.form.get('email', user.email)
+
+    # Handle profile picture if a new one is uploaded
+    if 'profile_picture' in request.files:
+        profile_picture = request.files['profile_picture']
+        if profile_picture:
+            user.profile_picture = profile_picture.read()
+
+    # Commit changes to the database
+    db.session.commit()
+
+    # Provide feedback and redirect to the updated profile page
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('main.soloist_profile', user_id=user_id))

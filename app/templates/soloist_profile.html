@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soloist Profile - MelodyMatch</title>
+    <title>{{ soloist.artist_name or 'Soloist Profile' }} - MelodyMatch</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -20,7 +20,6 @@
             width: 80%;
             max-width: 600px;
             margin: 50px auto;
-            text-align: center;
             color: #000;
         }
         .profile-picture {
@@ -29,47 +28,118 @@
             border-radius: 50%;
             background-color: #ccc; /* Placeholder for image */
             margin: 20px auto;
-            background-image: url("data:image/jpeg;base64,{{ user.profile_picture | b64encode | decode('utf-8') }}");
+            background-image: url("data:image/jpeg;base64,{{ profile_picture }}");
             background-size: cover;
             background-position: center;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .bio-box {
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            font-size: 1.2rem;
         }
         .field {
             margin: 10px 0;
             font-size: 1.2rem;
         }
-        button {
-            background-color: #6a00b5;
+        .section {
+            margin-top: 20px;
+        }
+        .section h2 {
+            margin-bottom: 10px;
+            border-bottom: 2px solid #6a00b5;
+            padding-bottom: 5px;
+            color: #6a00b5;
+            font-size: 1.4rem;
+        }
+        .box {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .separator {
+            border-top: 2px solid #6a00b5;
+            margin: 20px 0;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between buttons */
+            margin-top: 20px;
+        }
+        .button {
+            display: block;
+            text-align: center;
+            background-color: #6a00b5; /* Purple color */
             color: #fff;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none; /* Remove underline */
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #4e008f;
+        .button:hover {
+            background-color: #4e008f; /* Darker purple */
         }
     </style>
 </head>
 <body>
     <div class="profile-box">
-        <div class="profile-picture"
-            style="background-image: url('data:image/jpeg;base64,{{ user.profile_picture | b64encode }}');">
+        <div class="profile-picture" 
+            style="background-image: url('data:image/jpeg;base64,{{ profile_picture }}');">
         </div>
-        <h1>Soloist Profile</h1>
-        <p class="field"><strong>Artist Name:</strong> {{ user.artist_name or 'Not Specified' }}</p>
-        <p class="field"><strong>Date of Birth:</strong> {{ user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else 'Not Specified' }}</p>
-        <p class="field"><strong>Genre:</strong> {{ user.genre or 'Not Specified' }}</p>
-        <p class="field"><strong>City:</strong> {{ user.city or 'Not Specified' }}</p>
-        <p class="field"><strong>Country:</strong> {{ user.country or 'Not Specified' }}</p>
-        <p class="field"><strong>Street Name:</strong> {{ user.street_name or 'Not Specified' }}</p>
-        <p class="field"><strong>House Number:</strong> {{ user.house_number or 'Not Specified' }}</p>
-        <p class="field"><strong>Phone Number:</strong> {{ user.phone_number or 'Not Specified' }}</p>
-        <p class="field"><strong>Email:</strong> {{ user.email or 'Not Specified' }}</p>
-        <p class="field"><strong>Bio:</strong> {{ user.bio or 'Not Specified' }}</p>
+        <h1>{{ soloist.artist_name or 'Soloist Profile' }}</h1>
+        
+        <!-- Bio Section -->
+        <div class="bio-box">
+            {{ user.bio or 'No bio provided.' }}
+        </div>
+
+        <!-- Soloist Information -->
+        <p class="field"><strong>Date of Birth:</strong> {{ soloist.date_of_birth or 'Not Specified' }}</p>
+        <p class="field"><strong>Genre:</strong> {{ soloist.genre or 'Not Specified' }}</p>
+        <p class="field"><strong>Price per Hour (€):</strong> €{{ '{:.2f}'.format(soloist.price_per_hour) if soloist.price_per_hour else 'Not Specified' }}</p>
+        <p class="field"><strong>Link to Songs:</strong> <a href="{{ soloist.link_to_songs }}" target="_blank">{{ soloist.link_to_songs or 'Not Specified' }}</a></p>
+        <p class="field"><strong>Has Equipment:</strong> {{ 'Yes' if soloist.equipment else 'No' }}</p>
         <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }}</p>
-        <p class="field"><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(user.price_per_hour) if user.price_per_hour else 'Not Specified' }}</p>
-        <button>Edit Profile</button>
+
+        <!-- Address Section -->
+        <div class="section">
+            <h2>Address</h2>
+            <div class="box">
+                <p class="field"><strong>Country:</strong> {{ user.country or 'Not Specified' }}</p>
+                <p class="field"><strong>City:</strong> {{ user.city or 'Not Specified' }}</p>
+                <p class="field"><strong>Street Name:</strong> {{ user.street_name or 'Not Specified' }}</p>
+                <p class="field"><strong>House Number:</strong> {{ user.house_number or 'Not Specified' }}</p>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="section">
+            <h2>Contact Info</h2>
+            <div class="box">
+                <p class="field"><strong>First Name:</strong> {{ user.first_name or 'Not Specified' }}</p>
+                <p class="field"><strong>Last Name:</strong> {{ user.last_name or 'Not Specified' }}</p>
+                <p class="field"><strong>Phone Number:</strong> {{ user.phone_number or 'Not Specified' }}</p>
+                <p class="field"><strong>Email:</strong> {{ user.email or 'Not Specified' }}</p>
+            </div>
+        </div>
+
+        <!-- Button Group -->
+        <div class="button-group">
+            <a href="{{ url_for('main.edit_soloist_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
+            <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+        </div>
     </div>
 </body>
 </html>
