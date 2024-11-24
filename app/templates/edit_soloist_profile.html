@@ -115,6 +115,18 @@
 <body>
     <form action="{{ url_for('main.update_soloist_profile', user_id=soloist.profile_id) }}" method="post" enctype="multipart/form-data">
         <div class="profile-box">
+            <!-- Display error messages -->
+            {% with messages = get_flashed_messages(category_filter=["error"]) %}
+            {% if messages %}
+            <div class="error-message">
+                <ul>
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% endwith %}
             <!-- Profile Picture -->
             <div class="image-container" id="image-container">
                 <img id="preview" 
@@ -144,8 +156,15 @@
                     <option value="" {% if not soloist.genre %}selected{% endif %}>Choose a Genre</option>
                     <option value="Pop" {% if soloist.genre == 'Pop' %}selected{% endif %}>Pop</option>
                     <option value="Rock" {% if soloist.genre == 'Rock' %}selected{% endif %}>Rock</option>
+                    <option value="Hip-Hop/Rap" {% if soloist.genre == 'Hip-Hop/Rap' %}selected{% endif %}>Hip-Hop/Rap</option>
                     <option value="Jazz" {% if soloist.genre == 'Jazz' %}selected{% endif %}>Jazz</option>
-                    <!-- Add more genres as needed -->
+                    <option value="Electronic Dance Music (EDM)" {% if soloist.genre == 'Electronic Dance Music (EDM)' %}selected{% endif %}>Electronic Dance Music (EDM)</option>
+                    <option value="Classical" {% if soloist.genre == 'Classical' %}selected{% endif %}>Classical</option>
+                    <option value="Reggae" {% if soloist.genre == 'Reggae' %}selected{% endif %}>Reggae</option>
+                    <option value="Blues" {% if soloist.genre == 'Blues' %}selected{% endif %}>Blues</option>
+                    <option value="Country" {% if soloist.genre == 'Country' %}selected{% endif %}>Country</option>
+                    <option value="R&B" {% if soloist.genre == 'R&B' %}selected{% endif %}>R&B</option>
+                    <option value="Other" {% if soloist.genre == 'Other' %}selected{% endif %}>Other</option>
                 </select>
             </p>
             <p class="field">
@@ -153,15 +172,15 @@
                 <input type="number" id="price_per_hour" name="price_per_hour" value="{{ soloist.price_per_hour or '' }}" step="0.01">
             </p>
             <p class="field">
-                <label for="link_to_songs"><strong>Link to Songs:</strong></label>
-                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ soloist.link_to_songs or '' }}">
-            </p>
-            <p class="field">
                 <label for="equipment"><strong>Has Equipment:</strong></label>
                 <select id="equipment" name="equipment">
                     <option value="true" {% if soloist.equipment %}selected{% endif %}>Yes</option>
                     <option value="false" {% if not soloist.equipment %}selected{% endif %}>No</option>
                 </select>
+            </p>
+            <p class="field">
+                <label for="link_to_songs"><strong>Link to Songs:</strong></label>
+                <input type="url" id="link_to_songs" name="link_to_songs" value="{{ soloist.link_to_songs or '' }}">
             </p>
 
             <!-- Address Section -->

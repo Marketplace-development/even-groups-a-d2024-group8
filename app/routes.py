@@ -495,41 +495,65 @@ def edit_soloist_profile(user_id):
 @main.route('/update_soloist_profile/<user_id>', methods=['POST'])
 def update_soloist_profile(user_id):
     """
-    Route to handle updating the soloist profile.
+    Route to handle updating the soloist profile with proper validation and saving.
     """
     user = Profile.query.get(user_id)
     soloist = Soloist.query.get(user_id)
 
     if not user or not soloist:
-        flash("Profile not found", "error")
+        flash("Profile not found.", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update text fields from the form
-    soloist.artist_name = request.form.get('artist_name', soloist.artist_name)
-    soloist.date_of_birth = request.form.get('date_of_birth', soloist.date_of_birth)
-    user.musician.genre = request.form.get('genre', user.musician.genre)
-    user.musician.price_per_hour = request.form.get('price_per_hour', user.musician.price_per_hour)
-    user.musician.link_to_songs = request.form.get('link_to_songs', user.musician.link_to_songs)
-    user.musician.equipment = request.form.get('equipment', 'false') == 'true'
-    user.bio = request.form.get('bio', user.bio)
-    user.country = request.form.get('country', user.country)
-    user.city = request.form.get('city', user.city)
-    user.street_name = request.form.get('street_name', user.street_name)
-    user.house_number = request.form.get('house_number', user.house_number)
-    user.first_name = request.form.get('first_name', user.first_name)
-    user.last_name = request.form.get('last_name', user.last_name)
-    user.phone_number = request.form.get('phone_number', user.phone_number)
-    user.email = request.form.get('email', user.email)
+    # Collect form data
+    artist_name = request.form.get('artist_name', soloist.artist_name)
+    date_of_birth = request.form.get('date_of_birth')
+    genre = request.form.get('genre', user.musician.genre)
+    price_per_hour = request.form.get('price_per_hour')
+    equipment = request.form.get('equipment')
+    link_to_songs = request.form.get('link_to_songs')
+    
+    # Validate and update date_of_birth
+    if date_of_birth:
+        try:
+            soloist.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+        except ValueError:
+            flash("Invalid date format for Date of Birth. Please use YYYY-MM-DD.", "error")
+            return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
+    else:
+        flash("Date of Birth is required.", "error")
+        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
 
-    # Handle profile picture if a new one is uploaded
-    if 'profile_picture' in request.files:
-        profile_picture = request.files['profile_picture']
-        if profile_picture:
-            user.profile_picture = profile_picture.read()
+    # Update required musician fields
+    if not genre:
+        flash("Genre is required.", "error")
+        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
+    user.musician.genre = genre
+
+    if not price_per_hour:
+        flash("Price per Hour is required.", "error")
+        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
+    try:
+        user.musician.price_per_hour = float(price_per_hour)
+    except ValueError:
+        flash("Invalid Price per Hour. Please enter a valid number.", "error")
+        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
+
+    if equipment is None:
+        flash("Equipment selection is required.", "error")
+        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
+    user.musician.equipment = equipment.lower() == 'true'
+
+    # Update optional fields
+    soloist.artist_name = artist_name
+    user.musician.link_to_songs = link_to_songs
 
     # Commit changes to the database
-    db.session.commit()
+    try:
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while saving changes: {str(e)}", "error")
+        return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
 
-    # Provide feedback and redirect to the updated profile page
-    flash("Profile updated successfully!", "success")
     return redirect(url_for('main.soloist_profile', user_id=user_id))
