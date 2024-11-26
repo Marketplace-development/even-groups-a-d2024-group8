@@ -38,6 +38,14 @@ class Musician(db.Model):
 
     profile = db.relationship('Profile', backref=db.backref('musician', uselist=False))
 
+    __table_args__ = (
+        db.CheckConstraint(
+            "genre IN ('Pop', 'Rock', 'Hip-Hop/Rap', 'Jazz', 'Electronic Dance Music (EDM)', 'Classical', 'Reggae', 'Blues', 'Country', 'R&B', 'Other')", 
+            name='check_genre_valid'
+        ),
+    )
+
+    
     def __repr__(self):
         return f'<Musician {self.profile_id}, Genre: {self.genre}>'
 
