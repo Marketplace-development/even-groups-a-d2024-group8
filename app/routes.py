@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, render_template, session, flash
-from app.models import db, Profile, Musician, Soloist, Band, Venue  # Import db and models from app.models
+from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking, Review  # Import db and models from app.models
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -550,3 +550,6 @@ def update_soloist_profile(user_id):
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
+@main.route('/recommended')
+def recommended_page():
+    return render_template('my_recommendations.html', username=Profile.first_name)
