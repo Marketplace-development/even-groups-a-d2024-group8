@@ -576,7 +576,6 @@ def update_soloist_profile(user_id):
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
-<<<<<<< HEAD
     # Commit changes to the database
     db.session.commit()
 
@@ -870,9 +869,3 @@ def bookings():
         flash("Only venues can view this page.", "error")
         return redirect(url_for('main.main_page'))
 
-
-=======
-@main.route('/recommended')
-def recommended_page():
-    return render_template('my_recommendations.html', username=Profile.first_name)
->>>>>>> c52d5851baf7bc00942bff5b83d1f99799e0a1de
