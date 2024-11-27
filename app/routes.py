@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, render_template, session, flash
+from flask import Blueprint, request, redirect, url_for, render_template, session, flash, jsonify
 from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking, Review  # Import db and models from app.models
 import uuid
 from datetime import datetime
@@ -616,13 +616,13 @@ def search_profiles():
             query = query.filter(Profile.musician_type == musician_type)
             filters_applied = True
 
-        # Filter by artist name or band name
-        artist_name = data.get('artist_name')
-        if artist_name:
-            artist_name = f"%{artist_name}%"
+        # Filter by first name or last name
+        name = data.get('name')
+        if name:
+            name = f"%{name}%"
             query = query.filter(
-                (soloist_alias.artist_name.ilike(artist_name)) |
-                (band_alias.band_name.ilike(artist_name))
+                (Profile.first_name.ilike(name)) |
+                (Profile.last_name.ilike(name))
             )
             filters_applied = True
 
@@ -852,7 +852,6 @@ def respond_booking(booking_id):
     flash(f"Booking has been {response.lower()}.", "success")
     return redirect(url_for('main.main_page'))
 
-# routes.py
 @main.route('/bookings')
 def bookings():
     if 'user_id' not in session:
@@ -863,9 +862,10 @@ def bookings():
 
     if user.profile_type == 'venue':
         # Get bookings requested by this venue
-        bookings = Booking.query.filter_by(venue_id=user_id).all()
-        return render_template('bookings.html', bookings=bookings, user=user)
+        bookings = Booking.query.filter_by(venue_id=user_id).order_by(Booking.date_booking.desc()).all()
+        return render_template('mybooking.html', bookings=bookings, user=user)
     else:
         flash("Only venues can view this page.", "error")
         return redirect(url_for('main.main_page'))
+
 
