@@ -1,17 +1,35 @@
-from flask import Blueprint, request, redirect, url_for, render_template, session, flash
-from app.models import db, Profile, Musician, Soloist, Band, Venue  # Import db and models from app.models
+from flask import Blueprint, request, redirect, url_for, render_template, session, flash, jsonify
+from flask_login import current_user, login_required
+from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking  # Add Booking to the imports
+  # Import db and models from app.models
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import base64
+import random
+from datetime import datetime, timedelta
+
 main = Blueprint('main', __name__)
 
 
 @main.route('/')
 def index():
+    # Check if the user is logged in
     if 'user_id' in session:
-        return redirect(url_for('main.main_page'))  # Redirect to main page if already logged in
-    return render_template('index.html')  # Show the index page if not logged in
+        try:
+            user_id = uuid.UUID(session['user_id'])
+            user = Profile.query.get(user_id)
+
+            # If the user exists, redirect to the main page
+            if user:
+                return redirect(url_for('main.main_page'))
+        except Exception as e:
+            # Clear invalid session data if there's an issue
+            session.pop('user_id', None)
+
+    # Render the index.html for guests
+    return render_template('index.html')
+
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -246,12 +264,22 @@ def upload_picture():
 @main.route('/main_page')
 def main_page():
     if 'user_id' not in session:
-        # If user is not logged in, redirect to login page
         return redirect(url_for('main.login'))
-    # If logged in, render the main page
+
     user_id = uuid.UUID(session['user_id'])
     user = Profile.query.get(user_id)
-    return render_template('main_page.html', username=user.first_name)
+
+    if user.profile_type == 'venue':
+        # Show profiles of soloists and bands
+        musician_profiles = db.session.query(Musician).join(Profile).order_by(db.func.random()).all()
+        return render_template('main_page.html', user=user, profiles=musician_profiles)
+    elif user.profile_type == 'musician':
+        # Fetch bookings where the musician is the logged-in user and status is 'Requested'
+        bookings = Booking.query.filter_by(musician_id=user_id, status='Requested').all()
+        return render_template('main_page.html', user=user, bookings=bookings)
+    else:
+        return render_template('main_page.html', user=user)
+
 
 @main.route('/search_musicians', methods=['POST'])
 def search_musicians():
@@ -549,4 +577,298 @@ def update_soloist_profile(user_id):
         profile_picture = request.files['profile_picture']
         if profile_picture:
             user.profile_picture = profile_picture.read()
+
+    # Commit changes to the database
+    db.session.commit()
+
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('main.soloist_profile', user_id=user_id))
+
+from sqlalchemy.orm import aliased
+
+@main.route('/search_profiles', methods=['POST'])
+def search_profiles():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized access'}), 401
+
+    data = request.get_json()
+    user = Profile.query.get(uuid.UUID(session['user_id']))
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if user.profile_type == 'venue':
+        # Start the query with Musician joined with Profile
+        query = db.session.query(Musician).join(Profile)
+
+        # Create aliases for Soloist and Band models
+        soloist_alias = aliased(Soloist)
+        band_alias = aliased(Band)
+
+        # Outer join to Soloist and Band
+        query = query.outerjoin(soloist_alias, Musician.profile_id == soloist_alias.profile_id)
+        query = query.outerjoin(band_alias, Musician.profile_id == band_alias.profile_id)
+
+        # Initialize a flag to check if any filters are applied
+        filters_applied = False
+
+        # Filter by musician type if provided
+        musician_type = data.get('musician_type')
+        if musician_type:
+            query = query.filter(Profile.musician_type == musician_type)
+            filters_applied = True
+
+        # Filter by artist name or band name
+        artist_name = data.get('artist_name')
+        if artist_name:
+            artist_name = f"%{artist_name}%"
+            query = query.filter(
+                (soloist_alias.artist_name.ilike(artist_name)) |
+                (band_alias.band_name.ilike(artist_name))
+            )
+            filters_applied = True
+
+        # Apply other filters
+        city = data.get('city')
+        if city:
+            query = query.filter(Profile.city.ilike(f"%{city}%"))
+            filters_applied = True
+
+        style = data.get('style')
+        if style:
+            query = query.filter(Musician.genre == style)
+            filters_applied = True
+
+        max_price = data.get('max_price')
+        if max_price:
+            try:
+                max_price_float = float(max_price)
+                query = query.filter(Musician.price_per_hour <= max_price_float)
+                filters_applied = True
+            except ValueError:
+                pass  # Ignore invalid price input
+
+        equipment = data.get('equipment')
+        if equipment:
+            needs_equipment = equipment.lower() == 'yes'
+            # If musician needs equipment, they do NOT have equipment
+            query = query.filter(Musician.equipment != needs_equipment)
+            filters_applied = True
+
+        # Fetch results based on filters
+        results = query.all()
+
+        if not filters_applied:
+            # No filters applied, show random profiles
+            results = db.session.query(Musician).join(Profile).order_by(db.func.random()).limit(5).all()
+        # Else, if filters are applied and results are empty, we return an empty list
+        # This allows the frontend to display the "No Soloists Or Bands Satisfy Your Requirements" message
+
+        # Prepare the results
+        output = []
+        for musician in results:
+            profile = musician.profile
+            artist_or_band_name = None
+            if profile.musician_type == 'soloist' and musician.soloist:
+                artist_or_band_name = musician.soloist.artist_name
+            elif profile.musician_type == 'band' and musician.band:
+                artist_or_band_name = musician.band.band_name
+            else:
+                artist_or_band_name = f"{profile.first_name} {profile.last_name}"
+
+            output.append({
+                'id': str(musician.profile_id),
+                'name': artist_or_band_name,
+                'details': f"Genre: {musician.genre}, Price: €{musician.price_per_hour}/hour",
+            })
+
+        return jsonify(output)
+
+    # Handle other profile types if needed
+    return jsonify([])  # Default empty result
+
+
+@main.route('/profile/<user_id>')
+def view_profile(user_id):
+    user = Profile.query.get(uuid.UUID(user_id))
+
+    if not user:
+        flash("Profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    logged_in_user_id = uuid.UUID(session['user_id'])
+    is_own_profile = (logged_in_user_id == uuid.UUID(user_id))
+    logged_in_user = Profile.query.get(logged_in_user_id)
+
+    if user.profile_type == 'musician':
+        # Show "Book Here" button only if the logged-in user is a venue and not viewing their own profile
+        show_book_button = logged_in_user and logged_in_user.profile_type == 'venue' and not is_own_profile
+
+        # Convert profile picture to Base64 if it exists
+        profile_picture = None
+        if user.profile_picture:
+            profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+        if user.musician_type == 'soloist':
+            # Fetch the soloist data
+            soloist = Soloist.query.get(user.profile_id)
+            return render_template(
+                'soloist_profile.html',
+                user=user,
+                soloist=soloist,
+                show_book_button=show_book_button,
+                is_own_profile=is_own_profile,
+                profile_picture=profile_picture
+            )
+
+        elif user.musician_type == 'band':
+            # Fetch the band data
+            band = Band.query.get(user.profile_id)
+            return render_template(
+                'band_profile.html',
+                user=user,
+                band=band,
+                show_book_button=show_book_button,
+                is_own_profile=is_own_profile,
+                profile_picture=profile_picture
+            )
+
+    elif user.profile_type == 'venue':
+        # For venues
+        profile_picture = None
+        if user.profile_picture:
+            profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+        is_own_profile = (logged_in_user_id == uuid.UUID(user_id))
+        return render_template(
+            'venue_profile.html',
+            user=user,
+            venue=user.venue,
+            is_own_profile=is_own_profile,
+            profile_picture=profile_picture
+        )
+
+    flash("Invalid profile type", "error")
+    return redirect(url_for('main.main_page'))
+
+# routes.py
+@main.route('/request_booking/<musician_id>', methods=['GET', 'POST'])
+def request_booking(musician_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to book a musician.", "error")
+        return redirect(url_for('main.login'))
+
+    logged_in_user_id = uuid.UUID(session['user_id'])
+    logged_in_user = Profile.query.get(logged_in_user_id)
+
+    if not logged_in_user or logged_in_user.profile_type != 'venue':
+        flash("Only venues can request bookings.", "error")
+        return redirect(url_for('main.main_page'))
+
+    musician = Musician.query.get(uuid.UUID(musician_id))
+    if not musician:
+        flash("Musician not found.", "error")
+        return redirect(url_for('main.main_page'))
+
+    if request.method == 'POST':
+        # Get form data
+        date_booking_str = request.form.get('date_booking')
+        duration_str = request.form.get('duration')  # Get the unified duration field
+
+        # Validate and parse form data
+        try:
+            # Parse date_booking
+            date_booking = datetime.strptime(date_booking_str, '%Y-%m-%dT%H:%M')
+
+            # Parse and validate duration
+            if not duration_str or ':' not in duration_str:
+                raise ValueError("Invalid duration format. Please use HH:MM.")
+
+            hours, minutes = map(int, duration_str.split(':'))
+            if hours < 0 or minutes < 0 or minutes >= 60:
+                raise ValueError("Invalid duration values. Hours must be >= 0, and minutes between 0 and 59.")
+
+            duration = timedelta(hours=hours, minutes=minutes)
+            if duration.total_seconds() <= 0:
+                raise ValueError("Duration must be greater than zero.")
+        except ValueError as e:
+            flash(str(e), "error")
+            return redirect(url_for('main.request_booking', musician_id=musician_id))
+
+        # Create a new booking with status 'Requested'
+        new_booking = Booking(
+            musician_id=uuid.UUID(musician_id),
+            venue_id=logged_in_user_id,
+            status='Requested',
+            date_booking=date_booking,
+            duration=duration,
+            booked_by=logged_in_user_id,
+            booked_in=logged_in_user_id
+        )
+
+        try:
+            db.session.add(new_booking)
+            db.session.commit()
+            flash("Booking request sent successfully!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred while requesting the booking: {e}", "error")
+
+        return redirect(url_for('main.main_page'))
+
+    else:
+        # GET request, render booking.html
+        # Pass musician info to template
+        return render_template('booking.html', musician=musician)
+
+# routes.py
+@main.route('/respond_booking/<int:booking_id>', methods=['POST'])
+def respond_booking(booking_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to respond to bookings.", "error")
+        return redirect(url_for('main.login'))
+
+    user_id = uuid.UUID(session['user_id'])
+    user = Profile.query.get(user_id)
+
+    booking = Booking.query.get(booking_id)
+    if not booking:
+        flash("Booking not found.", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Ensure that only the musician associated with the booking can respond
+    if booking.musician_id != user_id:
+        flash("You are not authorized to respond to this booking.", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Get the response from the form
+    response = request.form.get('response')
+    if response not in ['Accepted', 'Denied']:
+        flash("Invalid response.", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Update the booking status
+    booking.status = response
+    db.session.commit()
+
+    flash(f"Booking has been {response.lower()}.", "success")
+    return redirect(url_for('main.main_page'))
+
+# routes.py
+@main.route('/bookings')
+def bookings():
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    user_id = uuid.UUID(session['user_id'])
+    user = Profile.query.get(user_id)
+
+    if user.profile_type == 'venue':
+        # Get bookings requested by this venue
+        bookings = Booking.query.filter_by(venue_id=user_id).all()
+        return render_template('bookings.html', bookings=bookings, user=user)
+    else:
+        flash("Only venues can view this page.", "error")
+        return redirect(url_for('main.main_page'))
+
 

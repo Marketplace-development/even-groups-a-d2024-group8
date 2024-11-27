@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Booking - MelodyMatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS styles here */
+        body {
+            background: linear-gradient(135deg, #3a007d, #6a00b5);
+            font-family: 'DM Sans', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            margin: 50px auto;
+            color: #000;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .musician-details {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .booking-form {
+            margin-top: 20px;
+        }
+        .booking-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .booking-form input[type="datetime-local"],
+        .booking-form input[type="number"],
+        .booking-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        .booking-form button {
+            display: block;
+            width: 100%;
+            background-color: #6a00b5;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .booking-form button:hover {
+            background-color: #4e008f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Request Booking</h1>
+        <div class="musician-details">
+            <h2>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h2>
+            <p><strong>Genre:</strong> {{ musician.genre }}</p>
+            <p><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(musician.price_per_hour) }}</p>
+        </div>
+        <form action="{{ url_for('main.request_booking', musician_id=musician.profile_id) }}" method="POST" class="booking-form">
+            <label for="date_booking">Date and Time of Performance:</label>
+            <input type="datetime-local" id="date_booking" name="date_booking" required>
+
+            <label for="duration">Duration (HH:MM):</label>
+            <input type="text" id="duration" name="duration" placeholder="e.g., 02:30" required>
+            <p class="hint">Enter the duration in hours and minutes (e.g., 02:30 for 2 hours 30 minutes).</p>
+
+            <!-- Optional message -->
+            <label for="message">Additional Notes:</label>
+            <textarea id="message" name="message" rows="4" placeholder="Any additional details or requests..."></textarea>
+
+            <button type="submit">Submit Booking Request</button>
+        </form>
+    </div>
+</body>
+</html>

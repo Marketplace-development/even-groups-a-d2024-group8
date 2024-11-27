@@ -75,22 +75,29 @@
             gap: 20px; /* Space between buttons */
             margin-top: 20px;
         }
+        
         .button {
-            display: block;
-            text-align: center;
+            display: flex; /* Use flexbox for proper text alignment */
+            justify-content: center; /* Center text horizontally */
+            align-items: center; /* Center text vertically */
             background-color: #6a00b5; /* Purple color */
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 0 20px; /* Horizontal padding */
             border-radius: 5px;
             font-size: 1rem;
             text-decoration: none; /* Remove underline */
             cursor: pointer;
             transition: background-color 0.3s;
+            height: 50px; /* Fixed height for all buttons */
+            width: 150px; /* Optional: Set a consistent width */
+            box-sizing: border-box; /* Include padding and border in height/width */
         }
+        
         .button:hover {
             background-color: #4e008f; /* Darker purple */
         }
+        
     </style>
 </head>
 <body>
@@ -107,12 +114,18 @@
         </div>
 
         <!-- Band Information --><!-- Band Information -->
+        <!-- Other parts of the template remain the same -->
+
+<!-- Band Information -->
         <p class="field"><strong>Genre:</strong> {{ user.musician.genre or 'Not Specified' }}</p>
         <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }}</p>
         <p class="field"><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(user.musician.price_per_hour) if user.musician.price_per_hour else 'Not Specified' }}</p>
         <p class="field"><strong>Has Equipment:</strong> {{ 'Yes' if user.musician.equipment else 'No' }}</p>
         <p class="field"><strong>Link to Songs:</strong> <a href="{{ user.musician.link_to_songs }}" target="_blank">{{ user.musician.link_to_songs or 'Not Specified' }}</a></p>
         <p class="field"><strong>Number of Band Members:</strong> {{ band.num_members_in_band or 'Not Specified' }}</p>
+
+<!-- Rest of the template -->
+
         
         <!-- Address Section -->
         <div class="section">
@@ -137,9 +150,15 @@
         </div>
 
         <!-- Button Group -->
+        <!-- ... existing HTML code ... -->
+
+<!-- Button Group -->
+        <!-- Button Group -->
         <div class="button-group">
-            <a href="{{ url_for('main.edit_band_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
             <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+            {% if show_book_button %}
+                <a href="{{ url_for('main.request_booking', musician_id=user.profile_id) }}" class="button">Book Here</a>
+            {% endif %}
         </div>
     </div>
 </body>

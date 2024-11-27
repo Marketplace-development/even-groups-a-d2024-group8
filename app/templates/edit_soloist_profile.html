@@ -192,14 +192,14 @@
                 <div class="box">
                     <p class="field">
                         <label for="country"><strong>Country:</strong></label>
-                        <select id="country" class="dropdown-select" name="country">
+                        <select id="country" class="dropdown-select" name="country" required>
                             <option value="" {% if not user.country %}selected{% endif %}>Select Country</option>
                             <option value="Belgium" {% if user.country == 'Belgium' %}selected{% endif %}>Belgium</option>
                         </select>
                     </p>
                     <p class="field">
                         <label for="city"><strong>City:</strong></label>
-                        <input type="text" id="city" name="city" value="{{ user.city or '' }}">
+                        <input type="text" id="city" name="city" value="{{ user.city or '' }}" required>
                     </p>
                     <p class="field">
                         <label for="street_name"><strong>Street Name:</strong></label>

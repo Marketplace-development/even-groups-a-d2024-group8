@@ -7,8 +7,8 @@ class Profile(db.Model):
     profile_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    country = db.Column(db.String)
-    city = db.Column(db.String)     
+    country = db.Column(db.String, nullable= False)
+    city = db.Column(db.String, nullable=False)     
     street_name = db.Column(db.String)  
     house_number = db.Column(db.String)  
     phone_number = db.Column(db.String)
@@ -53,7 +53,7 @@ class Soloist(db.Model):
     __tablename__ = 'soloist'
     profile_id = db.Column(UUID(as_uuid=True), db.ForeignKey('musician.profile_id', ondelete='SET NULL', onupdate='CASCADE'), primary_key=True)
     date_of_birth = db.Column(db.Date, nullable=False)
-    artist_name = db.Column(db.String)  # Optional
+    artist_name = db.Column(db.String, nullable=False)  # Optional
 
     musician = db.relationship('Musician', backref=db.backref('soloist', uselist=False))
 
@@ -110,7 +110,7 @@ class Booking(db.Model):
     profile_booked_by = db.relationship('Profile', foreign_keys=[booked_by], backref=db.backref('bookings_made', lazy=True))
 
     __table_args__ = (
-        db.CheckConstraint("status IN ('Completed', 'Processing', 'Failed')", name='check_status_valid'),
+        db.CheckConstraint("status IN ('Requested', 'Confirmed', 'Completed', 'Processing', 'Failed', 'Cancelled')", name='check_status_valid'),
     )
 
     def __repr__(self):

@@ -13,20 +13,30 @@
             padding: 0;
             color: #000;
             height: 100%;
+            overflow: hidden; /* Prevent page scrolling */
+        }
+        .layout {
+            display: flex;
+            height: 100vh; /* Full viewport height */
         }
         .side-bar {
             background: #6a00b5;
+            width: 250px; /* Fixed width for the sidebar */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100%;
+            padding: 20px 10px;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            height: 100vh; /* Ensures full height for the sidebar */
         }
         .button {
             text-align: center;
             color: #fff;
             border: none;
             border-radius: 5px;
-            padding: 10px 30px 10px 15px;
+            padding: 10px 15px;
             margin-bottom: 40px;
             font-size: 1rem;
             cursor: pointer;
@@ -36,18 +46,50 @@
         .button:hover {
             background-color: #4e008f;
         }
-        .search-bar { 
+        .right-part {
+            flex: 1; /* Occupies remaining space */
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 30px;
-            gap: 10px;
+            flex-direction: column;
+            height: 100%;
+        }
+        .logout-sub-side-bar{
+            display: flex;
+            align-items: flex-start;
+        }
+        .search-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Creates 4 equal-width columns */
+            grid-gap: 10px; /* Adds space between grid items */
+            background: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0; /* Sticks to the top */
+            z-index: 10; /* Ensures it stays above other elements */
+        }
+        
+        .search-bar select,
+        .search-bar input,
+        .search-bar button {
+            width: 100%; /* Makes inputs fill their grid cell */
+            border-radius: 5px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            padding: 5px;
+        }
+        
+        .sub-side-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
         .search-bar select, .search-bar input, .search-bar button {
             border-radius: 5px;
             background-color: #fff;
             border: 1px solid #ccc;
             font-size: 1rem;
+            padding: 5px;
         }
         .search-bar button {
             background-color: #4e008f;
@@ -56,21 +98,38 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+        .search-bar button:hover {
+            background-color: #6a00b5;
+        }
         .search-results {
-            width: 80%;
-            margin: 20px auto;
-            background-color: #f0f0f0;
+            flex: 1; /* Takes remaining vertical space */
+            overflow-y: auto; /* Enables scrolling for the profiles */
             padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .profile-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better design */
+        }
+        .view-profile-button {
+            background-color: #6a00b5; /* Purple */
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
             border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none; /* Remove underline */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-        .layout {
-            display: flex;
-            height: 100%;
-        }
-        .sub-side-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+        .view-profile-button:hover {
+            background-color: #4e008f; /* Darker purple on hover */
         }
         .icon {
             width: 24px;
@@ -83,14 +142,23 @@
             display: flex;
             justify-content: center;
         }
-        .right-part {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .flash-messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
-        .logout-sub-side-bar{
-            display: flex;
-            align-items: flex-start;
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-messages li.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
@@ -133,12 +201,17 @@
             </div>
             
         </div>
+        <!-- Main content -->
         <div class="right-part">
+            <!-- Search bar -->
+            {% if user.profile_type == 'venue' %}
             <form class="search-bar">
-                <select name="musician_type">
+                <select id="musician_type" name="musician_type">
+                    <option value="">Choose Type</option>
                     <option value="soloist">Soloist</option>
                     <option value="band">Band</option>
                 </select>
+                <input type="text" id="artist_name" name="artist_name" placeholder="Artist Name/Band Name">
                 <input type="text" placeholder="City" name="city">
                 <select name="style">
                     <option value="">Choose a Genre</option>
@@ -154,53 +227,100 @@
                     <option value="R&B">R&B</option>
                     <option value="Other">Other</option>
                 </select>
-                <select name="rating">
-                    <option value="">Minimum Rating</option>
-                    <option value="1">★☆☆☆☆</option>
-                    <option value="2">★★☆☆☆</option>
-                    <option value="3">★★★☆☆</option>
-                    <option value="4">★★★★☆</option>
-                    <option value="5">★★★★★</option>
-                </select>
                 <input type="number" placeholder="Max price per hour (€)" name="max_price" step="0.01">
                 <select name="equipment">
                     <option value="">Equipment Needed</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                 </select>
-                <button type="button" onclick="searchMusicians()">Search</button>
-            </form>
+                <button type="button" onclick="search_profiles()">Search</button>
+            </form>            
+            {% endif %}
+
+            <!-- Search results -->
             <div class="search-results" id="search-results">
-                <!-- Search results will be displayed here -->
+                {% if user.profile_type == 'venue' %}
+                    {% for musician in profiles %}
+                        <div class="profile-card">
+                            <div>
+                                <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
+                                <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
+                            </div>
+                            <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
+                        </div>
+                    {% endfor %}
+                <!-- main_page.html -->
+                {% elif user.profile_type == 'musician' %}
+                {% if bookings %}
+                    <h2>Booking Requests</h2>
+                    {% for booking in bookings %}
+                        <div class="profile-card">
+                            <div>
+                                <h3>{{ booking.venue.profile.first_name }} {{ booking.venue.profile.last_name }}</h3>
+                                <p>
+                                    Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                    Duration: {{ booking.duration }}<br>
+                                    Status: {{ booking.status }}
+                                </p>
+                            </div>
+                            {% if booking.status == 'Requested' %}
+                                <form action="{{ url_for('main.respond_booking', booking_id=booking.id) }}" method="post">
+                                    <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
+                                    <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
+                                </form>
+                            {% else %}
+                                <p>Status: {{ booking.status }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No Booking Requests</p>
+                {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>
     <script>
-        function searchMusicians() {
+        function search_profiles() {
             const formData = new FormData(document.querySelector('.search-bar'));
             const searchData = Object.fromEntries(formData.entries());
-            fetch('/search_musicians', {
+            fetch('/search_profiles', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // Ensure the content type is set to application/json
-                    'Accept': 'application/json'        // Explicitly state that the client expects JSON
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
                 body: JSON.stringify(searchData)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log(data); // Handle the response data
-                // Update the page with the results
+                const searchResultsDiv = document.getElementById('search-results');
+                searchResultsDiv.innerHTML = '';
+                if (data.length === 0) {
+                    searchResultsDiv.innerHTML = '<p>No results found.</p>';
+                    return;
+                }
+                data.forEach(profile => {
+                    const profileDiv = document.createElement('div');
+                    profileDiv.className = 'profile-card';
+                    profileDiv.innerHTML = `
+                        <div>
+                            <h3>${profile.name}</h3>
+                            <p>${profile.details}</p>
+                        </div>
+                        <button onclick="viewProfile('${profile.id}')" class="view-profile-button">View Profile</button>
+                    `;
+                    searchResultsDiv.appendChild(profileDiv);
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred while searching. Please try again.');
             });
+        }
+
+        function viewProfile(profileId) {
+            window.location.href = `/profile/${profileId}`;
         }
     </script>
 </body>
