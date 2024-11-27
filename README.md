@@ -50,6 +50,8 @@ This file initializes the Flask application and sets up the necessary configurat
 
 - Using with app.app_context() ensures that all database-related tasks are handled within the context of the app, ensuring that models and routes are available during the app's lifecycle.
 
+HIER NOG AANPASSEN
+
 ## ⚙️ config.py
 
 The config.py file contains the configuration settings for the Flask application, including the database connection and security settings.
@@ -217,6 +219,8 @@ This route renders the page for editing a soloist profile. It retrieves the user
 #### main.route('/update_soloist_profile/<user_id>', methods=['POST'])  
 This route processes the updating of the soloist profile when the user submits the edit form. It first retrieves the user and soloist data from the database based on the provided user_id. If the user or soloist cannot be found, an error message is shown, and the user is redirected. The form data is then processed, and fields such as artist name, date of birth, genre, and price per hour are updated. The route also handles musician-specific information such as song links, equipment, and bio updates. The date of birth is parsed and validated to ensure the correct format. If any errors occur in processing numeric fields (like price per hour), an error message is displayed, and the user is redirected to correct their input. If a new profile picture is uploaded, it replaces the existing one. After all updates are made, the changes are committed to the database, and a success message is shown. The user is redirected to their updated soloist profile page.
 
+HIER NOG AANPASSEN VANAF 551
+
 
 ## Templates
 
@@ -224,7 +228,7 @@ The templates folder holds the HTML files responsible for rendering pages relate
 
 ### Explanation of the Code
 
-
+HIER KOMT DE LAYOUT EXPLANATION 
 
 #### band_profile.html
 This section describes the profile page for a band's profile in MelodyMatch, where users can view and update various details about their band. The page shows the band's information, including their name, genre, rating, and more. If available, the band's profile picture is displayed.
@@ -240,3 +244,11 @@ The form includes several input fields. The band name is entered in a text input
 In addition to these details, the template includes sections for address and contact information. Users can enter their country, city, street name, and house number, as well as first name, last name, phone number, and email. These fields are displayed in grouped sections with headings, which help separate the different areas of the form.
 
 The form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be straightforward and user-friendly, ensuring that users can easily input and update their information.
+
+
+HIER VANAF EDIT SOLOIST PROFILE HTML
+
+
+
+
+RUN OOK NOG DOEN

@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 from flask import Blueprint, request, redirect, url_for, render_template, session, flash, jsonify
 from flask_login import current_user, login_required
 from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking  # Add Booking to the imports
   # Import db and models from app.models
+=======
+from flask import Blueprint, request, redirect, url_for, render_template, session, flash
+from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking, Review  # Import db and models from app.models
+>>>>>>> c52d5851baf7bc00942bff5b83d1f99799e0a1de
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -578,6 +583,7 @@ def update_soloist_profile(user_id):
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
+<<<<<<< HEAD
     # Commit changes to the database
     db.session.commit()
 
@@ -872,3 +878,8 @@ def bookings():
         return redirect(url_for('main.main_page'))
 
 
+=======
+@main.route('/recommended')
+def recommended_page():
+    return render_template('my_recommendations.html', username=Profile.first_name)
+>>>>>>> c52d5851baf7bc00942bff5b83d1f99799e0a1de
