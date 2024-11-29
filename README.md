@@ -4,7 +4,7 @@ Melody Match is an innovative platform designed to connect local musicians with 
 
 # 🗄️ EER and Database
 
-First we made an EER model to develop and model our business idee. Then we made a database in Supabase to store and manage the data for musicians, venues and bookings between those two when new users register or new bookings are made. 
+First we made an EER model to develop and model our business idea. Then we made a database in Supabase to store and manage the data for musicians, venues and bookings between those two when new users register or new bookings are made. 
 
 Finally, we have developed a Flask application to bring our idea to life.
 
@@ -58,11 +58,11 @@ The config.py file contains the configuration settings for the Flask application
 
 ### Explanation of the Code
 
-- SECRET_KEY: This key is used by Flask to securely sign cookies and session data
+- SECRET_KEY: This key is used by Flask to securely sign cookies and session data.
 
 - SQLALCHEMY_DATABASE_URI: This setting defines the connection URL for the database. 
 
-- SQLALCHEMY_TRACK_MODIFICATIONS: This setting ensures that Flask does not track changes in the database. This is disabled for better performance
+- SQLALCHEMY_TRACK_MODIFICATIONS: This setting ensures that Flask does not track changes in the database. This is disabled for better performance.
 
 ## 🗂️ Models
 
@@ -122,7 +122,7 @@ The Booking model manages the reservations made for musicians at venues.
 booking_id: A unique identifier for each booking.
 musician_id: A foreign key linking to the Musician table.
 venue_id: A foreign key linking to the Venue table.
-status: The current status of the booking (Completed, Processing, Failed).
+status: The current status of the booking (Requested, Confirmed, Completed, Processing, Failed, Cancelled).
 duration: The duration of the performance.
 date_booking: The date and time of the booking.
 booked_by: The profile ID of the person who made the booking.
@@ -152,17 +152,17 @@ The routes define how users interact with the application. They handle page navi
 ### Explanation of the Code
 
 #### main.route('/')
-Checks if a user is logged in. If logged in, the user is redirected to  main_page. If the user is not logged in, the homepage index.html is displayed.
+Checks if a user is logged in. If logged in, the user is redirected to main_page. If the user is not logged in, the homepage index.html is displayed.
 
 #### main.route('/register', methods=['GET', 'POST'])
 This function has two methods, GET and POST, which are handling the registration of new users, with different paths for musicians and venues.
 
 The GET request returns the registration form, register.html.
 
-The POST request the registration of the new user. It collects the common form data (email, profile type, name, address, phone, bio), and checks if all the required information is filled in and if the email is new, if not it returns an error. 
+The POST request returns the registration of the new user. It collects the common form data (email, profile type, name, address, phone, bio), and checks if all the required information is filled in and if the email is new, if not it returns an error. 
 The function then creates a new user.
-If the User is a musician, the function gathers musician-specific information such as role(soloist/band), genre, hourly rate, songs and equipment. It validates the musician files, creates a Musician record in the database and links it with the user's profile. It also checks if all the requierd information is given such as date of birth for a soloist or amount of members for a band, if not: error.
-If the User is a venue, the function collect venue-specific data like venue name and style, as well as creating a venue record which is linked to the user's profile.
+If the user is a musician, the function gathers musician-specific information such as role(soloist/band), genre, hourly rate, songs and equipment. It validates the musician files, creates a Musician record in the database and links it with the user's profile. It also checks if all the required information is given such as date of birth for a soloist or amount of members for a band, if not it will return an error.
+If the User is a venue, the function collects venue-specific data like venue name and style, as well as creating a venue record which is linked to the user's profile.
 At the end, the users are asked to upload their profile picture and so they are redirected towards the upload_profile function.
 
 #### main.route('/login', methods=['GET', 'POST'])
@@ -178,10 +178,10 @@ This route handles user logout. When accessed, it removes the user session and r
 This route displays the user’s profile page depending on their profile type, if the user is logged in. If not, the user is redirected to the login page.
 
 If the user is a venue, all musicians are displayed for booking.
-If the user is a musician, all available venues are displayed for performance opportunities.
+If the user is a musician, their booking requests will be displayed.
 
 #### main.route('/upload_picture', methods=['GET', 'POST'])
-This route handles the upload of a user’s profile picture. If the user is logged in, they can upload a profile picture. If not, they are redirected towards the login page. The image is saved to the database, and the user is redirected to the main page. If the user skips the upload, a notification is displayed, and they are redirected to the main page as well. In this case, the user is redirected towards the main page as well.
+This route handles the upload of a user’s profile picture. If the user is logged in, they can upload a profile picture. If not, they are redirected towards the login page. The image is saved to the database, and the user is redirected to the main page. If the user skips the upload, a notification is displayed, and they are redirected to the main page as well.
 
 #### main.route('/main_page')
 This route is the main dashboard page for logged-in users. It checks if the user is logged in, and if they are, it displays their profile on the main page. If the user is not logged in, they are redirected to the login page.
@@ -199,7 +199,7 @@ This route displays the profile of a musician’s band. It retrieves the user an
 This route allows users to edit their band profile. It fetches the user and band details for the specified user_id. If either the user or band is not found, an error message is displayed, and the user is redirected to the main page. If a profile picture exists, it is converted to Base64 format. The route then renders the edit_band_profile.html template, providing the user with their current information for editing.
 
 #### main.route('/update_band_profile/<user_id>', methods=['POST'])
-This route handles the update of a musician's band profile. It retrieves the user and band details for the specified `user_id. If the user or band is not found, an error message is displayed. The user’s data (name, bio, contact information, etc.) and the band’s data (band name, genre, price per hour, etc.) are updated based on the form input. If a new profile picture is uploaded, it is saved to the database. The changes are committed to the database, and a success message is displayed. The user is then redirected to their updated band profile page.
+This route handles the update of a musician's band profile. It retrieves the user and band details for the specified user_id. If the user or band is not found, an error message is displayed. The user’s data (name, bio, contact information, etc.) and the band’s data (band name, genre, price per hour, etc.) are updated based on the form input. If a new profile picture is uploaded, it is saved to the database. The changes are committed to the database, and a success message is displayed. The user is then redirected to their updated band profile page.
 
 #### main.route('/venue_profile/<user_id>')  
 This route is used to display the venue profile for a user based on the provided user_id. It retrieves the user and venue information from the database. If either the user or the venue is not found, an error message is displayed, and the user is redirected to the main page. If the user has uploaded a profile picture, it is retrieved and converted into a Base64 string, which is then passed to the venue_profile.html template for rendering. This allows the user's profile picture to be displayed on the venue profile page. Once the data is retrieved, the route renders the venue_profile.html template, which shows the venue’s details, such as venue name, style, and the user's profile picture.
@@ -245,8 +245,21 @@ In addition to these details, the template includes sections for address and con
 
 The form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be straightforward and user-friendly, ensuring that users can easily input and update their information.
 
+### soloist_profile.html
 
-HIER VANAF EDIT SOLOIST PROFILE HTML
+This section describes the same information for soloists as the "band_profile.html" file does for bands.
+
+The route for rendering this page fetches soloist details from the database, such as the artist's name, bio, genre, rating, and pricing details. If a profile picture is uploaded, it is processed and displayed on the page as a Base64 string. Information such as whether the soloist has equipment available, a link to their songs, and pricing per hour is also displayed. Any fields without data will show a default message like "Not Specified". 
+The page includes the sections Bio, Personal Information, Address and Contact Information. The profile design is visually enhanced with a gradient background, rounded card layout, and clean typography. Users are provided buttons for navigation: a link to return to the main page and, if applicable, an option to book the soloist directly. Missing data is replaced with clear placeholders, ensuring a structured and user-friendly presentation. This page allows soloists to showcase their details, giving users a seamless experience when reviewing or booking their services.
+
+### edit_soloist_profile.html
+The Edit Soloist Profile template is a form that allows solo artists to update their profile details. It does this in exactly the same way as it would for bands, but with the information that belongs to a soloist.
+
+The form includes several input fields. The artist's name is entered in a text input, and the bio is entered in a textarea. The genre is selected from a dropdown list, which contains options like Pop, Rock, and Jazz. The price per hour is entered as a number, and the equipment availability is selected via a dropdown with options for Yes or No. The form also includes an input field for linking the soloist's songs. 
+
+The soloists have the same option as the bands so that in addition to these details, the template includes sections for address and contact information. Users can enter their country, city, street name, and house number, as well as their first name, last name, phone number, and email. These fields are displayed in grouped sections with headings, which help separate the different areas of the form.
+
+Just like for bands, form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be user-friendly and visually appealing, with a clean design and a gradient background. This ensures that solo artists can easily input and update their information.
 
 
 
