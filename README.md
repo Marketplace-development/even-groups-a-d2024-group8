@@ -44,13 +44,16 @@ This file initializes the Flask application and sets up the necessary configurat
  
 - The SQLAlchemy() object, db, is used to interact with the database. The db.init_app(app) binds it to the Flask application, setting up the database connection. The configuration is loaded from the Config class defined in config.py.
 
+-----------------------------------------------
+- The Base64 Encoding Function (b64encode) encodes a given value into a Base64 string. It's especially useful for safely handling binary data (e.g., images) in text format.
+The function is registered as a Jinja2 filter (app.jinja_env.filters['b64encode'] = b64encode), making it accessible in HTML templates. 
+-----------------------------------------------
+
 - Inside the app context, the database models (such as Profile, Musician, Soloist, Band, Venue) are imported, and db.create_all() is called to create the necessary database tables based on these models. 
 
 - A Flask blueprint (main) is registered. Blueprints allow you to organize your app into modular components, making it easier to manage complex applications
 
 - Using with app.app_context() ensures that all database-related tasks are handled within the context of the app, ensuring that models and routes are available during the app's lifecycle.
-
-HIER NOG AANPASSEN
 
 ## ⚙️ config.py
 
@@ -75,7 +78,6 @@ We define classes in the models to represent the core entities of the applicatio
 At the end of each class, we added a __repr__ method. The __repr__ method is used to provide a clear and informative string representation of each object, which helps during debugging and logging.
 
 #### Profile
-
 profile_id: A unique identifier for each profile (UUID).
 first_name, last_name: The user's name.
 country, city, street_name, house_number: Address information.
@@ -218,17 +220,92 @@ This route renders the page for editing a soloist profile. It retrieves the user
 
 #### main.route('/update_soloist_profile/<user_id>', methods=['POST'])  
 This route processes the updating of the soloist profile when the user submits the edit form. It first retrieves the user and soloist data from the database based on the provided user_id. If the user or soloist cannot be found, an error message is shown, and the user is redirected. The form data is then processed, and fields such as artist name, date of birth, genre, and price per hour are updated. The route also handles musician-specific information such as song links, equipment, and bio updates. The date of birth is parsed and validated to ensure the correct format. If any errors occur in processing numeric fields (like price per hour), an error message is displayed, and the user is redirected to correct their input. If a new profile picture is uploaded, it replaces the existing one. After all updates are made, the changes are committed to the database, and a success message is shown. The user is redirected to their updated soloist profile page.
+-----------------------------------------------------
+#### @main.route('/search_profiles', methods ['POST'])
+This route handles the process of searching for musician profiles based on various filters provided by the user. It first checks if the user is logged in by verifying the presence of the user_id in the session. If not, it returns an "Unauthorized access" error. After retrieving the user's profile using the user ID from the session, it checks if the profile exists. If the user is not found, an error message is returned.
 
-HIER NOG AANPASSEN VANAF 551
+If the user is a venue type, the query starts by joining the Musician model with the Profile model. Aliases for the Soloist and Band models are created to handle outer joins, allowing the search to cover musicians who may be soloists or part of a band. A flag is initialized to track if any filters have been applied.
+
+The function processes various filters, including musician type (e.g., soloist or band), name (first or last), city, style (genre of music), maximum price per hour, and whether the musician needs equipment. For each filter, the query is modified to match the criteria provided by the user. Invalid inputs, such as a non-numeric value for the maximum price, are ignored.
+
+Once the filters are applied, the results are fetched using the query. If no filters are applied, random musician profiles are selected. If filters are applied but no results are found, an empty list is returned, allowing the frontend to display a message stating that no profiles meet the search criteria.
+
+The results are then formatted into a list of dictionaries, each containing the profile ID, name and details like genre and price per hour.
+
+If the user's profile is not a venue type, the function returns an empty list, which can be extended to handle other profile types if needed.
+---------------------------------------------------
+---------------------------------------------------
+#### @main.route('/profile/<user_id>')
+This route is responsible for displaying the profile page for a specific user, determined by the user_id provided in the URL. First, the function retrieves the user profile from the database using the user_id. If the profile is not found, the user is redirected to the main page with an error message.
+
+The function checks whether the logged-in user is viewing their own profile by comparing the logged_in_user_id (from the session) with the user_id in the URL. If the logged-in user is the same as the user being viewed, a flag is_own_profile is set to True. The logged-in user's profile data is then retrieved.
+
+If the profile type is 'musician', the function determines whether the logged-in user is a venue and not viewing their own profile, in which case a "Book Here" button is shown. The profile picture is passed to the template for display.
+
+For musicians, the profile could either be a soloist or a band. If the user is a soloist, the soloist's data is retrieved and passed to the soloist_profile.html template. If the user is part of a band, the band data is retrieved and passed to the band_profile.html template. In both cases, the profile page is rendered with relevant data, including the "Book Here" button, the profile image, and flags to indicate whether the profile is owned by the logged-in user.
+
+For venue profiles, the function similarly retrieves the venue’s details and renders the venue_profile.html template. The profile picture is passed to the template. It also checks if the logged-in user is viewing their own profile, indicated by the is_own_profile flag.
+
+If the profile type is invalid or not recognized, the user is redirected to the main page with an error message.
+-----------------------------------------------------
+#### @main.route('/request_booking/<musician_id>', methods=['GET', 'POST']) 
+This route handles the process of a venue requesting a booking with a musician. First, it checks if the user is logged in by looking for the user_id in the session. If the user is not logged in, they are redirected to the login page with an error message.
+
+If the user is logged in, the profile information is fetched. It then checks if the logged-in user is a venue, since only venues are allowed to request bookings. If the user is not a venue, they are redirected to the main page with an error message.
+
+The function then attempts to retrieve the musician's details based on the given musician_id. If the musician is not found, the user is redirected with an error message.
+
+When the form is submitted (via a POST request), the function processes the booking details. It checks the booking date and duration to ensure they are in the correct format. If the data is invalid, the user receives an error message and is redirected back to the booking page.
+
+If the data is valid, a new booking is created with the status "Requested". This booking is linked to both the musician and the venue, with details like the booking date and duration. The booking is saved in the database, and if successful, the user receives a confirmation message. If there is an error saving the booking, the changes are rolled back and the user is shown an error message.
+
+If the request is a GET request, the booking.html page is rendered, allowing the venue to review the booking details before submitting the request.
+-----------------------------------------------------
+#### @main.route('/respond_booking <uuid:booking_id>', methods=['POST'])
+ This route is used for a musician to respond to a booking request. It first checks if the user is logged in by looking for the user_id in the session. If the user is not logged in, they are redirected to the login page with an error message.
+
+The function then retrieves the user's profile and the booking details based on the given booking_id. If the booking is not found, the user is redirected to the main page with an error message.
+
+The function ensures that only the musician associated with the booking can respond. If the logged-in user is not the musician linked to the booking, they are redirected with an error message.
+
+When the form is submitted, the function checks whether the response is valid (either "Accepted" or "Denied"). If the response is invalid, the user is redirected back with an error message.
+
+If the response is valid, the booking status is updated to reflect the musician's decision. The changes are saved to the database, and if successful, a confirmation message is shown. If there is an error during the update, the changes are rolled back, and the user receives an error message.
+
+The user is redirected to the main page after the response is processed.
+-----------------------------------------------------
+#### @main.route('/bookings') 
+this route is used to display a user's booking information. It first checks if the user is logged in by looking for the user_id in the session. If the user is not logged in, they are redirected to the login page with an error message.
+
+Once logged in, the user's profile is retrieved. If the user is a venue, the function fetches all the bookings requested by that venue, ordered by the booking date in descending order. If the user is a musician, the function retrieves all the bookings that have been accepted for that musician, also ordered by date in descending order.
+
+If the user’s profile type is invalid, the user is redirected to the main page with an error message.
+
+The function renders the mybooking.html template, passing the list of bookings and the user profile information to be displayed on the page.
+
+The dictionary genre_to_style is a mapping of music genres to types of venues where those genres are typically played. For example, "Pop" music is associated with "Dance Club" and "Wine Bar" venues, while "Jazz" is linked to "Jazz Lounge" and "Restaurant" venues.
+-----------------------------------------------------
+#### @main.route('/recommended')
+This route is used to display musician recommendations to the user based on their profile and any previous bookings. It begins by checking if the user is logged in by retrieving their user_profile_id from the session. If the user is not logged in, the system redirects them to the main page with an error message.
+
+Once the user's profile ID is found, the system retrieves their username from the database. After that, it calls the get_recommendations() function to fetch a list of musicians that are recommended to the user.
+
+The get_recommendations() function works in two ways depending on whether the user has made any previous bookings. If the user has not made any bookings, the system suggests musicians based on the styles of venues that match the genres of music they play. The system looks at the style of each venue and compares it to a list of genres and styles. Musicians who play a genre that fits the venue's style are included in the recommendations. These musicians are limited to a maximum of three unique suggestions.
+
+If the user has made previous bookings, the function collects the styles of the venues from those bookings. It then recommends musicians who play genres that align with those venue styles. Again, the recommendations are limited to three, with any duplicates removed.
+
+The recommended_page() function renders a template with the user's name and the list of recommended musicians, allowing the user to view the personalized suggestions.
+-----------------------------------------------------
 
 
 ## Templates
 
 The templates folder holds the HTML files responsible for rendering pages related to user interactions such as registration, profile pages, login pages, booking views, etc.
 
+-----------------------------------------------------
 ### Explanation of the Code
-
-HIER KOMT DE LAYOUT EXPLANATION 
+The templates are designed to provide a clean and modern look for the web application. They use a combination of minimalistic design elements and user-friendly navigation to enhance the overall user experience. The layout is responsive, meaning it adjusts smoothly to different screen sizes, providing a consistent experience across devices such as desktops, tablets, and smartphones.
+-----------------------------------------------------
 
 #### band_profile.html
 This section describes the profile page for a band's profile in MelodyMatch, where users can view and update various details about their band. The page shows the band's information, including their name, genre, rating, and more. If available, the band's profile picture is displayed.
@@ -260,8 +337,11 @@ The form includes several input fields. The artist's name is entered in a text i
 The soloists have the same option as the bands so that in addition to these details, the template includes sections for address and contact information. Users can enter their country, city, street name, and house number, as well as their first name, last name, phone number, and email. These fields are displayed in grouped sections with headings, which help separate the different areas of the form.
 
 Just like for bands, form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be user-friendly and visually appealing, with a clean design and a gradient background. This ensures that solo artists can easily input and update their information.
+-----------------------------------------------------
+## 🚀 run.py
+This file is responsible for running the Flask web application. It starts by importing the create_app function from the app module. The create_app function is used to initialize the Flask application, setting up configurations and registering any necessary components.
 
+Once the application is created by calling create_app(), the app.run(debug=True) command starts the web server. The debug=True flag enables Flask's debugging mode, which provides detailed error messages and automatically reloads the server when changes are made to the code.
 
-
-
-RUN OOK NOG DOEN
+This script ensures that the application runs correctly when executed directly. The if __name__ == '__main__' condition ensures that the server is only started if this script is run as the main program, not when it's imported elsewhere.
+-----------------------------------------------------
