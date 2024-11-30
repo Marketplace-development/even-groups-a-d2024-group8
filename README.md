@@ -322,14 +322,13 @@ In addition to these details, the template includes sections for address and con
 
 The form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be straightforward and user-friendly, ensuring that users can easily input and update their information.
 
-### soloist_profile.html
-
+#### soloist_profile.html
 This section describes the same information for soloists as the "band_profile.html" file does for bands.
 
 The route for rendering this page fetches soloist details from the database, such as the artist's name, bio, genre, rating, and pricing details. If a profile picture is uploaded, it is processed and displayed on the page as a Base64 string. Information such as whether the soloist has equipment available, a link to their songs, and pricing per hour is also displayed. Any fields without data will show a default message like "Not Specified". 
 The page includes the sections Bio, Personal Information, Address and Contact Information. The profile design is visually enhanced with a gradient background, rounded card layout, and clean typography. Users are provided buttons for navigation: a link to return to the main page and, if applicable, an option to book the soloist directly. Missing data is replaced with clear placeholders, ensuring a structured and user-friendly presentation. This page allows soloists to showcase their details, giving users a seamless experience when reviewing or booking their services.
 
-### edit_soloist_profile.html
+#### edit_soloist_profile.html
 The Edit Soloist Profile template is a form that allows solo artists to update their profile details. It does this in exactly the same way as it would for bands, but with the information that belongs to a soloist.
 
 The form includes several input fields. The artist's name is entered in a text input, and the bio is entered in a textarea. The genre is selected from a dropdown list, which contains options like Pop, Rock, and Jazz. The price per hour is entered as a number, and the equipment availability is selected via a dropdown with options for Yes or No. The form also includes an input field for linking the soloist's songs. 
@@ -337,6 +336,92 @@ The form includes several input fields. The artist's name is entered in a text i
 The soloists have the same option as the bands so that in addition to these details, the template includes sections for address and contact information. Users can enter their country, city, street name, and house number, as well as their first name, last name, phone number, and email. These fields are displayed in grouped sections with headings, which help separate the different areas of the form.
 
 Just like for bands, form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be user-friendly and visually appealing, with a clean design and a gradient background. This ensures that solo artists can easily input and update their information.
+-----------------------------------------------------
+#### venue_profile.html
+This template displays a venue's profile page, allowing users to view key information about the venue. The layout and style are similar to the soloist_profile.html but tailored for venue-related content. 
+
+At the top of the page, the venue's name or event name is displayed, followed by a profile picture, which is rendered using a Base64 string for the image. The bio section provides an optional description of the venue, showing a default message ("No bio provided.") if no information is available.
+
+The venue's main details, such as the style (genre or type of venue) and rating, are displayed below the bio. If no data is available for these fields, default messages like "Not Specified" are shown.
+
+The page also contains sections for the venue's address and contact information. Each section is clearly labeled and includes details such as country, city, street name, and house number. The contact section includes the venue owner's first name, last name, phone number, and email. If any of these fields are missing, placeholders like "Not Specified" are used.
+
+Finally, there is a button group at the bottom, with options for users to edit the venue profile or return to the main page. The page uses a color scheme of purple tones for the buttons, which change shade when hovered over, adding an interactive touch.
+
+This page offers a well-structured and user-friendly presentation for venue owners or users to showcase their venue information and provides navigation options for further interactions.
+-----------------------------------------------------
+#### edit_venue_profile.html
+The Edit Venue Profile template provides a form that allows users to update their venue details. It begins with an image container that displays the venue's current profile picture. Users can upload a new image or adjust the existing one. The form uses a POST method to submit data, including the venue's name, bio, style, address, and contact information.
+
+The form contains several input fields. The venue name is entered in a text input, while the bio is entered in a textarea, allowing for a more detailed description of the venue. The style of the venue is selected from a dropdown menu, offering options like Pub, Cocktail Bar, etc. The address section includes fields for the country, city, street name, and house number. The country field is pre-filled with "Belgium," while users must input the other address details manually.
+
+In addition to the venue details, the form also includes fields for contact information. Users can input the first and last names of the venue's point of contact, as well as their phone number and email address. These fields are displayed in clearly separated sections, making it easy for users to update specific details.
+
+The form is submitted using a "Save Changes" button, allowing the user to save any modifications made. There is also a "Return" button that lets the user go back to the venue’s profile without saving changes. The layout is clean and user-friendly, making it simple for users to update the venue's information, while interactive features, such as the profile picture adjustment, enhance the overall experience.
+-----------------------------------------------------
+#### index.html
+The index template serves as an introductory page for MelodyMatch, welcoming users to the platform. The page is split into two sections: the left side features a bold heading, "Welcome to MelodyMatch," along with a brief description of the platform's purpose, inviting users to explore local music experiences.
+
+On the right, the authentication box provides options for users depending on their login status. If the user is logged in, a "Logout" button is displayed. For users who are not logged in, options to either "Login" or "Register" are presented, guiding them through the process of joining the platform or accessing their account.
+
+This template is designed to give a straightforward and welcoming experience for new and returning users, encouraging easy navigation to sign in or create an account.
+-----------------------------------------------------
+#### register.html
+This register template represents a dynamic registration form for a platform, allowing users to select between a "Musician" or "Venue" profile type. Depending on the selection, the form adjusts to show the relevant fields.
+
+For musicians, users can choose to be a "Soloist" or part of a "Band," with fields for their name, date of birth, genre, price per hour, equipment availability, and an optional link to their songs. For venues, users enter their venue name and style, with various venue types like "Pub," "Jazz Lounge," or "Dance Club."
+
+The form also collects general details such as the user's first name, last name, email, and optional address and bio information. This provides a streamlined and intuitive registration process for both musicians and venues.
+-----------------------------------------------------
+#### login.html
+The login.html file creates a login page with a clean design. It includes a heading "Welcome back!" and a simple form asking for the user's email address. There's a submit button below the email input. When the user submits the form, it sends the email data to the server for authentication. This page is designed to be responsive, meaning it will adjust to different screen sizes.
+-----------------------------------------------------
+#### upload_picture.html
+The upload_picture.html page is designed to allow users to upload a profile picture. At the top of the page, there is a heading that says "Upload Profile Picture." Below that, there is an area where users can preview the image they select. This area has a circular container that displays a default icon if no image is selected, but once a user selects an image, it is shown inside the container. The container also includes functionality for users to drag the image around and zoom in or out by using the mouse wheel.
+
+There is a "Choose Image" button that opens a file explorer, allowing users to select an image from their device. The file input is hidden, and the button triggers the file picker when clicked. Once an image is selected, the user can preview it, and if satisfied, they can click the "Upload" button to submit the image. If they do not wish to upload a picture, there is also a "Skip" button to bypass the process and continue.
+
+The form allows for both uploading a picture or skipping the process entirely.
+-----------------------------------------------------
+#### main_page.html
+The main_page.html file represents the main interface of the "MelodyMatch" platform, designed for users with either a "venue" or "musician" profile type. The layout features a sidebar and a main content area, making it easy to navigate between different sections of the site. The sidebar, which remains fixed as the user scrolls, offers quick links to key areas like "My Profile," "My Bookings," "My Reviews," "My Recommended," and a logout option. These navigation buttons are styled as purple-colored action buttons with hover effects, providing a consistent and visually appealing design. The sidebar ensures that important links are always accessible without scrolling, enhancing user experience.
+
+In the main content area, a search bar appears at the top of the page, allowing users with a "venue" profile type to search for musicians. The search bar includes several input fields and dropdowns to filter musicians by criteria such as type, name, city, genre, price, and equipment needs. The form is designed to gather relevant information for a refined search. Upon submission, the form triggers a JavaScript function to fetch the results and display them dynamically below the search bar.
+
+When results are returned, they are shown as profile cards in a scrollable area. Each card contains information about a musician, including their name, genre, and hourly price, along with a button to view the full profile. This allows users to quickly browse available musicians and explore their details further.
+
+For users with a "musician" profile, the page also includes an area to manage booking requests. If a musician has any pending bookings, they are displayed with details such as the venue name, booking date, duration, and current status. Musicians can choose to accept or deny a booking request directly from this interface. If no bookings are present, a message indicating "No Booking Requests" is shown. The booking section uses a similar design to the profile cards, ensuring consistency in the user interface.
+
+The design employs flexbox for a responsive layout, ensuring that both the sidebar and content areas adjust appropriately to different screen sizes. The search bar stays at the top of the page, allowing users to easily initiate new searches while browsing the results.
+
+Additionally, the JavaScript functionality is essential for providing a dynamic and interactive experience. When the search button is clicked, the data from the form is sent to the server, and the results are processed and displayed without needing to reload the page. If no results are found, a message is shown to inform the user. The page also includes error handling in case of issues with the search request.
+-----------------------------------------------------
+#### booking.html
+The booking.html file is designed to allow users to request a booking for a musician on the "MelodyMatch" platform. 
+
+At the top of the page, the main title "Request Booking" is prominently displayed. Below this, the musician's details are dynamically shown, including their first and last name, genre, and price per hour. 
+
+Under the musician’s details, there’s a form where users can submit their booking request. The form includes several fields: the date and time of the performance, which is selected using a datetime-local input; the duration, where users enter hours and minutes in a text input; and an optional message field where users can add any additional notes or requests.
+
+At the bottom of the form is a submit button. The form action dynamically links to a server-side function that processes the booking request for the selected musician.
+-----------------------------------------------------
+#### Mybooking.html
+The mybooking.html page is designed to display a user's booking information. It consists of two main sections: a sidebar and the main content area.
+
+The sidebar includes navigation links to different sections such as "My Profile," "My Bookings," "My Reviews," and "My Recommended," each represented by an icon and styled button. It also includes a logout button at the bottom for the user to log out of the platform.
+
+The main content area shows the user's bookings. If bookings exist, each booking is displayed in a card format with the musician's name, the booking date and time, duration, and status. The status is color-coded: accepted bookings are green, denied bookings are red, and requested bookings are orange. If there are no bookings, a message indicating this is shown. 
+
+The layout uses a flexible design with a sidebar fixed on the left and the main content scrollable on the right, providing a clear and organized view of the user's bookings.
+-----------------------------------------------------
+#### my_recommendations.html
+The my_recommendations.html page is designed to display a list of recommended musicians for the user. It consists of two main parts: a sidebar and a content area.
+
+The sidebar includes navigation buttons for sections like "My Profile," "My Bookings," "My Reviews," and "My Recommended." Each link is represented by a button with an icon. At the bottom of the sidebar, there is a logout button.
+
+The main content section displays the musician recommendations. If there are recommendations, each musician's name and genre are listed in a card format. If no recommendations are available, a message is shown indicating this.
+
+
 -----------------------------------------------------
 ## 🚀 run.py
 This file is responsible for running the Flask web application. It starts by importing the create_app function from the app module. The create_app function is used to initialize the Flask application, setting up configurations and registering any necessary components.
