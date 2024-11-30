@@ -253,26 +253,46 @@
                 {% elif user.profile_type == 'musician' %}
                 {% if bookings %}
                     <h2>Booking Requests</h2>
-                    {% for booking in bookings %}
-                        <div class="profile-card">
-                            <div>
-                                <h3>{{ booking.venue.profile.first_name }} {{ booking.venue.profile.last_name }}</h3>
-                                <p>
-                                    Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
-                                    Duration: {{ booking.duration }}<br>
-                                    Status: {{ booking.status }}
-                                </p>
-                            </div>
-                            {% if booking.status == 'Requested' %}
-                                <form action="{{ url_for('main.respond_booking', booking_id=booking.id) }}" method="post">
-                                    <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
-                                    <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
-                                </form>
+                    <div class="search-results" id="search-results">
+                        {% if user.profile_type == 'venue' %}
+                            {% for musician in profiles %}
+                                <div class="profile-card">
+                                    <div>
+                                        <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
+                                        <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
+                                    </div>
+                                    <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
+                                </div>
+                            {% endfor %}
+                        {% elif user.profile_type == 'musician' %}
+                            {% if bookings %}
+                                <h2>Booking Requests</h2>
+                                {% for booking in bookings %}
+                                    <div class="profile-card">
+                                        <div>
+                                            <h3>{{ booking.venue.profile.first_name }} {{ booking.venue.profile.last_name }}</h3>
+                                            <p>
+                                                Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                                Duration: {{ booking.duration }}<br>
+                                                Status: {{ booking.status }}
+                                            </p>
+                                        </div>
+                                        {% if booking.status == 'Requested' %}
+                                            <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post">
+                                                <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
+                                                <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
+                                            </form>
+                                        {% else %}
+                                            <p>Status: {{ booking.status }}</p>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
                             {% else %}
-                                <p>Status: {{ booking.status }}</p>
+                                <p>No Booking Requests</p>
                             {% endif %}
-                        </div>
-                    {% endfor %}
+                        {% endif %}
+                    </div>
+                     
                 {% else %}
                     <p>No Booking Requests</p>
                 {% endif %}

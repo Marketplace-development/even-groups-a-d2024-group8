@@ -749,7 +749,6 @@ def view_profile(user_id):
     flash("Invalid profile type", "error")
     return redirect(url_for('main.main_page'))
 
-# routes.py
 @main.route('/request_booking/<musician_id>', methods=['GET', 'POST'])
 def request_booking(musician_id):
     if 'user_id' not in session:
@@ -773,10 +772,13 @@ def request_booking(musician_id):
         date_booking_str = request.form.get('date_booking')
         duration_str = request.form.get('duration')  # Get the unified duration field
 
+        print(f"Received form data: date_booking={date_booking_str}, duration={duration_str}")
+
         # Validate and parse form data
         try:
             # Parse date_booking
             date_booking = datetime.strptime(date_booking_str, '%Y-%m-%dT%H:%M')
+            print(f"Parsed date_booking: {date_booking}")
 
             # Parse and validate duration
             if not duration_str or ':' not in duration_str:
@@ -789,38 +791,47 @@ def request_booking(musician_id):
             duration = timedelta(hours=hours, minutes=minutes)
             if duration.total_seconds() <= 0:
                 raise ValueError("Duration must be greater than zero.")
+            print(f"Duration validated: {duration}")
+
         except ValueError as e:
+            print(f"ValueError: {e}")
             flash(str(e), "error")
             return redirect(url_for('main.request_booking', musician_id=musician_id))
-
+        
+        status = 'Requested'
         # Create a new booking with status 'Requested'
         new_booking = Booking(
             musician_id=uuid.UUID(musician_id),
             venue_id=logged_in_user_id,
-            status='Requested',
+            status=status,
             date_booking=date_booking,
             duration=duration,
             booked_by=logged_in_user_id,
             booked_in=logged_in_user_id
         )
+        
+        print(f"New booking object created: {new_booking}")
 
         try:
+            print("Attempting to commit booking...")
             db.session.add(new_booking)
             db.session.commit()
             flash("Booking request sent successfully!", "success")
+            print("Booking successfully committed.")
         except Exception as e:
             db.session.rollback()
             flash(f"An error occurred while requesting the booking: {e}", "error")
+            print(f"Error during commit: {e}")
 
         return redirect(url_for('main.main_page'))
 
     else:
         # GET request, render booking.html
-        # Pass musician info to template
+        print("Rendering booking.html")
         return render_template('booking.html', musician=musician)
 
 # routes.py
-@main.route('/respond_booking/<int:booking_id>', methods=['POST'])
+@main.route('/respond_booking/<uuid:booking_id>', methods=['POST'])
 def respond_booking(booking_id):
     if 'user_id' not in session:
         flash("You must be logged in to respond to bookings.", "error")
@@ -846,10 +857,14 @@ def respond_booking(booking_id):
         return redirect(url_for('main.main_page'))
 
     # Update the booking status
-    booking.status = response
-    db.session.commit()
+    try:
+        booking.status = response
+        db.session.commit()
+        flash(f"Booking has been {response.lower()}.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while updating the booking: {e}", "error")
 
-    flash(f"Booking has been {response.lower()}.", "success")
     return redirect(url_for('main.main_page'))
 
 @main.route('/bookings')
@@ -868,4 +883,9 @@ def bookings():
         flash("Only venues can view this page.", "error")
         return redirect(url_for('main.main_page'))
 
+
+
+@main.route('/recommended')
+def recommended_page():
+    return render_template('my_recommendations.html', username=Profile.first_name)
 
