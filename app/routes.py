@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import base64
 import random
 from datetime import datetime, timedelta
+from app import db
 
 main = Blueprint('main', __name__)
 
@@ -870,6 +871,7 @@ def respond_booking(booking_id):
 @main.route('/bookings')
 def bookings():
     if 'user_id' not in session:
+        flash("You must be logged in to view your bookings.", "error")
         return redirect(url_for('main.login'))
 
     user_id = uuid.UUID(session['user_id'])
@@ -878,14 +880,99 @@ def bookings():
     if user.profile_type == 'venue':
         # Get bookings requested by this venue
         bookings = Booking.query.filter_by(venue_id=user_id).order_by(Booking.date_booking.desc()).all()
-        return render_template('mybooking.html', bookings=bookings, user=user)
+        
+    elif user.profile_type == 'musician':
+        # Get bookings accepted for this musician
+        bookings = Booking.query.filter_by(musician_id=user_id, status='Accepted').order_by(Booking.date_booking.desc()).all()
+        
     else:
-        flash("Only venues can view this page.", "error")
+        flash("Invalid user type.", "error")
         return redirect(url_for('main.main_page'))
 
+    return render_template('mybooking.html', bookings=bookings, user=user)
 
-
+# Define the genre to style mapping
+genre_to_style = {
+    'Pop': ['Dance Club', 'Wine Bar'],
+    'Rock': ['Beach Bar', 'Dance Club'],
+    'Hip-Hop/Rap': ['Dance Club', 'Bar'],
+    'Jazz': ['Jazz Lounge', 'Restaurant'],
+    'Classical': ['Restaurant', 'Jazz Lounge'],
+    'EDM': ['Dance Club', 'Bar'],
+    'Blues': ['Jazz Lounge', 'Art Café'],
+    'Reggae': ['Beach Bar', 'Restaurant'],
+    'R&B': ['Wine Bar', 'Dance Club'],
+    'Country': ['Restaurant', 'Art Café'],
+    'Other': ['Dance Club', 'Wine Bar', 'Beach Bar', 'Restaurant', 'Jazz Lounge', 'Art Café', 'Dance Club']
+}
 @main.route('/recommended')
 def recommended_page():
-    return render_template('my_recommendations.html', username=Profile.first_name)
+    user_profile_id = session.get('user_profile_id')  # Verkrijg de user_profile_id uit de sessie
+    if not user_profile_id:
+        return render_template('main_page.html', message="User profile ID not found.")  # Zorg dat error.html bestaat
 
+    username = Profile.query.get(user_profile_id).first_name  # Haal de gebruikersnaam op op basis van het profiel
+    recommendations = get_recommendations(user_profile_id)
+
+    print(f"Recommendations for User ID {user_profile_id}: {recommendations}")
+
+    return render_template('my_recommendations.html', username=username, recommendations=recommendations)
+
+def get_recommendations(user_profile_id):
+    """
+    Verkrijg muzikantaanbevelingen op basis van genre-naar-venue stijl matching.
+
+    1. Als er geen eerdere boekingen zijn, wordt er aanbevolen op basis van genre en venue stijlen.
+    2. Als er eerdere boekingen zijn, wordt er aanbevolen op basis van eerdere venue stijlen en muzikant genres.
+    """
+    # 1. Controleer of de gebruiker eerdere boekingen heeft
+    bookings = Booking.query.filter(Booking.booked_by == user_profile_id).all()
+
+    print(f"User ID: {user_profile_id}, Bookings Found: {len(bookings)}")  # Debug output
+
+    if not bookings:
+        # Geen eerdere boekingen, aanbevelen op basis van genre en venue stijlen.
+        recommended_musicians = []
+        
+        # Verkrijg alle venues en hun stijlen
+        venues = Venue.query.all()
+        
+        print(f"Total Venues Found: {len(venues)}")  # Debug output
+        
+        # Itereer over de venues om ze te matchen met geschikte muzikanten
+        for venue in venues:
+            for genre, styles in genre_to_style.items():
+                if venue.style in styles:
+                    # Verkrijg muzikanten met het bijpassende genre
+                    musicians = Musician.query.filter(Musician.genre == genre).all()
+                    print(f"Venue: {venue.style}, Genre: {genre}, Musicians Found: {len(musicians)}")  # Debug output
+                    recommended_musicians.extend(musicians)
+
+        # Verwijder duplicaten en beperk tot 3 aanbevelingen
+        recommended_musicians = list({m.profile_id: m for m in recommended_musicians}.values())[:3]
+        print(f"Recommended Musicians (no bookings): {len(recommended_musicians)}")  # Debug output
+        return recommended_musicians
+
+    else:
+        # Gebruiker heeft eerder boekingen, aanbevelen op basis van de stijlen van eerdere venues
+        venue_styles = set()
+        recommended_musicians = []
+
+        # Verzamel venue stijlen uit eerdere boekingen
+        for booking in bookings:
+            venue = Venue.query.get(booking.venue_id)
+            if venue:
+                venue_styles.add(venue.style)
+
+        print(f"Venue Styles from Previous Bookings: {venue_styles}")  # Debug output
+
+        # Recommend musicians based on the venue styles
+        for style in venue_styles:
+            for genre, styles in genre_to_style.items():
+                if style in styles:
+                    # Get musicians matching the genre of the style
+                    musicians = Musician.query.filter(Musician.genre == genre).all()
+                    print(f"Style: {style}, Genre: {genre}, Musicians Found: {len(musicians)}")  # Debug output
+                    recommended_musicians.extend(musicians)
+
+        # Remove duplicates and limit to 3 recommendations
