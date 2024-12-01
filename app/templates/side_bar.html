@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MelodyMatch - My Recommendations</title>
+    <title>MelodyMatch - Main</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -13,18 +13,13 @@
             padding: 0;
             color: #000;
             height: 100%;
-            overflow: hidden; /* Prevent page scrolling */
-        }
-        .layout {
-            display: flex;
-            height: 100vh; /* Full viewport height */
         }
         .side-bar {
             background: #6a00b5;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100%; /* Ensures full height for the sidebar */
+            height: 100%;
         }
         .button {
             text-align: center;
@@ -32,7 +27,7 @@
             border: none;
             border-radius: 5px;
             padding: 10px 30px 10px 15px;
-            margin-bottom: 40px; /* Adjust to be visually consistent */
+            margin-bottom: 40px;
             font-size: 1rem;
             cursor: pointer;
             text-decoration: none;
@@ -41,39 +36,11 @@
         .button:hover {
             background-color: #4e008f;
         }
-        .main-content {
-            flex: 1; /* Occupies remaining space */
-            padding: 20px;
-            overflow-y: auto; /* Enables scrolling for the profiles */
-        }
-        .recommendation-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #6a00b5;
-        }
-        .profile-card {
+
+
+        .layout {
             display: flex;
-            justify-content: space-between; /* Space between info and button */
-            align-items: center;
-        }
-        .view-profile-button {
-            background-color: #6a00b5; /* Purple */
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 1rem;
-            text-decoration: none; /* Remove underline */
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .view-profile-button:hover {
-            background-color: #4e008f; /* Darker purple on hover */
+            height: 100%;
         }
         .sub-side-bar {
             display: flex;
@@ -99,10 +66,6 @@
         .logout-sub-side-bar{
             display: flex;
             align-items: flex-start;
-        }
-        .layout {
-            display: flex;
-            height: 100%;
         }
     </style>
 </head>
@@ -145,25 +108,5 @@
             </div>
            
         </div>
-
-        <div class="main-content">
-            <h1>Recommendations for you</h1>
-            {% if recommendations %}
-                {% for musician in recommendations %}
-                <div class="recommendation-card">
-                    <div class="profile-card">
-                        <div>
-                            <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
-                            <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
-                        </div>
-                        <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No recommendations available.</p>
-            {% endif %}
-        </div>
-    </div>
 </body>
 </html>
