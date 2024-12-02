@@ -15,7 +15,6 @@ class Profile(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     bio = db.Column(db.String)
     profile_picture = db.Column(db.LargeBinary)
-    pictures = db.Column(db.LargeBinary)
     rating = db.Column(db.Numeric(2, 1), default=0.0, nullable=True)
     profile_type = db.Column(db.String, nullable=False)
     musician_type = db.Column(db.String, nullable=True)

@@ -661,7 +661,6 @@ def search_profiles():
             # No filters applied, show random profiles
             results = db.session.query(Musician).join(Profile).order_by(db.func.random()).limit(5).all()
         # Else, if filters are applied and results are empty, we return an empty list
-        # This allows the frontend to display the "No Soloists Or Bands Satisfy Your Requirements" message
 
         # Prepare the results
         output = []
