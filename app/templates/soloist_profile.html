@@ -146,10 +146,15 @@
 <!-- Button Group -->
         <!-- Button Group -->
         <div class="button-group">
-            <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
-            {% if show_book_button %}
-                <a href="{{ url_for('main.request_booking', musician_id=user.profile_id) }}" class="button">Book Here</a>
-            {% endif %}
+            <div class="button-group">
+                {% if is_own_profile %}
+                    <a href="{{ url_for('main.edit_soloist_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
+                {% endif %}
+                <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+                {% if show_book_button %}
+                    <a href="{{ url_for('main.request_booking', musician_id=user.profile_id) }}" class="button">Book Here</a>
+                {% endif %}
+            </div>            
         </div>
     </div>
 </body>
