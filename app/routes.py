@@ -335,15 +335,40 @@ def profile():
 
 @main.route('/band_profile/<user_id>')
 def band_profile(user_id):
+    # Controleer of de gebruiker is ingelogd
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for('main.login'))
+
+    # Haal de ingelogde gebruiker op
+    logged_in_user_id = session['user_id']
+
+    # Haal de gebruiker en bandgegevens op
     user = Profile.query.get(user_id)
     band = Band.query.get(user_id)
 
+    # Controleer of de gebruiker en band bestaan
+    if not user or not band:
+        flash("Profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    # Bereken of het de eigen pagina is
+    is_own_profile = (str(user_id) == logged_in_user_id)
+
     # Convert profile picture to Base64 if it exists
     profile_picture = None
-    if user and user.profile_picture:
+    if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    return render_template('band_profile.html', user=user, band=band, profile_picture=profile_picture)
+    # Render de template
+    return render_template(
+        'band_profile.html',
+        user=user,
+        band=band,
+        profile_picture=profile_picture,
+        is_own_profile=is_own_profile
+    )
+
 
 @main.route('/edit_band_profile/<user_id>')
 def edit_band_profile(user_id):
@@ -374,13 +399,31 @@ def update_band_profile(user_id):
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update fields
+    # Update band-specific fields
     band.band_name = request.form.get('band_name', band.band_name)
-    user.musician.genre = request.form.get('genre', user.musician.genre)
-    user.musician.price_per_hour = request.form.get('price_per_hour', user.musician.price_per_hour)
-    user.musician.link_to_songs = request.form.get('link_to_songs', user.musician.link_to_songs)
-    user.musician.equipment = request.form.get('equipment', 'false') == 'true'
-    user.bio = request.form.get('bio', user.bio)  # Added bio to be updated
+    num_members = request.form.get('num_members_in_band', band.num_members_in_band)
+    try:
+        band.num_members_in_band = int(num_members) if num_members else band.num_members_in_band
+    except ValueError:
+        flash("Invalid value for number of band members. Please enter a valid integer.", "error")
+        return redirect(url_for('main.edit_band_profile', user_id=user_id))
+
+    # Update musician-specific fields
+    musician = getattr(user, 'musician', None)
+    if musician:
+        musician.genre = request.form.get('genre', musician.genre)
+        price_per_hour = request.form.get('price_per_hour', None)
+        if price_per_hour:
+            try:
+                musician.price_per_hour = float(price_per_hour)  # Convert to float
+            except ValueError:
+                flash("Invalid value for Price per Hour. Please enter a valid number.", "error")
+                return redirect(url_for('main.edit_band_profile', user_id=user_id))
+        musician.link_to_songs = request.form.get('link_to_songs', musician.link_to_songs)
+        musician.equipment = request.form.get('equipment', 'false').lower() == 'true'
+
+    # Update user-specific fields
+    user.bio = request.form.get('bio', user.bio)
     user.country = request.form.get('country', user.country)
     user.city = request.form.get('city', user.city)
     user.street_name = request.form.get('street_name', user.street_name)
@@ -390,7 +433,7 @@ def update_band_profile(user_id):
     user.phone_number = request.form.get('phone_number', user.phone_number)
     user.email = request.form.get('email', user.email)
 
-    # Handle profile picture
+    # Handle profile picture if uploaded
     if 'profile_picture' in request.files:
         profile_picture = request.files['profile_picture']
         if profile_picture:
@@ -401,6 +444,7 @@ def update_band_profile(user_id):
 
     flash("Profile updated successfully!", "success")
     return redirect(url_for('main.band_profile', user_id=user_id))
+
 
 @main.route('/venue_profile/<user_id>')
 def venue_profile(user_id):
@@ -444,17 +488,20 @@ def edit_venue_profile(user_id):
 
 @main.route('/update_venue_profile/<user_id>', methods=['POST'])
 def update_venue_profile(user_id):
-    # Fetch user and venue data
+    # Haal de gebruiker en venuegegevens op
     user = Profile.query.get(user_id)
     venue = Venue.query.get(user_id)
 
-    # Handle cases where the user or venue is not found
+    # Controleer of de gebruiker en venue bestaan
     if not user or not venue:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update text fields from the form
-    venue.style = request.form.get('venue_style', venue.style)  # Update style
+    # Update de velden van de venue
+    venue.name_event = request.form.get('name_event', venue.name_event)  # Update venue name
+    venue.style = request.form.get('venue_style', venue.style)  # Update venue style
+
+    # Update de profielvelden van de gebruiker
     user.bio = request.form.get('bio', user.bio)
     user.country = request.form.get('country', user.country)
     user.city = request.form.get('city', user.city)
@@ -465,37 +512,62 @@ def update_venue_profile(user_id):
     user.phone_number = request.form.get('phone_number', user.phone_number)
     user.email = request.form.get('email', user.email)
 
-    # Update profile picture if a new one is uploaded
+    # Verwerk de geüploade profielfoto (indien aanwezig)
     if 'profile_picture' in request.files:
         profile_picture = request.files['profile_picture']
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
-    # Commit changes to the database
+    # Commit wijzigingen naar de database
     db.session.commit()
 
-    # Provide feedback and redirect to the updated profile page
+    # Toon een succesmelding en stuur de gebruiker door naar de profielpagina
     flash("Profile updated successfully!", "success")
     return redirect(url_for('main.venue_profile', user_id=user_id))
 
+
 @main.route('/soloist_profile/<user_id>')
 def soloist_profile(user_id):
-    # Fetch the user profile and soloist details
+    # Controleer of de gebruiker is ingelogd
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for('main.login'))
+
+    # Haal de ingelogde gebruiker op
+    logged_in_user_id = session['user_id']
+
+    # Haal de gebruiker en soloist gegevens op
     user = Profile.query.get(user_id)
     soloist = Soloist.query.get(user_id)
 
-    # Handle cases where the user or soloist is not found
+    # Controleer of de gebruiker en soloist bestaan
     if not user or not soloist:
         flash("Soloist profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Convert profile picture to Base64 if it exists
+    # Bereken of het de eigen pagina is
+    is_own_profile = (str(user_id) == logged_in_user_id)
+
+    # Toon de "Book Here" knop alleen als een venue een soloist bekijkt
+    show_book_button = (
+        logged_in_user_id != user_id and 
+        Profile.query.get(logged_in_user_id).profile_type == 'venue'
+    )
+
+    # Converteer profielafbeelding naar Base64 als deze bestaat
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render the soloist_profile.html template with necessary data
-    return render_template('soloist_profile.html', user=user, soloist=soloist, profile_picture=profile_picture)
+    # Render de template
+    return render_template(
+        'soloist_profile.html',
+        user=user,
+        soloist=soloist,
+        profile_picture=profile_picture,
+        is_own_profile=is_own_profile,
+        show_book_button=show_book_button
+    )
 
 
 @main.route('/edit_soloist_profile/<user_id>')

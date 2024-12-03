@@ -77,21 +77,20 @@
         }
         
         .button {
-            display: flex; /* Use flexbox for proper text alignment */
-            justify-content: center; /* Center text horizontally */
-            align-items: center; /* Center text vertically */
-            background-color: #6a00b5; /* Purple color */
-            color: #fff;
-            border: none;
-            padding: 0 20px; /* Horizontal padding */
-            border-radius: 5px;
-            font-size: 1rem;
-            text-decoration: none; /* Remove underline */
-            cursor: pointer;
-            transition: background-color 0.3s;
-            height: 50px; /* Fixed height for all buttons */
-            width: 150px; /* Optional: Set a consistent width */
-            box-sizing: border-box; /* Include padding and border in height/width */
+        display: inline-flex; /* Gebruik inline-flex voor flexibele uitlijning */
+        justify-content: center; /* Centreer de tekst horizontaal */
+        align-items: center; /* Centreer de tekst verticaal */
+        background-color: #6a00b5; /* Paarse achtergrondkleur */
+        color: #fff; /* Witte tekst */
+        border: none;
+        padding: 10px 20px; /* Consistente binnenmarge */
+        border-radius: 5px; /* Afgeronde hoeken */
+        font-size: 1rem; /* Standaard tekstgrootte */
+        text-decoration: none; /* Verwijder onderstreping */
+        cursor: pointer;
+        transition: background-color 0.3s; /* Vloeiende overgang bij hover */
+        min-height: 50px; /* Zorg voor consistente hoogte */
+        box-sizing: border-box; /* Inclusief padding en border in hoogte/breedte */
         }
         
         .button:hover {
@@ -155,6 +154,9 @@
 <!-- Button Group -->
         <!-- Button Group -->
         <div class="button-group">
+            {% if is_own_profile %}
+            <a href="{{ url_for('main.edit_band_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
+            {% endif %}
             <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
             {% if show_book_button %}
                 <a href="{{ url_for('main.request_booking', musician_id=user.profile_id) }}" class="button">Book Here</a>

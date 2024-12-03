@@ -19,11 +19,31 @@
         }
         .side-bar {
             background: #6a00b5;
+            width: 250px; /* Fixed width for the sidebar */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100%;
-           
+            padding: 20px 10px;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            height: 100vh; /* Ensures full height for the sidebar */
+        }
+        .sub-side-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .icon {
+            width: 24px;
+            height: 24px;
+            color: white;
+            padding: 10px 10px;
+        }
+        
+        .icon-link {
+            display: flex;
+            justify-content: center;
         }
         .button {
             text-align: center;
