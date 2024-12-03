@@ -5,7 +5,6 @@
     <title>Request Booking - MelodyMatch</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS styles here */
         body {
             background: linear-gradient(135deg, #3a007d, #6a00b5);
             font-family: 'DM Sans', sans-serif;
@@ -39,14 +38,26 @@
             font-weight: bold;
         }
         .booking-form input[type="datetime-local"],
-        .booking-form input[type="number"],
+        .booking-form input[type="text"],
+        .booking-form select,
         .booking-form textarea {
             width: 100%;
             padding: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 5px; /* Adjusted margin to reduce space */
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 1rem;
+        }
+        .booking-form .hint {
+            margin-top: -5px; /* Negative margin to bring closer to input field */
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .booking-form .price-display {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #6a00b5;
+            text-align: center;
         }
         .booking-form button {
             display: block;
@@ -77,15 +88,53 @@
             <input type="datetime-local" id="date_booking" name="date_booking" required>
 
             <label for="duration">Duration (HH:MM):</label>
-            <input type="text" id="duration" name="duration" placeholder="e.g., 02:30" required>
+            <input type="text" id="duration" name="duration" placeholder="e.g., 02:30" required oninput="calculatePrice()">
             <p class="hint">Enter the duration in hours and minutes (e.g., 02:30 for 2 hours 30 minutes).</p>
 
-            <!-- Optional message -->
+            <!-- Price Display -->
+            <div class="price-display" id="price_display">Price: €0.00</div>
+
+            <label for="payment_method">Payment Method:</label>
+            <select id="payment_method" name="payment_method" required>
+                <option value="" disabled selected>Select a payment method</option>
+                <option value="Cash">Cash</option>
+                <option value="Mobile payment">Mobile payment</option>
+                <option value="Credit card">Credit card</option>
+                <option value="Bancontact">Bancontact</option>
+                <option value="Other">Other</option>
+            </select>
+
             <label for="message">Additional Notes:</label>
             <textarea id="message" name="message" rows="4" placeholder="Any additional details or requests..."></textarea>
 
             <button type="submit">Submit Booking Request</button>
         </form>
     </div>
+
+    <script>
+        const pricePerHour = {{ musician.price_per_hour }}; // Fetch the musician's price per hour
+
+        function calculatePrice() {
+            const durationInput = document.getElementById('duration').value;
+            const priceDisplay = document.getElementById('price_display');
+
+            if (!durationInput.includes(':')) {
+                priceDisplay.textContent = 'Price: €0.00';
+                return;
+            }
+
+            const [hours, minutes] = durationInput.split(':').map(Number);
+
+            if (isNaN(hours) || isNaN(minutes) || hours < 0 || minutes < 0 || minutes >= 60) {
+                priceDisplay.textContent = 'Price: €0.00';
+                return;
+            }
+
+            const totalHours = hours + minutes / 60;
+            const totalPrice = totalHours * pricePerHour;
+
+            priceDisplay.textContent = `Price: €${totalPrice.toFixed(2)}`;
+        }
+    </script>
 </body>
 </html>

@@ -234,6 +234,8 @@
                         <p>
                             Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                             Duration: {{ booking.duration }}<br>
+                            Price: {{ '{€:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
+                            Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br> 
                             Status:
                             {% if booking.status == 'Accepted' %}
                                 <span class="status accepted">{{ booking.status }}</span>

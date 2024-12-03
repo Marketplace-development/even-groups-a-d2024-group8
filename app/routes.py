@@ -738,17 +738,12 @@ def search_profiles():
         output = []
         for musician in results:
             profile = musician.profile
-            artist_or_band_name = None
-            if profile.musician_type == 'soloist' and musician.soloist:
-                artist_or_band_name = musician.soloist.artist_name
-            elif profile.musician_type == 'band' and musician.band:
-                artist_or_band_name = musician.band.band_name
-            else:
-                artist_or_band_name = f"{profile.first_name} {profile.last_name}"
+            # Always use first_name and last_name for the name
+            artist_name = f"{profile.first_name} {profile.last_name}"
 
             output.append({
                 'id': str(musician.profile_id),
-                'name': artist_or_band_name,
+                'name': artist_name,  # Use first and last name only
                 'details': f"Genre: {musician.genre}, Price: €{musician.price_per_hour}/hour",
             })
 
@@ -756,6 +751,7 @@ def search_profiles():
 
     # Handle other profile types if needed
     return jsonify([])  # Default empty result
+
 
 
 @main.route('/profile/<user_id>')
