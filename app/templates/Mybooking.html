@@ -29,8 +29,6 @@
             position: sticky;
             top: 0;
             height: 100vh; /* Ensures full height for the sidebar */
-<<<<<<< HEAD
-=======
         }
         .sub-side-bar {
             display: flex;
@@ -47,7 +45,6 @@
         .icon-link {
             display: flex;
             justify-content: center;
->>>>>>> b3bdd04097a88b3e8eb81c8bfaeb0df21208c4c5
         }
         .button {
             text-align: center;
@@ -178,9 +175,68 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+
+        /* Styles for the booking cards */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .booking-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-details {
+            flex-grow: 1;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .status.accepted {
+            color: green;
+        }
+
+        .status.denied {
+            color: red;
+        }
+
+        .status.requested {
+            color: orange;
+        }
+
+        .review-button {
+            background-color: #6a00b5;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .review-button:hover {
+            background-color: #4e008f;
+        }
+
     </style>
 </head>
-<body>
     <div class="layout">
         <div class="side-bar">
             <div class="sub-side-bar">
@@ -225,31 +281,46 @@
             </div>
             
         </div>
-        <div class="main-content">
-            <h1>My Bookings</h1>
-            {% if bookings %}
-                {% for booking in bookings %}
-                    <div class="booking-card">
-                        <h3>Musician: {{ booking.musician.profile.first_name }} {{ booking.musician.profile.last_name }}</h3>
-                        <p>
-                            Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
-                            Duration: {{ booking.duration }}<br>
-                            Price: {{ '{€:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
-                            Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br> 
-                            Status:
-                            {% if booking.status == 'Accepted' %}
-                                <span class="status accepted">{{ booking.status }}</span>
-                            {% elif booking.status == 'Denied' %}
-                                <span class="status denied">{{ booking.status }}</span>
-                            {% else %}
-                                <span class="status requested">{{ booking.status }}</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>You have no bookings.</p>
-            {% endif %}
+        <div class="right-part">
+            <div class="main-content">
+                <h1>My Bookings</h1>
+                {% if bookings %}
+                    {% for booking in bookings %}
+                        <div class="booking-card">
+                            <div class="booking-details">
+                                <h3>Musician: {{ booking.musician.profile.first_name }} {{ booking.musician.profile.last_name }}</h3>
+                                <p>
+                                    Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                    Duration: {{ booking.duration }}<br>
+                                    Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
+                                    Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br> 
+                                    Status:
+                                    {% if booking.status == 'Accepted' %}
+                                        <span class="status accepted">{{ booking.status }}</span>
+                                    {% elif booking.status == 'Denied' %}
+                                        <span class="status denied">{{ booking.status }}</span>
+                                    {% else %}
+                                        <span class="status requested">{{ booking.status }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div>
+                                {% if booking.status == 'Accepted' %}
+                                    <!-- Show Review button if user hasn't already reviewed this booking -->
+                                    {% set existing_review = booking.reviews | selectattr('reviewer_id', 'equalto', user.profile_id) | list %}
+                                    {% if not existing_review %}
+                                        <a href="{{ url_for('main.submit_review', booking_id=booking.booking_id) }}" class="review-button">Review</a>
+                                    {% else %}
+                                        <span>Reviewed</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>You have no bookings.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>
