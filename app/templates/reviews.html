@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>My Reviews</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Include Font Awesome for star icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
         html, body {
             background: #fff;
@@ -41,7 +43,6 @@
             color: white;
             padding: 10px 10px;
         }
-        
         .icon-link {
             display: flex;
             justify-content: center;
@@ -67,192 +68,78 @@
             flex-direction: column;
             height: 100%;
         }
-        .logout-sub-side-bar{
-            display: flex;
-            align-items: flex-start;
-        }
-        .search-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* Creates 4 equal-width columns */
-            grid-gap: 10px; /* Adds space between grid items */
-            background: #fff;
-            padding: 10px 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0; /* Sticks to the top */
-            z-index: 10; /* Ensures it stays above other elements */
-        }
-        
-        .search-bar select,
-        .search-bar input,
-        .search-bar button {
-            width: 100%; /* Makes inputs fill their grid cell */
-            border-radius: 5px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            padding: 5px;
-        }
-        
-        .sub-side-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .search-bar select, .search-bar input, .search-bar button {
-            border-radius: 5px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            padding: 5px;
-        }
-        .search-bar button {
-            background-color: #4e008f;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: #6a00b5;
-        }
-        .search-results {
-            flex: 1; /* Takes remaining vertical space */
-            overflow-y: auto; /* Enables scrolling for the profiles */
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .profile-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better design */
-        }
-        .view-profile-button {
-            background-color: #6a00b5; /* Purple */
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 1rem;
-            text-decoration: none; /* Remove underline */
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .view-profile-button:hover {
-            background-color: #4e008f; /* Darker purple on hover */
-        }
-        .icon {
-            width: 24px;
-            height: 24px;
-            color: white;
-            padding: 10px 10px;
-        }
-        
-        .icon-link {
-            display: flex;
-            justify-content: center;
-        }
-        .flash-messages {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-        .flash-messages li {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .flash-messages li.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .flash-messages li.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Styles for the booking cards */
         .main-content {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             background-color: #f9f9f9;
         }
-
         h1 {
             margin-top: 0;
         }
-
-        .booking-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            padding: 15px;
+        /* Styles for the average rating */
+        .average-rating {
+            margin-bottom: 20px;
+        }
+        .average-rating h2 {
             margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-
-        .booking-details {
-            flex-grow: 1;
+        .stars-outer {
+            display: inline-block;
+            position: relative;
+            font-size: 24px;
+            color: #e0e0e0; /* Light gray unfilled stars */
         }
-
-        .status {
+        .stars-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0%; /* Will be set dynamically */
+            color: #6a00b5; /* Purple filled stars */
+        }
+        .stars-outer::before {
+            content: "\f005 \f005 \f005 \f005 \f005";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+        }
+        .stars-inner::before {
+            content: "\f005 \f005 \f005 \f005 \f005";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+        }
+        /* Styles for the reviews header */
+        .reviews-header {
+            font-size: 24px;
             font-weight: bold;
+            margin-bottom: 20px;
         }
-
-        .status.accepted {
-            color: green;
-        }
-
-        .status.denied {
-            color: red;
-        }
-
-        .status.requested {
-            color: orange;
-        }
-
-        .review-button {
-            background-color: #6a00b5;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 1rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .review-button:hover {
-            background-color: #4e008f;
-        }
-
+        /* Styles for individual review cards */
         .review-card {
             background-color: #fff;
             padding: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-
-        .rating {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #6a00b5;
+        .reviewer-info {
+            margin-bottom: 10px;
         }
-
-        .comment {
+        .reviewer-name {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .review-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .review-rating {
+            margin-bottom: 10px;
+        }
+        .review-comment {
             margin-top: 10px;
         }
-
     </style>
 </head>
 <body>
@@ -300,21 +187,47 @@
             </div>
         </div>
         <div class="right-part">
-            <h1>My Reviews</h1>
-            {% if reviews %}
-                {% for review in reviews %}
-                    <div class="review-card">
-                        <p class="rating">Rating: {{ review.rating }}</p>
-                        {% if review.comment %}
-                            <p class="comment">{{ review.comment }}</p>
-                        {% endif %}
-                        <p>Reviewed by: {{ review.reviewer.first_name }} {{ review.reviewer.last_name }}</p>
-                        <p>Booking Date: {{ review.booking.date_booking.strftime('%Y-%m-%d %H:%M') }}</p>
+            <div class="main-content">
+                <h1>My Reviews</h1>
+                {% if reviews %}
+                    {% set total_rating = 0 %}
+                    {% for review in reviews %}
+                        {% set total_rating = total_rating + review.rating %}
+                    {% endfor %}
+                    {% set average_rating = (total_rating / reviews|length)|round(2) %}
+                    <!-- Calculate average rating percentage -->
+                    {% set average_percentage = (average_rating / 5 * 100) | round(2) %}
+                    <div class="average-rating">
+                        <h2>Rating</h2>
+                        <div class="stars-outer">
+                            <div class="stars-inner" style="width: {{ average_percentage }}%;"></div>
+                        </div>
+                        <p>({{ average_rating }} out of 5)</p>
                     </div>
-                {% endfor %}
-            {% else %}
-                <p>You have not received any reviews yet.</p>
-            {% endif %}
+                    <div class="reviews-header">Reviews</div>
+                    <!-- List of reviews -->
+                    {% for review in reviews %}
+                        <!-- Calculate individual review percentage -->
+                        {% set review_percentage = (review.rating / 5 * 100) | round(2) %}
+                        <div class="review-card">
+                            <div class="reviewer-info">
+                                <span class="reviewer-name">{{ review.reviewer.first_name }} {{ review.reviewer.last_name }}</span>
+                                <span class="review-date">{{ review.booking.date_booking.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </div>
+                            <div class="review-rating">
+                                <div class="stars-outer">
+                                    <div class="stars-inner" style="width: {{ review_percentage | safe }}%;"></div>
+                                </div>
+                            </div>
+                            {% if review.comment %}
+                                <div class="review-comment">{{ review.comment }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>You have not received any reviews yet.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>
