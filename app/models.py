@@ -142,15 +142,20 @@ class Review(db.Model):
 
     review_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     booking_id = db.Column(UUID(as_uuid=True), db.ForeignKey('booking.booking_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
+    reviewer_id = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
+    reviewee_id = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'), nullable=False)
     rating = db.Column(db.Numeric(2, 1), nullable=False)
     comment = db.Column(db.String, nullable=True)
     role_reviewer = db.Column(db.String, nullable=False)
 
+    # Relationships
     booking = db.relationship('Booking', backref=db.backref('reviews', lazy=True))
+    reviewer = db.relationship('Profile', foreign_keys=[reviewer_id], backref='reviews_given')
+    reviewee = db.relationship('Profile', foreign_keys=[reviewee_id], backref='reviews_received')
 
     __table_args__ = (
         db.CheckConstraint('rating >= 0.0 AND rating <= 5.0', name='check_rating_range_review'),
-        db.CheckConstraint("role_reviewer IN ('Musician', 'Venue Owner')", name='check_role_reviewer_valid'),
+        db.CheckConstraint("role_reviewer IN ('Musician', 'Venue')", name='check_role_reviewer_valid'),
     )
 
     def __repr__(self):
