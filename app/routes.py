@@ -1037,3 +1037,81 @@ def get_recommendations(user_profile_id):
         recommended_musicians = list({m.profile_id: m for m in recommended_musicians}.values())[:3]
         print(f"Recommended Musicians (with bookings): {len(recommended_musicians)}")  # Debug output
         return recommended_musicians
+    
+@main.route('/bookings/<uuid:booking_id>/review', methods=['GET', 'POST'])
+def submit_review(booking_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to submit a review.", "error")
+        return redirect(url_for('main.login'))
+
+    current_user_id = uuid.UUID(session['user_id'])
+    current_user = Profile.query.get(current_user_id)
+    booking = Booking.query.get_or_404(booking_id)
+
+    # Ensure the current user is involved in this booking
+    if booking.booked_by != current_user_id and booking.musician_id != current_user_id:
+        flash('You are not authorized to review this booking.', 'error')
+        return redirect(url_for('main.bookings'))
+
+    # Check if a review already exists from this reviewer for this booking
+    existing_review = Review.query.filter_by(
+        booking_id=booking_id,
+        reviewer_id=current_user_id
+    ).first()
+    if existing_review:
+        flash('You have already submitted a review for this booking.', 'error')
+        return redirect(url_for('main.bookings'))
+
+    if request.method == 'POST':
+        rating = request.form.get('rating')
+        comment = request.form.get('comment')
+
+        # Validate the rating
+        try:
+            rating = float(rating)
+            if rating < 0.0 or rating > 5.0:
+                raise ValueError
+        except ValueError:
+            flash('Invalid rating. Please select a rating between 0 and 5.', 'error')
+            return render_template('submit_review.html', booking=booking)
+
+        # Determine roles and IDs
+        if current_user.profile_type == 'venue':
+            role_reviewer = 'Venue'
+            reviewee_id = booking.musician_id
+        elif current_user.profile_type == 'musician':
+            role_reviewer = 'Musician'
+            reviewee_id = booking.venue_id
+        else:
+            flash('Invalid profile type for reviewing.', 'error')
+            return redirect(url_for('main.bookings'))
+
+        # Create the review
+        review = Review(
+            booking_id=booking_id,
+            reviewer_id=current_user_id,
+            reviewee_id=reviewee_id,
+            rating=rating,
+            comment=comment,
+            role_reviewer=role_reviewer
+        )
+        db.session.add(review)
+        db.session.commit()
+        flash('Your review has been submitted.', 'success')
+        return redirect(url_for('main.bookings'))
+
+    return render_template('submit_review.html', booking=booking)
+
+@main.route('/reviews')
+def reviews():
+    if 'user_id' not in session:
+        flash("You must be logged in to view your reviews.", "error")
+        return redirect(url_for('main.login'))
+
+    current_user_id = uuid.UUID(session['user_id'])
+    current_user = Profile.query.get(current_user_id)
+
+    # Fetch reviews where the current user is the reviewee
+    reviews = Review.query.filter_by(reviewee_id=current_user_id).all()
+
+    return render_template('reviews.html', reviews=reviews)

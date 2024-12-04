@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Review - MelodyMatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #3a007d, #6a00b5); /* Consistent gradient */
+            color: #fff;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            margin: 50px auto;
+            color: #000;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .review-form {
+            margin-top: 20px;
+            display: inline-block;
+            width: 100%;
+        }
+        .review-form select,
+        .review-form textarea {
+            width: 95%; /* Almost as wide as the container */
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        .review-form textarea {
+            resize: none; /* Prevent manual resizing */
+            overflow: hidden; /* Hide scrollbar */
+            min-height: 100px; /* Set initial minimum height */
+        }
+        .review-form button {
+            display: block;
+            width: 95%; /* Match the width of select and textarea */
+            background-color: #6a00b5;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 auto; /* Center the button */
+        }
+        .review-form button:hover {
+            background-color: #4e008f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Consider Giving a Review!</h1>
+        <form method="POST" class="review-form">
+            <!-- Rating Dropdown with Stars -->
+            <select name="rating" id="rating" required>
+                <option value="" disabled selected>Select a rating</option>
+                {% for i in range(1, 6) %}
+                    <option value="{{ i }}">{{ '★' * i }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Auto-expanding Textarea -->
+            <textarea name="comment" id="comment" placeholder="Write your feedback here..." oninput="autoGrow(this)"></textarea>
+
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
+
+    <script>
+        function autoGrow(element) {
+            element.style.height = '100px'; // Reset to initial height
+            element.style.height = (element.scrollHeight) + 'px';
+        }
+    </script>
+</body>
+</html>
