@@ -117,6 +117,11 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better design */
         }
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end; /* Zorgt ervoor dat de knoppen helemaal naar rechts staan */
+            gap: 10px; /* Ruimte tussen de knoppen */
+        }
         .view-profile-button {
             background-color: #6a00b5; /* Purple */
             color: #fff;
@@ -272,7 +277,7 @@
                             {% endfor %}
                         {% elif user.profile_type == 'musician' %}
                             {% if bookings %}
-                                <h2>Booking Requests</h2>
+                                <h2></h2>
                                 {% for booking in bookings %}
                                     <div class="profile-card">
                                         <div>
@@ -283,14 +288,15 @@
                                                 Status: {{ booking.status }}
                                             </p>
                                         </div>
-                                        {% if booking.status == 'Requested' %}
-                                            <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post">
-                                                <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
-                                                <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
-                                            </form>
-                                        {% else %}
-                                            <p>Status: {{ booking.status }}</p>
-                                        {% endif %}
+                                        <div class="action-buttons">
+                                            {% if booking.status == 'Requested' %}
+                                                <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post" style="display: inline;">
+                                                    <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
+                                                    <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
+                                                </form>
+                                            {% endif %}
+                                            <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="view-profile-button">Profile</a>
+                                        </div>
                                     </div>
                                 {% endfor %}
                             {% else %}
