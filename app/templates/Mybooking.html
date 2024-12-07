@@ -285,46 +285,67 @@
             <div class="main-content">
                 <h1>My Bookings</h1>
                 {% if bookings %}
-                    {% for booking in bookings %}
-                        <div class="booking-card">
-                            <div class="booking-details">
-                                {% if user.profile_type == 'venue' %}
-                                    <h3>Musician: {{ booking.musician.profile.first_name }} {{ booking.musician.profile.last_name }}</h3>
-                                {% elif user.profile_type == 'musician' %}
+                    <!-- Accepted Bookings -->
+                    <h2>Accepted Bookings</h2>
+                    {% set accepted_bookings = bookings | selectattr('status', 'equalto', 'Accepted') | list %}
+                    {% if accepted_bookings %}
+                        {% for booking in accepted_bookings %}
+                            <div class="booking-card">
+                                <div class="booking-details">
                                     <h3>Venue: {{ booking.venue.name_event }}</h3>
-                                {% endif %}
-                                <p>
-                                    Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
-                                    Duration: {{ booking.duration }}<br>
-                                    Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
-                                    Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br> 
-                                    Status:
-                                    {% if booking.status == 'Accepted' %}
-                                        <span class="status accepted">{{ booking.status }}</span>
-                                    {% elif booking.status == 'Denied' %}
-                                        <span class="status denied">{{ booking.status }}</span>
-                                    {% else %}
-                                        <span class="status requested">{{ booking.status }}</span>
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <div>
-                                {% if booking.status == 'Accepted' %}
-                                    <!-- Show Review button if user hasn't already reviewed this booking -->
+                                    <p>
+                                        Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                        Duration: {{ booking.duration }}<br>
+                                        Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
+                                        Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
+                                        Status: <span class="status accepted">{{ booking.status }}</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <!-- Review button if the user hasn't already reviewed -->
                                     {% set existing_review = booking.reviews | selectattr('reviewer_id', 'equalto', user.profile_id) | list %}
                                     {% if not existing_review %}
                                         <a href="{{ url_for('main.submit_review', booking_id=booking.booking_id) }}" class="review-button">Review</a>
                                     {% else %}
                                         <span>Reviewed</span>
                                     {% endif %}
-                                {% endif %}
+                                    <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="review-button">Profile</a>
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No accepted bookings yet.</p>
+                    {% endif %}
+            
+                    <!-- Denied Bookings -->
+                    <h2>Denied Bookings</h2>
+                    {% set denied_bookings = bookings | selectattr('status', 'equalto', 'Denied') | list %}
+                    {% if denied_bookings %}
+                        {% for booking in denied_bookings %}
+                            <div class="booking-card">
+                                <div class="booking-details">
+                                    <h3>Venue: {{ booking.venue.name_event }}</h3>
+                                    <p>
+                                        Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                        Duration: {{ booking.duration }}<br>
+                                        Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
+                                        Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
+                                        Status: <span class="status denied">{{ booking.status }}</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="status-message">This booking was denied.</p>
+                                    <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="review-button">Profile</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No denied bookings yet.</p>
+                    {% endif %}
                 {% else %}
                     <p>You have no bookings.</p>
                 {% endif %}
-            </div>
+            </div>                        
         </div>
     </div>
 </body>

@@ -465,6 +465,19 @@ def venue_profile(user_id):
     return render_template('venue_profile.html', user=user, venue=venue, profile_picture=profile_picture)
 
 
+@main.route('/venue/<int:venue_id>')
+def venue_details(venue_id):
+    venue = Venue.query.filter_by(profile_id=venue_id).first_or_404()
+    profile = Profile.query.get(venue_id)
+
+    # Zorg ervoor dat beide bestaan
+    if not venue or not profile:
+        flash("Venue or Profile not found", "error")
+        return redirect(url_for('main.main_page'))
+
+    return render_template('venue_details.html', venue=venue, profile=profile)
+
+
 @main.route('/edit_venue_profile/<user_id>')
 def edit_venue_profile(user_id):
     """
