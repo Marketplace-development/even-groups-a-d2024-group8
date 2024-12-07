@@ -99,7 +99,7 @@ At the end of each class, we added a __repr__ method. The __repr__ method is use
 The Musician model extends the Profile model, adding specific fields for musicians.
 
 - profile_id: A foreign key linking to the Profile table.
-- genre: The genre of music the musician plays.
+- genre: The genre of music the musician plays. ('Pop', 'Rock', 'Jazz', 'Other')
 - price_per_hour: The hourly rate of the musician.
 - link_to_songs: A link to the musician's songs or portfolio.
 - equipment: A boolean indicating if the musician provides their own equipment.
@@ -152,6 +152,8 @@ The Review model allows users to leave feedback for bookings.
 
 - review_id: A unique identifier for each review.
 - booking_id: A foreign key linking to the Booking table.
+- reviewer_id: A foreign key linking to the Profile of the reviewer.
+- reviewee_id: a foreign key linking to the Profile being reviewed.
 - rating: The rating given to the booking (range: 0.0 - 5.0).
 - comment: An optional comment from the reviewer.
 - role_reviewer: Defines whether the reviewer is a Musician or a Venue Owner.
@@ -165,15 +167,17 @@ The routes define how users interact with the application. They handle page navi
 Checks if a user is logged in. If logged in, the user is redirected to main_page. If the user is not logged in, the homepage (index.html) is displayed.
 
 #### main.route('/register', methods=['GET', 'POST'])
-This function has two methods, GET and POST, which are handling the registration of new users, with different paths for musicians and venues.
+This function handles both the GET and POST requests for registering new users, with separate logic for musicians and venues.
 
 The GET request returns the registration form, (register.html).
 
-The POST request returns the registration of the new user. It collects the common data (email, profile type, name, address, phone number and bio), and checks if all the required information is filled in and if the email is new. If not, it returns an error. 
-The function then creates a new user.
-If the user is a musician, the function gathers musician-specific information such as role(soloist/band), genre, hourly rate, songs and equipment. It validates the musician files, creates a Musician record in the database and links it with the user's profile. It also checks if all the required information is given such as date of birth and artist name for a soloist or amount of members and band name for a band. If not, it will return an error.
-If the User is a venue, the function collects venue-specific data like venue name and style, as well as creating a venue record which is linked to the user's profile.
-At the end, the users are asked to upload their profile picture and so they are redirected towards the upload_profile function.
+The POST request handles the registration process. It collects common user data (email, profile type, name, address, phone number, and bio), then checks that all required fields are filled in and that the email is not already registered. If any of these conditions are not met, an error message is returned. The function then creates a new user profile.
+
+For musicians, the function gathers additional details like role (soloist or band), genre, hourly rate, song links, and equipment. It validates this data, creates a Musician record in the database, and links it to the user’s profile. Specific checks are performed for soloists (requiring date of birth and artist name) or bands (requiring band name and number of members). If any required information is missing or invalid, an error message is shown.
+
+For venues, the function collects venue-specific information such as venue name and style, and creates a Venue record linked to the user’s profile.
+
+Finally, users are prompted to upload their profile picture and are redirected to the upload_profile function.
 
 #### main.route('/login', methods=['GET', 'POST'])
 This route handles user login. It uses both GET and POST methods:
@@ -202,8 +206,11 @@ This route handles the search for musicians. It receives a JSON request with var
 #### main.route('/profile')
 This route handles the user's profile page. It checks if the user is logged in. If the user is logged in, it redirects them to their specific profile page based on their profile type. If the user is a musician with a soloist type, they are redirected to their soloist profile. If the user is a musician with a band type, they are redirected to their band profile. If the user is a venue, they are redirected to their venue profile. If the user is not logged in or their profile type is not recognized, they are redirected to the main page.
 
-#### main.route('/band_profile/<user_id>')
-This route displays the profile of a musician’s band. It retrieves the user and band details based on the user_id. If the user has a profile picture, it is converted to Base64 format and rendered in the HTML template. The route then renders the band_profile.html template with the user and band details, including the profile picture.
+#### @main.route('/band_profile/<user_id>')
+This function displays a band profile page.
+It first checks if the user is logged in; if not, they are redirected to the login page. It then retrieves the user and band details using the provided user_id. If either is missing, an error message is shown, and the user is redirected to the main page.
+The function checks if the profile belongs to the logged-in user and sets a flag (is_own_profile) accordingly. If a profile picture exists, it is encoded in Base64 for display.
+The page is rendered with the user's and band's details, profile picture (if available), and the is_own_profile flag.
 
 #### main.route('/edit_band_profile/<user_id>')
 This route allows users to edit their band profile. It fetches the user and band details for the specified user_id. If either the user or band is not found, an error message is displayed, and the user is redirected to the main page. If a profile picture exists, it is converted to Base64 format. The route then renders the edit_band_profile.html template, providing the user with their current information for editing.
@@ -273,21 +280,28 @@ The function renders the (mybooking.html) template, passing the list of bookings
 
 - This is the algorithm we implemented in our app.
 
-This route is used to display musician recommendations to the user based on their profile and any previous bookings. It begins by checking if the user is logged in by retrieving their user_profile_id from the session. If the user is not logged in, the system redirects them to the main page with an error message.
+This route is designed to provide personalized musician recommendations to users based on their preferences, previous bookings, and a matching algorithm that aligns venue styles with music genres. This process involves several key steps, including user authentication, data retrieval, and recommendation generation. The route begins by checking if the user is logged in by retrieving their user_profile_id from the session. If the user is not logged in, the system redirects them to the main page with an error message.
 Once the user's profile ID is found, the system retrieves their username from the database. After that, it calls the get_recommendations() function to fetch a list of musicians that are recommended to the user.
 The get_recommendations() function works in two ways depending on whether the user has made any previous bookings. If the user has not made any bookings, the system suggests musicians based on the styles of venues that match the genres of music they play according to the dicionary genre_to_style.  Musicians who play a genre that fits the venue's style are included in the recommendations. These musicians are limited to a maximum of three unique suggestions.
 If the user has made previous bookings, the function collects the styles of the venues from those bookings. It then recommends musicians who play genres that align with those venue styles. Again, the recommendations are limited to three, with any duplicates removed.
+Throughout the process, debug statements print information to the console, such as the number of bookings found, the total number of venues, and the final recommendations. These logs aid in monitoring the algorithm's behavior and diagnosing potential issues.
 The recommended_page() function renders a template with the user's name and the list of recommended musicians, allowing the user to view the personalized suggestions.
+
+#### @main.route('/bookings/<uuid:booking_id>/review', methods=['GET', 'POST'])
+This route allows users to submit reviews for a specific booking. It begins by checking if the user is logged in and ensures that only those directly involved in the booking can submit a review. If the user is not authorized or has already submitted a review for the same booking, they are redirected with an appropriate error message.
+When a review is submitted, the system validates the provided rating to ensure it is between 0.0 and 5.0. Based on the user's profile type (musician or venue), the role of the reviewer is determined, and the appropriate reviewee ID is assigned. A new review is then created with the provided data, stored in the database, and the user is redirected to the bookings page with a success message.
+If the request is a GET, the review form is displayed along with details about the booking. The route ensures that reviews are handled securely, fairly, and with proper validation.
+
+#### @main.route('/reviews')
+This route allows users to view the reviews they have received. It first checks if the user is logged in, and if not, redirects them to the login page with an error message. After confirming the user is logged in, it fetches the reviews where the current user is the reviewee from the database. These reviews are then passed to the template for rendering, allowing the user to view their received feedback.
 
 ## ✏️ Templates
 
 The templates folder holds the HTML files responsible for rendering pages related to user interactions such as registration, profile pages, login pages, booking views, etc.
 
------------------------------------------------------
 ### Explanation of the Code
 The templates are designed to provide a clean and modern look for the web application. They use a combination of minimalistic design elements and user-friendly navigation to enhance the overall user experience. The layout is responsive, meaning it adjusts smoothly to different screen sizes, providing a consistent experience across devices such as desktops, tablets, and smartphones.
 
------------------------------------------------------
 
 #### band_profile.html
 This section describes the profile page for a band's profile in MelodyMatch, where users can view and update various details about their band. The page shows the band's information, including their name, genre, rating, and more. If available, the band's profile picture is displayed.
@@ -311,7 +325,6 @@ The form includes several input fields. The artist's name is entered in a text i
 The soloists have the same option as the bands so that in addition to these details, the template includes sections for address and contact information. Users can enter their country, city, street name, and house number, as well as their first name, last name, phone number, and email. These fields are displayed in grouped sections with headings, which help separate the different areas of the form.
 Just like for bands, form is submitted using a button that saves the changes. There is also a button to return to the previous page without saving changes. The form layout is designed to be user-friendly and visually appealing, with a clean design and a gradient background. This ensures that solo artists can easily input and update their information.
 
------------------------------------------------------
 #### venue_profile.html
 This template displays a venue's profile page, allowing users to view key information about the venue. The layout and style are similar to the soloist_profile.html but tailored for venue-related content. 
 At the top of the page, the venue's name or event name is displayed, followed by a profile picture, which is rendered using a Base64 string for the image. The bio section provides an optional description of the venue, showing a default message ("No bio provided.") if no information is available.
@@ -320,36 +333,30 @@ The page also contains sections for the venue's address and contact information.
 Finally, there is a button group at the bottom, with options for users to edit the venue profile or return to the main page. The page uses a color scheme of purple tones for the buttons, which change shade when hovered over, adding an interactive touch.
 This page offers a well-structured and user-friendly presentation for venue owners or users to showcase their venue information and provides navigation options for further interactions.
 
------------------------------------------------------
 #### edit_venue_profile.html
 The Edit Venue Profile template provides a form that allows users to update their venue details. It begins with an image container that displays the venue's current profile picture. Users can upload a new image or adjust the existing one. The form uses a POST method to submit data, including the venue's name, bio, style, address, and contact information.
 The form contains several input fields. The venue name is entered in a text input, while the bio is entered in a textarea, allowing for a more detailed description of the venue. The style of the venue is selected from a dropdown menu, offering options like Pub, Cocktail Bar, etc. The address section includes fields for the country, city, street name, and house number. The country field is pre-filled with "Belgium," while users must input the other address details manually.
 In addition to the venue details, the form also includes fields for contact information. Users can input the first and last names of the venue's point of contact, as well as their phone number and email address. These fields are displayed in clearly separated sections, making it easy for users to update specific details.
 The form is submitted using a "Save Changes" button, allowing the user to save any modifications made. There is also a "Return" button that lets the user go back to the venue’s profile without saving changes. The layout is clean and user-friendly, making it simple for users to update the venue's information, while interactive features, such as the profile picture adjustment, enhance the overall experience.
 
------------------------------------------------------
 #### index.html
 The index template serves as an introductory page for MelodyMatch, welcoming users to the platform. The page is split into two sections: the left side features a bold heading, "Welcome to MelodyMatch," along with a brief description of the platform's purpose, inviting users to explore local music experiences.
 On the right, the authentication box provides options for users depending on their login status. If the user is logged in, a "Logout" button is displayed. For users who are not logged in, options to either "Login" or "Register" are presented, guiding them through the process of joining the platform or accessing their account.
 This template is designed to give a straightforward and welcoming experience for new and returning users, encouraging easy navigation to sign in or create an account.
 
------------------------------------------------------
 #### register.html
 This register template represents a dynamic registration form for a platform, allowing users to select between a "Musician" or "Venue" profile type. Depending on the selection, the form adjusts to show the relevant fields.
 For musicians, users can choose to be a "Soloist" or part of a "Band," with fields for their name, date of birth, genre, price per hour, equipment availability, and an optional link to their songs. For venues, users enter their venue name and style, with various venue types like "Pub," "Jazz Lounge," or "Dance Club."
 The form also collects general details such as the user's first name, last name, email, and optional address and bio information. This provides a streamlined and intuitive registration process for both musicians and venues.
 
------------------------------------------------------
 #### login.html
 The login.html file creates a login page with a clean design. It includes a heading "Welcome back!" and a simple form asking for the user's email address. There's a submit button below the email input. When the user submits the form, it sends the email data to the server for authentication. This page is designed to be responsive, meaning it will adjust to different screen sizes.
 
------------------------------------------------------
 #### upload_picture.html
 The upload_picture.html page is designed to allow users to upload a profile picture. At the top of the page, there is a heading that says "Upload Profile Picture." Below that, there is an area where users can preview the image they select. This area has a circular container that displays a default icon if no image is selected, but once a user selects an image, it is shown inside the container. The container also includes functionality for users to drag the image around and zoom in or out by using the mouse wheel.
 There is a "Choose Image" button that opens a file explorer, allowing users to select an image from their device. The file input is hidden, and the button triggers the file picker when clicked. Once an image is selected, the user can preview it, and if satisfied, they can click the "Upload" button to submit the image. If they do not wish to upload a picture, there is also a "Skip" button to bypass the process and continue.
 The form allows for both uploading a picture or skipping the process entirely.
 
------------------------------------------------------
 #### main_page.html
 The main_page.html file represents the main interface of the "MelodyMatch" platform, designed for users with either a "venue" or "musician" profile type. The layout features a sidebar and a main content area, making it easy to navigate between different sections of the site. The sidebar, which remains fixed as the user scrolls, offers quick links to key areas like "My Profile," "My Bookings," "My Reviews," "My Recommended," and a logout option. These navigation buttons are styled as purple-colored action buttons with hover effects, providing a consistent and visually appealing design. The sidebar ensures that important links are always accessible without scrolling, enhancing user experience.
 In the main content area, a search bar appears at the top of the page, allowing users with a "venue" profile type to search for musicians. The search bar includes several input fields and dropdowns to filter musicians by criteria such as type, name, city, genre, price, and equipment needs. The form is designed to gather relevant information for a refined search. Upon submission, the form triggers a JavaScript function to fetch the results and display them dynamically below the search bar.
@@ -358,31 +365,42 @@ For users with a "musician" profile, the page also includes an area to manage bo
 The design employs flexbox for a responsive layout, ensuring that both the sidebar and content areas adjust appropriately to different screen sizes. The search bar stays at the top of the page, allowing users to easily initiate new searches while browsing the results.
 Additionally, the JavaScript functionality is essential for providing a dynamic and interactive experience. When the search button is clicked, the data from the form is sent to the server, and the results are processed and displayed without needing to reload the page. If no results are found, a message is shown to inform the user. The page also includes error handling in case of issues with the search request.
 
------------------------------------------------------
 #### booking.html
 The booking.html file is designed to allow users to request a booking for a musician on the "MelodyMatch" platform. 
 At the top of the page, the main title "Request Booking" is prominently displayed. Below this, the musician's details are dynamically shown, including their first and last name, genre, and price per hour. 
 Under the musician’s details, there’s a form where users can submit their booking request. The form includes several fields: the date and time of the performance, which is selected using a datetime-local input; the duration, where users enter hours and minutes in a text input; and an optional message field where users can add any additional notes or requests.
 At the bottom of the form is a submit button. The form action dynamically links to a server-side function that processes the booking request for the selected musician.
 
------------------------------------------------------
 #### Mybooking.html
 The mybooking.html page is designed to display a user's booking information. It consists of two main sections: a sidebar and the main content area.
 The sidebar includes navigation links to different sections such as "My Profile," "My Bookings," "My Reviews," and "My Recommended," each represented by an icon and styled button. It also includes a logout button at the bottom for the user to log out of the platform.
 The main content area shows the user's bookings. If bookings exist, each booking is displayed in a card format with the musician's name, the booking date and time, duration, and status. The status is color-coded: accepted bookings are green, denied bookings are red, and requested bookings are orange. If there are no bookings, a message indicating this is shown. 
 The layout uses a flexible design with a sidebar fixed on the left and the main content scrollable on the right, providing a clear and organized view of the user's bookings.
 
------------------------------------------------------
 #### my_recommendations.html
-The my_recommendations.html page is designed to display a list of recommended musicians for the user. It consists of two main parts: a sidebar and a content area.
-The sidebar includes navigation buttons for sections like "My Profile," "My Bookings," "My Reviews," and "My Recommended." Each link is represented by a button with an icon. At the bottom of the sidebar, there is a logout button.
-The main content section displays the musician recommendations. If there are recommendations, each musician's name and genre are listed in a card format. If no recommendations are available, a message is shown indicating this.
+Your explanation of the `my_recommendations.html` page is mostly accurate, but there are a couple of details that could be added for completeness: 
 
+1. **Profile Card Details**:  
+   Mention that each recommended musician's profile card includes their full name, genre, price per hour, and a "View Profile" button linking to their profile.
 
------------------------------------------------------
+2. **Flash Messages** (if applicable):  
+   If the "flash-messages" list in your CSS is utilized to show success or error notifications (e.g., related to recommendations or actions), it would be worth highlighting this feature in the explanation.
+
+### Revised Explanation
+The my_recommendations.html page displays a list of recommended musicians. It features two main sections: a sidebar for navigation and a main content area for recommendations. 
+The sidebar includes navigation buttons for "My Profile," "My Bookings," "My Reviews," "My Recommended," and a logout option, each represented with an icon. 
+The main content area shows musician recommendations in a card format. Each card displays the musician's name, genre, price per hour, and a "View Profile" button linking to their profile. If no recommendations are available, the page displays a message indicating this. 
+
+#### reviews.html
+The reviews.html page allows users to view feedback they’ve received. It features a sidebar for navigation to other sections and a main content area displaying reviews.
+The main content area highlights the user's average rating with a star-based indicator, calculated dynamically based on received reviews. Individual reviews are displayed in cards, showing the reviewer's name, booking date, star rating, and optional comments. If no reviews are available, a message indicates this. 
+
+#### submit_review.html
+The submit_review page allows users to provide feedback on their experience with a musician. It features a form where users can select a star rating from a dropdown menu and write comments in a text area. The dropdown dynamically generates star options, and the text area adjusts its height automatically to fit the content as users type. Once the review is completed, users can submit it using the provided button. 
+
 ## 🚀 run.py
 This file is responsible for running the Flask web application. It starts by importing the create_app function from the app module. The create_app function is used to initialize the Flask application, setting up configurations and registering any necessary components.
 Once the application is created by calling create_app(), the app.run(debug=True) command starts the web server. The debug=True flag enables Flask's debugging mode, which provides detailed error messages and automatically reloads the server when changes are made to the code.
 This script ensures that the application runs correctly when executed directly. The if __name__ == '__main__' condition ensures that the server is only started if this script is run as the main program, not when it's imported elsewhere.
 
------------------------------------------------------
+
