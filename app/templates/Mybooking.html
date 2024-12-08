@@ -297,8 +297,6 @@
                                 <div class="booking-details">
                                     {% if user.profile_type == 'venue' %}
                                         <h3>Musician: {{ booking.musician.profile.first_name }} {{ booking.musician.profile.last_name }}</h3>
-                                    {% else %}
-                                        <h3>Venue: {{ booking.venue.name_event }}</h3>
                                     {% endif %}                              
                                     <p>
                                         Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>

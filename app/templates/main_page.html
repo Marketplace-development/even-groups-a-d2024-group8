@@ -264,8 +264,8 @@
                     {% endfor %}
                 <!-- main_page.html -->
                 {% elif user.profile_type == 'musician' %}
+                <h2>Booking Requests</h2>
                 {% if bookings %}
-                    <h2>Booking Requests</h2>
                     <div class="search-results" id="search-results">
                         {% if user.profile_type == 'venue' %}
                             {% for musician in profiles %}
@@ -283,7 +283,7 @@
                                 {% for booking in bookings %}
                                     <div class="profile-card">
                                         <div>
-                                            <h3>{{ booking.venue.profile.first_name }} {{ booking.venue.profile.last_name }}</h3>
+                                            <h3>Venue: {{ booking.venue.name_event }}</h3>                                       
                                             <p>
                                                 Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                                 Duration: {{ booking.duration }}<br>
