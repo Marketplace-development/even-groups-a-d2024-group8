@@ -747,9 +747,9 @@ def search_profiles():
         if min_rating:
             try:
                 min_rating_value = float(min_rating)
-                # Use COALESCE to treat NULL ratings as 0
+                # Use COALESCE to treat NULL as 0 if a rating hasn't been set
                 query = query.filter(func.coalesce(Profile.rating, 0) >= min_rating_value)
-                filters_applied = True
+                filters_applied = True  
             except ValueError:
                 pass
 
@@ -1127,7 +1127,6 @@ def submit_review(booking_id):
 
         reviewee_profile = Profile.query.get(reviewee_id)
         if reviewee_profile:
-            # Fetch all reviews for this reviewee
             all_reviews = Review.query.filter_by(reviewee_id=reviewee_id).all()
             if all_reviews:
                 avg_rating = sum(float(r.rating) for r in all_reviews) / len(all_reviews)
