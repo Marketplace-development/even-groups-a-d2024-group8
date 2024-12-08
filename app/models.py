@@ -57,7 +57,7 @@ class Soloist(db.Model):
     musician = db.relationship('Musician', backref=db.backref('soloist', uselist=False))
 
     def __repr__(self):
-        return f'<Soloist {self.profile_id}, DOB: {self.date_of_birth}>'
+        return f"<Soloist {self.profile_id}, Artist Name: {self.artist_name}>"
 
 class Band(db.Model):
     __tablename__ = 'band'
@@ -109,7 +109,7 @@ class Booking(db.Model):
     profile_booked_by = db.relationship('Profile', foreign_keys=[booked_by], backref=db.backref('bookings_made', lazy=True))
 
     __table_args__ = (
-        db.CheckConstraint("status IN ('Requested', 'Confirmed', 'Completed', 'Processing', 'Failed', 'Cancelled')", name='check_status_valid'),
+        db.CheckConstraint("status IN ('Requested', 'Accepted', 'Denied')", name='check_status_valid'),
     )
 
     def __repr__(self):
