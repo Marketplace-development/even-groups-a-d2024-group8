@@ -287,6 +287,7 @@
             <div class="main-content">
                 <h1>My Bookings</h1>
                 {% if bookings %}
+                    {% if user.profile_type == 'venue' %}
                     <!-- Requested Bookings -->
                     <h2>Requested Bookings</h2>
                     {% set requested_bookings = bookings | selectattr('status', 'equalto', 'Requested') | list %}
@@ -314,6 +315,7 @@
                         {% endfor %}
                     {% else %}
                         <p>No requested bookings yet.</p>
+                    {% endif %}
                     {% endif %}
                     <!-- Accepted Bookings -->
                     <h2>Accepted Bookings</h2>
@@ -372,7 +374,6 @@
                                     </p>
                                 </div>
                                 <div>
-                                    <p class="status-message">This booking was denied.</p>
                                     <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="review-button">Profile</a>
                                 </div>
                             </div>
