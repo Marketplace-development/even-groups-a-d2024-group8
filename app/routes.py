@@ -7,6 +7,7 @@ import base64
 import random
 from datetime import datetime, timedelta
 from app import db
+from sqlalchemy import func
 
 main = Blueprint('main', __name__)
 
@@ -741,6 +742,16 @@ def search_profiles():
             # If musician needs equipment, they do NOT have equipment
             query = query.filter(Musician.equipment != needs_equipment)
             filters_applied = True
+        
+        min_rating = data.get('min_rating')
+        if min_rating:
+            try:
+                min_rating_value = float(min_rating)
+                # Use COALESCE to treat NULL ratings as 0
+                query = query.filter(func.coalesce(Profile.rating, 0) >= min_rating_value)
+                filters_applied = True
+            except ValueError:
+                pass
 
         # Fetch results based on filters
         results = query.all()
@@ -1113,6 +1124,16 @@ def submit_review(booking_id):
         )
         db.session.add(review)
         db.session.commit()
+
+        reviewee_profile = Profile.query.get(reviewee_id)
+        if reviewee_profile:
+            # Fetch all reviews for this reviewee
+            all_reviews = Review.query.filter_by(reviewee_id=reviewee_id).all()
+            if all_reviews:
+                avg_rating = sum(float(r.rating) for r in all_reviews) / len(all_reviews)
+                reviewee_profile.rating = round(avg_rating, 1)
+                db.session.commit()
+
         flash('Your review has been submitted.', 'success')
         return redirect(url_for('main.bookings'))
 
