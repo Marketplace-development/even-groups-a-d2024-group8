@@ -287,6 +287,30 @@
             <div class="main-content">
                 <h1>My Bookings</h1>
                 {% if bookings %}
+                    <!-- Requested Bookings -->
+                    <h2>Requested Bookings</h2>
+                    {% set requested_bookings = bookings | selectattr('status', 'equalto', 'Requested') | list %}
+                    {% if requested_bookings %}
+                        {% for booking in requested_bookings %}
+                            <div class="booking-card">
+                                <div class="booking-details">
+                                    <h3>Venue: {{ booking.venue.name_event }}</h3>
+                                    <p>
+                                        Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                        Duration: {{ booking.duration }}<br>
+                                        Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
+                                        Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
+                                        Status: <span class="status requested">{{ booking.status }}</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="review-button">Profile</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No requested bookings yet.</p>
+                    {% endif %}
                     <!-- Accepted Bookings -->
                     <h2>Accepted Bookings</h2>
                     {% set accepted_bookings = bookings | selectattr('status', 'equalto', 'Accepted') | list %}
