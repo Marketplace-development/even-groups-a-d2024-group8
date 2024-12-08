@@ -707,8 +707,11 @@ def search_profiles():
         if name:
             name = f"%{name}%"
             query = query.filter(
-                (Profile.first_name.ilike(name)) |
-                (Profile.last_name.ilike(name))
+                db.or_(
+                    Profile.first_name.ilike(name),
+                    Profile.last_name.ilike(name),
+                    (Profile.first_name + " " + Profile.last_name).ilike(name)
+                )
             )
             filters_applied = True
 

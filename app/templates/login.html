@@ -76,6 +76,26 @@
         .login-box input[type="submit"]:hover {
             background-color: #4e008f;
         }
+        .flash-messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .flash-messages li.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +103,21 @@
     <div class="login-box">
         <h1>Welcome back!</h1>
         <hr> <!-- Horizontal line separating the header -->
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
         <form method="post">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required placeholder="Enter Your Email">
@@ -91,4 +126,3 @@
     </div>
 </body>
 </html>
-
