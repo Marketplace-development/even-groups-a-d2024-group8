@@ -1130,4 +1130,9 @@ def reviews():
     # Fetch reviews where the current user is the reviewee
     reviews = Review.query.filter_by(reviewee_id=current_user_id).all()
 
-    return render_template('reviews.html', reviews=reviews)
+    # Calculate the average rating
+    total_rating = sum(float(review.rating) for review in reviews)
+    average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
+
+    # Pass user to the template
+    return render_template('reviews.html', user=current_user, reviews=reviews, average_rating=average_rating)
