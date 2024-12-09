@@ -301,7 +301,11 @@
                                     <p>
                                         Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                         Duration: {{ booking.duration }}<br>
-                                        Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
+                                        Price: {% if booking.payment and booking.payment.amount is not none %}
+                                                    €{{ '{:.2f}'.format(booking.payment.amount) }}
+                                                {% else %}
+                                                    Calculation Missing
+                                                {% endif %}<br>                              
                                         Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
                                         Status: <span class="status requested">{{ booking.status }}</span>
                                     </p>
@@ -330,11 +334,11 @@
                                     <p>
                                         Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                         Duration: {{ booking.duration }}<br>
-                                        {% if booking.payment %}
-                                          Price: {{ '€{:.2f}'.format(booking.payment.amount) }}
-                                        {% else %}
-                                          Price: Calculation Missing<br>
-                                        {% endif %}
+                                        Price: {% if booking.payment and booking.payment.amount is not none %}
+                                                    €{{ '{:.2f}'.format(booking.payment.amount) }}
+                                                {% else %}
+                                                    Calculation Missing
+                                                {% endif %}<br>    
                                         Payment Method: {{ booking.payment.method if booking.payment.method else 'Not Selected' }}<br>
                                         Status: <span class="status {{ booking.status|lower }}">{{ booking.status }}</span>
                                     </p>
@@ -370,7 +374,11 @@
                                     <p>
                                         Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                         Duration: {{ booking.duration }}<br>
-                                        Price: {{ '€{:.2f}'.format(booking.payment.amount)}}<br>
+                                        Price: {% if booking.payment and booking.payment.amount is not none %}
+                                                    €{{ '{:.2f}'.format(booking.payment.amount) }}
+                                                {% else %}
+                                                    Calculation Missing
+                                                {% endif %}<br>
                                         Payment Method: {{ booking.payment.method}}<br>
                                         Status: <span class="status denied">{{ booking.status }}</span>
                                     </p>

@@ -355,24 +355,29 @@
     </div>
     <script>
         function search_profiles() {
-            const formData = new FormData(document.querySelector('.search-bar'));
+            const form = document.querySelector('.search-bar');
+            const formData = new FormData(form);
             const searchData = Object.fromEntries(formData.entries());
+        
+            // Fetch request
             fetch('/search_profiles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify(searchData)
+                body: JSON.stringify(searchData),
             })
             .then(response => response.json())
             .then(data => {
                 const searchResultsDiv = document.getElementById('search-results');
-                searchResultsDiv.innerHTML = '';
+                searchResultsDiv.innerHTML = ''; // Clear existing results
                 if (data.length === 0) {
                     searchResultsDiv.innerHTML = '<p>No results found.</p>';
                     return;
                 }
+        
+                // Populate search results
                 data.forEach(profile => {
                     const profileDiv = document.createElement('div');
                     profileDiv.className = 'profile-card';
@@ -390,11 +395,11 @@
                 console.error('Error:', error);
                 alert('An error occurred while searching. Please try again.');
             });
-        }
+        }        
 
         function viewProfile(profileId) {
-            window.location.href = /profile/${profileId};
-        }
+            window.location.href = `/profile/${profileId}`;
+        }        
     </script>
 </body>
 </html>
