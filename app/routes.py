@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, render_template, session, flash, jsonify
-from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking, Review  # Import db and models from app.models
+from app.models import db, Profile, Musician, Soloist, Band, Venue, Booking, Review, Payment  # Import db and models from app.models
 import uuid
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -8,6 +8,7 @@ import random
 from datetime import datetime, timedelta
 from app import db
 from sqlalchemy import func
+from decimal import Decimal
 
 main = Blueprint('main', __name__)
 
@@ -865,9 +866,10 @@ def request_booking(musician_id):
     if request.method == 'POST':
         # Get form data
         date_booking_str = request.form.get('date_booking')
-        duration_str = request.form.get('duration')  # Get the unified duration field
+        duration_str = request.form.get('duration')
+        method_str = request.form.get('payment_method')
 
-        print(f"Received form data: date_booking={date_booking_str}, duration={duration_str}")
+        print(f"Received form data: date_booking={date_booking_str}, duration={duration_str}, payment_method={method_str}")
 
         # Validate and parse form data
         try:
@@ -888,6 +890,10 @@ def request_booking(musician_id):
                 raise ValueError("Duration must be greater than zero.")
             print(f"Duration validated: {duration}")
 
+            # Calculate total price based on standard pricing
+            total_hours = hours + minutes / 60
+            total_price = Decimal(total_hours) * Decimal(musician.price_per_hour)  # Gebruik de prijs per uur van de muzikant
+
         except ValueError as e:
             print(f"ValueError: {e}")
             flash(str(e), "error")
@@ -904,15 +910,26 @@ def request_booking(musician_id):
             booked_by=logged_in_user_id,
             booked_in=logged_in_user_id
         )
-        
+
         print(f"New booking object created: {new_booking}")
 
+        # Create the payment object 
+        total_hours = hours + minutes / 60
+        total_price = Decimal(total_hours) * Decimal(musician.price_per_hour)
+        new_payment = Payment(
+            method=method_str,
+            amount= total_price  # Stel standaardbedrag in
+        )
+
         try:
-            print("Attempting to commit booking...")
+            print("Attempting to commit booking and payment...")
             db.session.add(new_booking)
+            db.session.flush()  # Zorg ervoor dat de booking_id beschikbaar is voor de betaling
+            new_payment.booking_id = new_booking.booking_id  # Koppel de betaling aan de boeking
+            db.session.add(new_payment)
             db.session.commit()
             flash("Booking request sent successfully!", "success")
-            print("Booking successfully committed.")
+            print("Booking and payment successfully committed.")
         except Exception as e:
             db.session.rollback()
             flash(f"An error occurred while requesting the booking: {e}", "error")
@@ -923,7 +940,8 @@ def request_booking(musician_id):
     else:
         # GET request, render booking.html
         print("Rendering booking.html")
-        return render_template('booking.html', musician=musician)
+        return render_template('booking.html', musician=musician)      
+
 
 # routes.py
 @main.route('/respond_booking/<uuid:booking_id>', methods=['POST'])
@@ -997,7 +1015,7 @@ genre_to_style = {
     'Reggae': ['Beach Bar', 'Restaurant'],
     'R&B': ['Wine Bar', 'Dance Club'],
     'Country': ['Restaurant', 'Art Café'],
-    'Other': ['Dance Club', 'Wine Bar', 'Beach Bar', 'Restaurant', 'Jazz Lounge', 'Art Café', 'Dance Club']
+    'Other': ['Dance Club', 'Wine Bar', 'Beach Bar', 'Restaurant', 'Jazz Lounge', 'Art Café', 'Dance Club', 'Modern Cocktailbar']
 }
 @main.route('/recommended')
 def recommended_page():
@@ -1017,7 +1035,7 @@ def get_recommendations(user_profile_id):
     Verkrijg muzikantaanbevelingen op basis van genre-naar-venue stijl matching.
     
     1. Als er geen eerdere boekingen zijn, wordt er aanbevolen op basis van genre en venue stijlen.
-    2. Als er eerdere boekingen zijn, wordt er aanbevolen op basis van eerdere venue stijlen en muzikant genres.
+    2. Als er eerdere boekingen zijn, wordt er aanbevolen op basis van de meest geboekte genres.
     """
     # Controleer of de gebruiker eerdere boekingen heeft
     bookings = Booking.query.filter(Booking.booked_by == user_profile_id).all()
@@ -1044,25 +1062,32 @@ def get_recommendations(user_profile_id):
         return recommended_musicians
 
     else:
-        venue_styles = set()
-        recommended_musicians = []
+        genre_count = {}
 
+        # Tel de genres op basis van eerdere boekingen
         for booking in bookings:
-            venue = Venue.query.get(booking.venue_id)
-            if venue:
-                venue_styles.add(venue.style)
+            musician = Musician.query.get(booking.musician_id)  # Verkrijg de muzikant van de boeking
+            if musician:
+                genre = musician.genre
+                genre_count[genre] = genre_count.get(genre, 0) + 1
 
-        print(f"Venue Styles from Previous Bookings: {venue_styles}")  # Debug output
+        print(f"Genre Count from Previous Bookings: {genre_count}")  # Debug output
 
-        for style in venue_styles:
-            for genre, styles in genre_to_style.items():
-                if style in styles:
-                    musicians = Musician.query.filter(Musician.genre == genre).all()
-                    recommended_musicians.extend(musicians)
+        # Bepaal het genre met de meeste boekingen
+        if not genre_count:
+            print("No genres found from previous bookings.")  # Debug output
+            return []
+
+        most_booked_genre = max(genre_count, key=genre_count.get)
+        print(f"Most Booked Genre: {most_booked_genre}")  # Debug output
+
+        # Verkrijg aanbevelingen op basis van het meest geboekte genre
+        recommended_musicians = Musician.query.filter(Musician.genre == most_booked_genre).all()
 
         # Verwijder duplicaten en beperk tot 3 aanbevelingen
         recommended_musicians = list({m.profile_id: m for m in recommended_musicians}.values())[:3]
-        print(f"Recommended Musicians (with bookings): {len(recommended_musicians)}")  # Debug output
+        print(f"Recommended Musicians (based on most booked genre): {len(recommended_musicians)}")  # Debug output
+        
         return recommended_musicians
     
 @main.route('/bookings/<uuid:booking_id>/review', methods=['GET', 'POST'])

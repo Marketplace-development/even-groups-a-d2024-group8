@@ -330,9 +330,14 @@
                                     <p>
                                         Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                         Duration: {{ booking.duration }}<br>
-                                        Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
-                                        Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
-                                        Status: <span class="status accepted">{{ booking.status }}</span>
+                                        {% if booking.payment %}
+                                          Price: {{ '€{:.2f}'.format(booking.payment.amount) }}
+                                        {% else %}
+                                          Price: Calculation Missing<br>
+                                          <span style="color: red;">No payment object found for this booking.</span>
+                                        {% endif %}
+                                        Payment Method: {{ booking.payment.method if booking.payment.method else 'Not Selected' }}<br>
+                                        Status: <span class="status {{ booking.status|lower }}">{{ booking.status }}</span>
                                     </p>
                                 </div>
                                 <div>
@@ -366,8 +371,8 @@
                                     <p>
                                         Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                         Duration: {{ booking.duration }}<br>
-                                        Price: {{ '€{:.2f}'.format(booking.payment.amount) if booking.payment and booking.payment.amount else 'Calculation Missing' }}<br>
-                                        Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
+                                        Price: {{ '€{:.2f}'.format(booking.payment.amount)}}<br>
+                                        Payment Method: {{ booking.payment.method}}<br>
                                         Status: <span class="status denied">{{ booking.status }}</span>
                                     </p>
                                 </div>

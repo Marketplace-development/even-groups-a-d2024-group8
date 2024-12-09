@@ -108,6 +108,8 @@ class Booking(db.Model):
     venue_booking = db.relationship('Venue', backref=db.backref('booked_venues', lazy=True), foreign_keys=[booked_in])
     profile_booked_by = db.relationship('Profile', foreign_keys=[booked_by], backref=db.backref('bookings_made', lazy=True))
 
+    payment = db.relationship('Payment', backref='associated_booking', uselist=False)
+
     __table_args__ = (
         db.CheckConstraint("status IN ('Requested', 'Accepted', 'Denied')", name='check_status_valid'),
     )
@@ -125,6 +127,8 @@ class Payment(db.Model):
     method = db.Column(db.String, nullable=False)
     date_payment = db.Column(db.TIMESTAMP(timezone=True), default=db.func.current_timestamp())
     status = db.Column(db.String, nullable=False, default='Processing')
+    
+    booking_ref = db.relationship('Booking', backref='payments_list', lazy=True)
 
     booking = db.relationship('Booking', backref=db.backref('payments', lazy=True))
 
