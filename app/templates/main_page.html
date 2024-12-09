@@ -121,25 +121,32 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better design */
         }
-        .action-buttons {
-            display: flex;
-            justify-content: flex-end; /* Zorgt ervoor dat de knoppen helemaal naar rechts staan */
-            gap: 10px; /* Ruimte tussen de knoppen */
-        }
+        .action-buttons button,
+        .action-buttons a,
         .view-profile-button {
             background-color: #6a00b5; /* Purple */
             color: #fff;
             border: none;
-            padding: 10px 15px;
+            padding: 10px 15px; /* Consistente padding */
             border-radius: 5px;
             font-size: 1rem;
-            text-decoration: none; /* Remove underline */
+            text-decoration: none; /* Verwijdert onderstreping van links */
             cursor: pointer;
+            display: inline-flex; /* Consistente uitlijning voor beide elementen */
+            align-items: center; /* Verticale uitlijning van de tekst */
+            justify-content: center; /* Horizontale uitlijning van de tekst */
+            height: 40px; /* Stel een vaste hoogte in voor beide knoppen */
+            width: auto; /* Breedte wordt bepaald door de tekst */
+            box-sizing: border-box; /* Zorgt dat padding wordt meegerekend */
             transition: background-color 0.3s ease;
         }
+
+        .action-buttons button:hover,
+        .action-buttons a:hover,
         .view-profile-button:hover {
-            background-color: #4e008f; /* Darker purple on hover */
+            background-color: #4e008f; /* Donkerder paars bij hover */
         }
+
         .icon {
             width: 24px;
             height: 24px;
@@ -256,8 +263,14 @@
                                         <p>
                                             Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
                                             Duration: {{ booking.duration }}<br>
-                                            Status: {{ booking.status }}       
-                                        </p>
+                                            Price: {% if booking.payment and booking.payment.amount is not none %}
+                                                      €{{ '{:.2f}'.format(booking.payment.amount) }}
+                                                   {% else %}
+                                                      Not Available
+                                                   {% endif %}<br>
+                                            Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
+                                            Status: {{ booking.status }}
+                                        </p>                                        
                     
                                         <!-- Voeg de beoordeling van de venue toe -->
                                         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">

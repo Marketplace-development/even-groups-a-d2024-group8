@@ -992,11 +992,9 @@ def bookings():
     if user.profile_type == 'venue':
         # Get bookings requested by this venue
         bookings = Booking.query.filter_by(venue_id=user_id).order_by(Booking.date_booking.desc()).all()
-        
     elif user.profile_type == 'musician':
-        # Get bookings accepted for this musician
-        bookings = Booking.query.filter_by(musician_id=user_id, status='Accepted').order_by(Booking.date_booking.desc()).all()
-        
+        # Get all bookings for this musician
+        bookings = Booking.query.filter_by(musician_id=user_id).order_by(Booking.date_booking.desc()).all()
     else:
         flash("Invalid user type.", "error")
         return redirect(url_for('main.main_page'))
