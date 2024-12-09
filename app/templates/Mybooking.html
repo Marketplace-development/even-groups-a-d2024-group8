@@ -334,7 +334,6 @@
                                           Price: {{ '€{:.2f}'.format(booking.payment.amount) }}
                                         {% else %}
                                           Price: Calculation Missing<br>
-                                          <span style="color: red;">No payment object found for this booking.</span>
                                         {% endif %}
                                         Payment Method: {{ booking.payment.method if booking.payment.method else 'Not Selected' }}<br>
                                         Status: <span class="status {{ booking.status|lower }}">{{ booking.status }}</span>

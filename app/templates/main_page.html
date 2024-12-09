@@ -109,7 +109,7 @@
             flex: 1; /* Takes remaining vertical space */
             overflow-y: auto; /* Enables scrolling for the profiles */
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #fff;
         }
         .profile-card {
             display: flex;
@@ -226,6 +226,63 @@
         </div>
         <!-- Main content -->
         <div class="right-part">
+            {% if user.profile_type == 'musician' %}
+            <h2>Booking Requests</h2>
+            {% if bookings %}
+                <div class="search-results" id="search-results">
+                    {% if user.profile_type == 'venue' %}
+                        {% for musician in profiles %}
+                            <div class="profile-card">
+                                <div>
+                                    <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
+                                    <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
+                                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+                                    {% if musician.profile.rating and musician.profile.rating >= 4 %}
+                                    <i class="fas fa-star highly-rated"></i> 
+                                    <span>Highly Rated!</span> <!-- Dit is een debugbericht -->
+                                {% endif %}
+                                   
+                                </div>
+                                <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
+                            </div>
+                        {% endfor %}
+                        {% elif user.profile_type == 'musician' %}
+                        {% if bookings %}
+                            <h2></h2>
+                            {% for booking in bookings %}
+                                <div class="profile-card">
+                                    <div>
+                                        <h3>Venue: {{ booking.venue.name_event }}</h3>                                       
+                                        <p>
+                                            Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
+                                            Duration: {{ booking.duration }}<br>
+                                            Status: {{ booking.status }}       
+                                        </p>
+                    
+                                        <!-- Voeg de beoordeling van de venue toe -->
+                                        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+                                        {% if booking.venue.profile.rating and booking.venue.profile.rating >= 4 %}
+                                            <i class="fas fa-star highly-rated"></i> 
+                                            <span>Highly Rated!</span> <!-- Dit is de badge voor een goed beoordeelde venue -->
+                                        {% endif %}
+                                    </div>
+                                    <div class="action-buttons">
+                                        {% if booking.status == 'Requested' %}
+                                            <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post" style="display: inline;">
+                                                <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
+                                                <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
+                                            </form>
+                                        {% endif %}
+                                        <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="view-profile-button">Profile</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endif %}
+            {% else %}
+                <p>No Booking Requests</p>
+            {% endif %}
+            {% endif %}
             <!-- Search bar -->
             {% if user.profile_type == 'venue' %}
             <form class="search-bar">
@@ -292,63 +349,7 @@
             </div>
             
                 <!-- main_page.html -->
-                {% if user.profile_type == 'musician' %}
-                <h2>Booking Requests</h2>
-                {% if bookings %}
-                    <div class="search-results" id="search-results">
-                        {% if user.profile_type == 'venue' %}
-                            {% for musician in profiles %}
-                                <div class="profile-card">
-                                    <div>
-                                        <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
-                                        <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
-                                        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-                                        {% if musician.profile.rating and musician.profile.rating >= 4 %}
-                                        <i class="fas fa-star highly-rated"></i> 
-                                        <span>Highly Rated!</span> <!-- Dit is een debugbericht -->
-                                    {% endif %}
-                                       
-                                    </div>
-                                    <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
-                                </div>
-                            {% endfor %}
-                            {% elif user.profile_type == 'musician' %}
-                            {% if bookings %}
-                                <h2></h2>
-                                {% for booking in bookings %}
-                                    <div class="profile-card">
-                                        <div>
-                                            <h3>Venue: {{ booking.venue.name_event }}</h3>                                       
-                                            <p>
-                                                Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
-                                                Duration: {{ booking.duration }}<br>
-                                                Status: {{ booking.status }}       
-                                            </p>
-                        
-                                            <!-- Voeg de beoordeling van de venue toe -->
-                                            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-                                            {% if booking.venue.profile.rating and booking.venue.profile.rating >= 4 %}
-                                                <i class="fas fa-star highly-rated"></i> 
-                                                <span>Highly Rated!</span> <!-- Dit is de badge voor een goed beoordeelde venue -->
-                                            {% endif %}
-                                        </div>
-                                        <div class="action-buttons">
-                                            {% if booking.status == 'Requested' %}
-                                                <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post" style="display: inline;">
-                                                    <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
-                                                    <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
-                                                </form>
-                                            {% endif %}
-                                            <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="view-profile-button">Profile</a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endif %}
-                {% else %}
-                    <p>No Booking Requests</p>
-                {% endif %}
-                {% endif %}
+
             </div>
         </div>
     </div>
