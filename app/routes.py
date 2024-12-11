@@ -450,34 +450,40 @@ def update_band_profile(user_id):
 
 @main.route('/venue_profile/<user_id>')
 def venue_profile(user_id):
+    # Controleer of de gebruiker is ingelogd
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for('main.login'))
+
+    # Haal de ingelogde gebruiker op
+    logged_in_user_id = session['user_id']
+
+    # Haal de gebruiker en venue-gegevens op
     user = Profile.query.get(user_id)
     venue = Venue.query.get(user_id)
 
-    # Validate if user and venue exist
+    # Controleer of de gebruiker en venue bestaan
     if not user or not venue:
         flash("Venue profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Convert profile picture to Base64 if it exists
+    # Bereken of het de eigen pagina is
+    is_own_profile = (str(user_id) == logged_in_user_id)
+
+    # Convert profile picture to Base64 als die bestaat
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render the venue_profile template
-    return render_template('venue_profile.html', user=user, venue=venue, profile_picture=profile_picture)
+    # Render de venue_profile template
+    return render_template(
+        'venue_profile.html',
+        user=user,
+        venue=venue,
+        profile_picture=profile_picture,
+        is_own_profile=is_own_profile
+    )
 
-
-@main.route('/venue/<int:venue_id>')
-def venue_details(venue_id):
-    venue = Venue.query.filter_by(profile_id=venue_id).first_or_404()
-    profile = Profile.query.get(venue_id)
-
-    # Zorg ervoor dat beide bestaan
-    if not venue or not profile:
-        flash("Venue or Profile not found", "error")
-        return redirect(url_for('main.main_page'))
-
-    return render_template('venue_details.html', venue=venue, profile=profile)
 
 
 @main.route('/edit_venue_profile/<user_id>')
@@ -781,30 +787,34 @@ def search_profiles():
     return jsonify([])  # Default empty result
 
 
-
 @main.route('/profile/<user_id>')
 def view_profile(user_id):
+    # Haal profiel op
     user = Profile.query.get(uuid.UUID(user_id))
 
+    # Controleer of het profiel bestaat
     if not user:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
+    # Verkrijg de ingelogde gebruiker (uit de sessie)
     logged_in_user_id = uuid.UUID(session['user_id'])
-    is_own_profile = (logged_in_user_id == uuid.UUID(user_id))
     logged_in_user = Profile.query.get(logged_in_user_id)
 
-    if user.profile_type == 'musician':
-        # Show "Book Here" button only if the logged-in user is a venue and not viewing their own profile
-        show_book_button = logged_in_user and logged_in_user.profile_type == 'venue' and not is_own_profile
+    # Controleer of de ingelogde gebruiker het eigen profiel bekijkt
+    is_own_profile = (logged_in_user_id == uuid.UUID(user_id))  # True als dit het eigen profiel is
 
-        # Convert profile picture to Base64 if it exists
-        profile_picture = None
-        if user.profile_picture:
-            profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+    # Base64 voor profielafbeeldingen
+    profile_picture = None
+    if user.profile_picture:
+        profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+
+    # **Logica voor Musicians**
+    if user.profile_type == 'musician':
+        # Toon "Book Here" knop alleen als de ingelogde gebruiker een venue is en niet het eigen profiel bekijkt
+        show_book_button = logged_in_user.profile_type == 'venue' and not is_own_profile
 
         if user.musician_type == 'soloist':
-            # Fetch the soloist data
             soloist = Soloist.query.get(user.profile_id)
             return render_template(
                 'soloist_profile.html',
@@ -814,9 +824,7 @@ def view_profile(user_id):
                 is_own_profile=is_own_profile,
                 profile_picture=profile_picture
             )
-
         elif user.musician_type == 'band':
-            # Fetch the band data
             band = Band.query.get(user.profile_id)
             return render_template(
                 'band_profile.html',
@@ -827,13 +835,10 @@ def view_profile(user_id):
                 profile_picture=profile_picture
             )
 
+    # **Logica voor Venues**
     elif user.profile_type == 'venue':
-        # For venues
-        profile_picture = None
-        if user.profile_picture:
-            profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
+   
 
-        is_own_profile = (logged_in_user_id == uuid.UUID(user_id))
         return render_template(
             'venue_profile.html',
             user=user,
@@ -842,8 +847,10 @@ def view_profile(user_id):
             profile_picture=profile_picture
         )
 
+    # Als het profieltype niet geldig is, terug naar de hoofdpagina
     flash("Invalid profile type", "error")
     return redirect(url_for('main.main_page'))
+
 
 @main.route('/request_booking/<musician_id>', methods=['GET', 'POST'])
 def request_booking(musician_id):

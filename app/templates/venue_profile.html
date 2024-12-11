@@ -131,9 +131,15 @@
 
         <!-- Button Group -->
         <div class="button-group">
-            <a href="{{ url_for('main.edit_venue_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
-            <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+                {% if is_own_profile %}
+                    <a href="{{ url_for('main.edit_venue_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
+                {% endif %}
+                <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+            </div>            
         </div>
     </div>
 </body>
 </html>
+        
+        
+ 
