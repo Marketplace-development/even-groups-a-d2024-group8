@@ -181,6 +181,9 @@
             color: gold; /* Of een andere kleur die je wilt */
             font-size: 24px; /* Pas de grootte van de ster aan, zodat deze goed zichtbaar is */
         }
+        h2 {
+            margin-left: 20px; /* Verplaatst de titel naar rechts door een marge van 20px aan de linkerzijde toe te voegen */
+        }
 
     </style>
 </head>
@@ -234,7 +237,7 @@
         <!-- Main content -->
         <div class="right-part">
             {% if user.profile_type == 'musician' %}
-            <h2>Booking Requests</h2>
+            <h2>Booking Requests</h2>            
             {% if bookings %}
                 <div class="search-results" id="search-results">
                     {% if user.profile_type == 'venue' %}
