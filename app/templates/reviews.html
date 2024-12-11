@@ -193,12 +193,14 @@
                 <div class="average-rating">
                     <h2>Rating</h2>
                     <div class="stars-outer">
-                        <div class="stars-inner" style="width: {{ (average_rating / 5 * 100) | round(2) }}%;"></div>
+                        <div class="stars-inner" style="width: {{ '{:.2f}'.format(average_rating / 5 * 100) }}%;"></div>
                     </div>
                     <p>({{ average_rating }} out of 5)</p>
                 </div>
                 {% if reviews %}
-                    <div class="reviews-header">Reviews</div>
+                    <div class="reviews-header">
+                        Reviews ({{ reviews | length }})
+                    </div>
                     <!-- List of reviews -->
                     {% for review in reviews %}
                         <div class="review-card">
@@ -208,7 +210,7 @@
                             </div>
                             <div class="review-rating">
                                 <div class="stars-outer">
-                                    <div class="stars-inner" style="width: {{ (review.rating / 5 * 100) | round(2) }}%;"></div>
+                                    <div class="stars-inner" style="width: {{ '{:.2f}'.format(review.rating / 5 * 100) }}%;"></div>
                                 </div>
                             </div>
                             {% if review.comment %}

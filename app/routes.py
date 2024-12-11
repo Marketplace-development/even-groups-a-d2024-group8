@@ -322,18 +322,22 @@ def profile():
     user_id = session['user_id']
     user = Profile.query.get(user_id)
 
+    # Haal het aantal reviews op
+    reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
+
     if not user:
         return redirect(url_for('main.main_page'))
 
     if user.profile_type == 'musician':
         if user.musician_type == 'soloist':
-            return redirect(url_for('main.soloist_profile', user_id=user_id))
+            return redirect(url_for('main.soloist_profile', user_id=user_id, reviews_count=reviews_count))
         elif user.musician_type == 'band':
-            return redirect(url_for('main.band_profile', user_id=user_id))
+            return redirect(url_for('main.band_profile', user_id=user_id, reviews_count=reviews_count))
     elif user.profile_type == 'venue':
-        return redirect(url_for('main.venue_profile', user_id=user_id))
+        return redirect(url_for('main.venue_profile', user_id=user_id, reviews_count=reviews_count))
 
     return redirect(url_for('main.main_page'))
+
 
 @main.route('/band_profile/<user_id>')
 def band_profile(user_id):
@@ -349,6 +353,10 @@ def band_profile(user_id):
     user = Profile.query.get(user_id)
     band = Band.query.get(user_id)
 
+    # Haal het aantal reviews op
+    reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
+
+    
     # Controleer of de gebruiker en band bestaan
     if not user or not band:
         flash("Profile not found", "error")
@@ -368,8 +376,10 @@ def band_profile(user_id):
         user=user,
         band=band,
         profile_picture=profile_picture,
-        is_own_profile=is_own_profile
+        is_own_profile=is_own_profile,
+        reviews_count=reviews_count  # Zorg ervoor dat de naam van de variabele overeenkomt
     )
+
 
 
 @main.route('/edit_band_profile/<user_id>')
@@ -462,6 +472,10 @@ def venue_profile(user_id):
     user = Profile.query.get(user_id)
     venue = Venue.query.get(user_id)
 
+    # Haal het aantal reviews op
+    reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
+
+
     # Controleer of de gebruiker en venue bestaan
     if not user or not venue:
         flash("Venue profile not found", "error")
@@ -481,7 +495,8 @@ def venue_profile(user_id):
         user=user,
         venue=venue,
         profile_picture=profile_picture,
-        is_own_profile=is_own_profile
+        is_own_profile=is_own_profile,
+        reviews_count= reviews_count
     )
 
 
@@ -561,6 +576,9 @@ def soloist_profile(user_id):
     user = Profile.query.get(user_id)
     soloist = Soloist.query.get(user_id)
 
+    # Haal het aantal reviews op
+    reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
+    
     # Controleer of de gebruiker en soloist bestaan
     if not user or not soloist:
         flash("Soloist profile not found", "error")
@@ -587,7 +605,8 @@ def soloist_profile(user_id):
         soloist=soloist,
         profile_picture=profile_picture,
         is_own_profile=is_own_profile,
-        show_book_button=show_book_button
+        show_book_button=show_book_button,
+        reviews_count = reviews_count
     )
 
 
@@ -800,6 +819,9 @@ def view_profile(user_id):
     # Verkrijg de ingelogde gebruiker (uit de sessie)
     logged_in_user_id = uuid.UUID(session['user_id'])
     logged_in_user = Profile.query.get(logged_in_user_id)
+    
+    # Haal het aantal reviews op voor het profiel
+    reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
 
     # Controleer of de ingelogde gebruiker het eigen profiel bekijkt
     is_own_profile = (logged_in_user_id == uuid.UUID(user_id))  # True als dit het eigen profiel is
@@ -822,7 +844,8 @@ def view_profile(user_id):
                 soloist=soloist,
                 show_book_button=show_book_button,
                 is_own_profile=is_own_profile,
-                profile_picture=profile_picture
+                profile_picture=profile_picture,
+                reviews_count=reviews_count
             )
         elif user.musician_type == 'band':
             band = Band.query.get(user.profile_id)
@@ -832,7 +855,8 @@ def view_profile(user_id):
                 band=band,
                 show_book_button=show_book_button,
                 is_own_profile=is_own_profile,
-                profile_picture=profile_picture
+                profile_picture=profile_picture,
+                reviews_count=reviews_count
             )
 
     # **Logica voor Venues**
@@ -844,7 +868,8 @@ def view_profile(user_id):
             user=user,
             venue=user.venue,
             is_own_profile=is_own_profile,
-            profile_picture=profile_picture
+            profile_picture=profile_picture,
+            reviews_count = reviews_count
         )
 
     # Als het profieltype niet geldig is, terug naar de hoofdpagina

@@ -105,8 +105,8 @@
 
         <!-- Venue Information -->
         <p class="field"><strong>Style:</strong> {{ venue.style or 'Not Specified' }}</p>
-        <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }}</p>
-
+        <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }} ({{ reviews_count }} review(s))</p>
+        
         <!-- Address Section -->
         <div class="section">
             <h2>Address</h2>

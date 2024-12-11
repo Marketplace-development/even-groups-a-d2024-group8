@@ -351,6 +351,13 @@
                                     {% else %}
                                         <a href="{{ url_for('main.view_profile', user_id=booking.venue.profile_id) }}" class="review-button">View Profile</a>
                                     {% endif %}
+                                     <!-- Review button if the user hasn't already reviewed -->
+                                    {% set existing_review = booking.reviews | selectattr('reviewer_id', 'equalto', user.profile_id) | list %}
+                                    {% if not existing_review %}
+                                        <a href="{{ url_for('main.submit_review', booking_id=booking.booking_id) }}" class="review-button">Review</a>
+                                    {% else %}
+                                        <span>Reviewed</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}
