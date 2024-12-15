@@ -1226,18 +1226,27 @@ def view_reviews(musician_id):
         flash("You must be logged in to view reviews.", "error")
         return redirect(url_for('main.login'))
 
+    show_all_param = request.args.get('show_all', 'false').lower()
+    show_all = (show_all_param == 'true')
+
     current_user_id = uuid.UUID(session['user_id'])
     current_user = Profile.query.get(current_user_id)
 
-    # Haal alle reviews voor deze muzikant op
+    # Fetch all reviews for this profile (could be musician or venue)
     reviews = Review.query.filter_by(reviewee_id=musician_id).all()
 
-    # Bereken de gemiddelde beoordeling
+    # Calculate the average rating
     total_rating = sum(float(review.rating) for review in reviews)
     average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
 
-    # Haal de muzikant op
+    # Fetch the profile of the person being reviewed
     musician = Profile.query.get(musician_id)
 
-    # Render de template met de gegevens
-    return render_template('view_reviews.html', user=current_user, reviews=reviews, average_rating=average_rating, musician=musician)
+    return render_template(
+        'view_reviews.html',
+        logged_in_user=current_user,
+        reviews=reviews,
+        average_rating=average_rating,
+        musician=musician,
+        show_all=show_all
+    )

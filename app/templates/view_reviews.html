@@ -2,92 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Reviews</title>
+    <title>Reviews</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Include Font Awesome for star icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
         html, body {
-            background: #fff;
+            background: linear-gradient(135deg, #3a007d, #6a00b5);
             font-family: 'DM Sans', sans-serif;
             margin: 0;
             padding: 0;
             color: #000;
             height: 100%;
-            overflow: hidden; /* Prevent page scrolling */
+            overflow: hidden; 
         }
-        .layout {
-            display: flex;
-            height: 100%;
-        }
-        .side-bar {
-            background: #6a00b5;
-            width: 250px; /* Fixed width for the sidebar */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px 10px;
-            color: #fff;
-            position: sticky;
-            top: 0;
-            height: 100vh; /* Ensures full height for the sidebar */
-        }
-        .sub-side-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .icon {
-            width: 24px;
-            height: 24px;
-            color: white;
-            padding: 10px 10px;
-        }
-        .icon-link {
+        
+        /* Container that holds everything */
+        .outer-container {
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            padding: 50px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: auto;
         }
-        .button {
-            text-align: center;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 15px;
-            margin-bottom: 40px;
-            font-size: 1rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
+
+        /* The big grey box */
+        .grey-box {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .button:hover {
-            background-color: #4e008f;
-        }
-        .right-part {
-            flex: 1; /* Occupies remaining space */
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-        }
-        h1 {
+
+        h1, h2 {
             margin-top: 0;
+            font-weight: 600;
         }
+
+        .profile-name {
+            font-weight: 700;
+            color: #333;
+        }
+
         .average-rating {
             margin-bottom: 20px;
+            margin-top: 20px;
         }
+
         .average-rating h2 {
             margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #333;
         }
+
         .stars-outer {
             display: inline-block;
             position: relative;
             font-size: 24px;
-            color: #e0e0e0; /* Light gray unfilled stars */
+            color: #e0e0e0;
         }
         .stars-inner {
             position: absolute;
@@ -95,8 +72,8 @@
             left: 0;
             white-space: nowrap;
             overflow: hidden;
-            width: 0%; /* Will be set dynamically */
-            color: #6a00b5; /* Purple filled stars */
+            width: 0%;
+            color: #6a00b5;
         }
         .stars-outer::before {
             content: "\f005 \f005 \f005 \f005 \f005";
@@ -108,99 +85,127 @@
             font-family: 'Font Awesome 5 Free';
             font-weight: 900;
         }
+
         .reviews-header {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 1.5rem;
+            font-weight: 700;
             margin-bottom: 20px;
+            color: #444;
+            margin-top: 30px;
         }
+
         .review-card {
             background-color: #fff;
-            padding: 15px;
+            padding: 20px;
             margin-bottom: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+
         .reviewer-info {
             margin-bottom: 10px;
-        }
-        .reviewer-name {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .review-date {
-            font-size: 0.9em;
+            font-size: 0.95rem;
             color: #666;
         }
+
+        .reviewer-name {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .review-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
         .review-rating {
             margin-bottom: 10px;
         }
+
         .review-comment {
             margin-top: 10px;
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #333;
         }
-        .logout-sub-side-bar{
-            display: flex;
-            align-items: flex-start;
+
+        .button {
+            display: inline-block;
+            background-color: #6a00b5;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+
+        .button:hover {
+            background-color: #4e008f;
+        }
+
+        /* Scrollbar styling for .outer-container */
+        .outer-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .outer-container::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+        .outer-container::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 4px;
+        }
+        .outer-container::-webkit-scrollbar-thumb:hover {
+            background: #b5b5b5;
+        }
+
+        .load-more-container, .return-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .return-container {
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-    <div class="layout">
-        <div class="side-bar">
-            <div class="sub-side-bar">
-                <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                    </svg>
-                    <a href="/profile" class="button">My Profile</a>
-                </div>
-                <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                    </svg>
-                    <a href="/main_page" class="button">My Main Page</a>
-                </div>
-                <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                      </svg> 
-                      <a href="/bookings" class="button">My Bookings</a>                 
-                </div>
-                <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-                    </svg>
-                    <a href="/reviews" class="button">My Reviews</a>
-                </div>
-                {% if user.profile_type == 'venue' %}
-                <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-                    </svg>
-                    <a href="/recommended" class="button">My Recommended</a>
-                </div>
+    <div class="outer-container">
+        <div class="grey-box">
+            <h1>Reviews of
+                {% if musician.profile_type == 'venue' %}
+                    <span class="profile-name">{{ musician.venue.name_event }}</span>
+                {% elif musician.profile_type == 'musician' %}
+                    {% if musician.musician_type == 'band' %}
+                        <span class="profile-name">{{ musician.musician.band.band_name }}</span>
+                    {% elif musician.musician_type == 'soloist' %}
+                        <span class="profile-name">{{ musician.musician.soloist.artist_name }}</span>
+                    {% else %}
+                        <span class="profile-name">{{ musician.first_name }} {{ musician.last_name }}</span>
+                    {% endif %}
+                {% else %}
+                    <span class="profile-name">{{ musician.first_name }} {{ musician.last_name }}</span>
                 {% endif %}
-            </div>
-            <div class="logout-sub-side-bar">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                </svg>
-                <a href="{{ url_for('main.logout') }}" class="button">Logout</a>
-            </div>
-        </div>
-        <div class="right-part">
-            <div class="main-content">
-                <h1>Reviews of {{ musician.name }}</h1>
-                <div class="average-rating">
-                    <h2>Average rating </h2>
-                    <div class="stars-outer">
-                        <div class="stars-inner" style="width: {{ '{:.2f}'.format(average_rating / 5 * 100) }}%;"></div>
-                    </div>
-                    <p>({{ average_rating }} out of 5)</p>
+            </h1>
+
+            <div class="average-rating">
+                <h2>Average Rating</h2>
+                <div class="stars-outer">
+                    <div class="stars-inner" style="width: {{ '{:.2f}'.format(average_rating / 5 * 100) }}%;"></div>
                 </div>
-                {% if reviews %}
-                    <div class="reviews-header">
-                        Reviews ({{ reviews | length }})
-                    </div>
+                <p>({{ average_rating }} out of 5)</p>
+            </div>
+
+            {% set total_reviews = reviews|length %}
+            
+            {% if total_reviews > 0 %}
+                <div class="reviews-header">
+                    Reviews ({{ total_reviews }})
+                </div>
+                {% if show_all %}
                     {% for review in reviews %}
                     <div class="review-card">
                         <div class="reviewer-info">
@@ -218,11 +223,36 @@
                     </div>
                     {% endfor %}
                 {% else %}
-                    <p>Er zijn nog geen reviews ontvangen voor deze gebruiker.</p>
+                    {% for review in reviews[:5] %}
+                    <div class="review-card">
+                        <div class="reviewer-info">
+                            <span class="reviewer-name">{{ review.reviewer.first_name }} {{ review.reviewer.last_name }}</span>
+                            <span class="review-date">{{ review.booking.date_booking.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </div>
+                        <div class="review-rating">
+                            <div class="stars-outer">
+                                <div class="stars-inner" style="width: {{ '{:.2f}'.format(review.rating / 5 * 100) }}%;"></div>
+                            </div>
+                        </div>
+                        {% if review.comment %}
+                            <div class="review-comment">{{ review.comment }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% if total_reviews > 5 %}
+                    <div class="load-more-container">
+                        <a href="{{ url_for('main.view_reviews', musician_id=musician.profile_id, show_all='true') }}" class="button">Show More</a>
+                    </div>
+                    {% endif %}
                 {% endif %}
+            {% else %}
+                <p>This user has not yet received any reviews.</p>
+            {% endif %}
+
+            <div class="return-container">
+                <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="button">Return to Profile</a>
             </div>
         </div>
     </div>
 </body>
 </html>
-
