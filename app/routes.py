@@ -1047,20 +1047,36 @@ genre_to_style = {
     'Country': ['Restaurant', 'Art Café'],
     'Other': ['Dance Club', 'Wine Bar', 'Beach Bar', 'Restaurant', 'Jazz Lounge', 'Art Café', 'Dance Club', 'Modern Cocktailbar']
 }
+import base64
+
+import base64
+
 @main.route('/recommended')
 def recommended_page():
-    user_profile_id = session.get('user_profile_id')  # Verkrijg de user_profile_id uit de sessie
     if 'user_id' not in session:
         flash("You must be logged in to respond to bookings.", "error")
-        return redirect(url_for('main.login'))  # Zorg dat error.html bestaat
+        return redirect(url_for('main.login'))
 
-    logged_in_user_id = uuid.UUID(session['user_id'])  # Haal de gebruikersnaam op op basis van het profiel
+    logged_in_user_id = uuid.UUID(session['user_id'])
+    user = Profile.query.get(logged_in_user_id)  # Fetch current user
+
     recommendations = get_recommendations(logged_in_user_id)
 
-    print(f"Recommendations for User ID {user_profile_id}: {recommendations}")
+    # Process each musician's profile_picture
+    processed_recommendations = []
+    for musician in recommendations:
+        if musician.profile.profile_picture:
+            encoded_image = base64.b64encode(musician.profile.profile_picture).decode('utf-8')
+            musician.encoded_picture = f"data:image/jpeg;base64,{encoded_image}"
+        else:
+            # No picture means encoded_picture is None
+            musician.encoded_picture = None
+        processed_recommendations.append(musician)
 
-    return render_template('my_recommendations.html', username=user_profile_id, recommendations=recommendations)
-    
+    print(f"Recommendations for User ID {user.profile_id}: {recommendations}")
+
+    return render_template('my_recommendations.html', user=user, recommendations=processed_recommendations)
+
 def get_recommendations(user_profile_id):
     """
     Verkrijg muzikantaanbevelingen op basis van genre-naar-venue stijl matching en hoogste rating.
