@@ -48,22 +48,11 @@
             color: #333;
         }
 
-        .average-rating {
-            margin-bottom: 20px;
-            margin-top: 20px;
-        }
-
-        .average-rating h2 {
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: #333;
-        }
-
+        /* Average rating stars: larger size (30px) */
         .stars-outer {
             display: inline-block;
             position: relative;
-            font-size: 24px;
+            font-size: 30px;
             color: #e0e0e0;
         }
         .stars-inner {
@@ -123,6 +112,33 @@
             margin-bottom: 10px;
         }
 
+        /* Review stars: 75% of 30px ~ 22px */
+        .review-rating .stars-outer {
+            display: inline-block;
+            position: relative;
+            font-size: 22px;
+            color: #e0e0e0;
+        }
+        .review-rating .stars-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0%;
+            color: #6a00b5;
+        }
+        .review-rating .stars-outer::before {
+            content: "\f005 \f005 \f005 \f005 \f005";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+        }
+        .review-rating .stars-inner::before {
+            content: "\f005 \f005 \f005 \f005 \f005";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+        }
+
         .review-comment {
             margin-top: 10px;
             font-size: 1rem;
@@ -170,6 +186,62 @@
         .return-container {
             margin-top: 30px;
         }
+
+        /* Rating breakdown section */
+        .rating-breakdown {
+            margin-top: 40px;
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        /* We'll use a table-like layout to align everything perfectly */
+        .rating-breakdown-table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px; /* Bigger width */
+        }
+
+        .rating-breakdown-table td {
+            padding: 5px 0;
+            vertical-align: middle;
+        }
+
+        .label-cell {
+            width: 120px;
+            text-align: right;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        
+        .line-cell {
+            width: 400px; /* Larger line length */
+            position: relative;
+        }
+
+        .count-cell {
+            width: 50px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .bar-container {
+            background: #ddd;
+            height: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            border-radius: 10px;
+            background: #6a00b5;
+            width: 0; 
+        }
+
     </style>
 </head>
 <body>
@@ -191,13 +263,74 @@
                 {% endif %}
             </h1>
 
-            <div class="average-rating">
-                <h2>Average Rating</h2>
-                <div class="stars-outer">
-                    <div class="stars-inner" style="width: {{ '{:.2f}'.format(average_rating / 5 * 100) }}%;"></div>
-                </div>
-                <p>({{ average_rating }} out of 5)</p>
+            <!-- Rating Breakdown Section -->
+            <div class="rating-breakdown">
+                <table class="rating-breakdown-table">
+                    <!-- Average row -->
+                    <tr>
+                        <td class="label-cell">Average:</td>
+                        <td>
+                            <div style="display:inline-block; vertical-align:middle; margin-right:10px;">
+                                <div class="stars-outer">
+                                    <div class="stars-inner" style="width: {{ '{:.2f}'.format(average_rating / 5 * 100) }}%;"></div>
+                                </div>
+                            </div>
+                            <span style="vertical-align:middle;">({{ average_rating }} out of 5)</span>
+                        </td>
+                    </tr>
+                    <!-- 5 stars row -->
+                    <tr>
+                        <td class="label-cell">5 stars:</td>
+                        <td class="line-cell">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: {% if total_counts > 0 %}{{ (five_stars / total_counts) * 100 }}%{% else %}0{% endif %};"></div>
+                            </div>
+                        </td>
+                        <td class="count-cell">{{ five_stars }}</td>
+                    </tr>
+                    <!-- 4 stars row -->
+                    <tr>
+                        <td class="label-cell">4 stars:</td>
+                        <td class="line-cell">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: {% if total_counts > 0 %}{{ (four_stars / total_counts) * 100 }}%{% else %}0{% endif %};"></div>
+                            </div>
+                        </td>
+                        <td class="count-cell">{{ four_stars }}</td>
+                    </tr>
+                    <!-- 3 stars row -->
+                    <tr>
+                        <td class="label-cell">3 stars:</td>
+                        <td class="line-cell">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: {% if total_counts > 0 %}{{ (three_stars / total_counts) * 100 }}%{% else %}0{% endif %};"></div>
+                            </div>
+                        </td>
+                        <td class="count-cell">{{ three_stars }}</td>
+                    </tr>
+                    <!-- 2 stars row -->
+                    <tr>
+                        <td class="label-cell">2 stars:</td>
+                        <td class="line-cell">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: {% if total_counts > 0 %}{{ (two_stars / total_counts) * 100 }}%{% else %}0{% endif %};"></div>
+                            </div>
+                        </td>
+                        <td class="count-cell">{{ two_stars }}</td>
+                    </tr>
+                    <!-- 1 star row -->
+                    <tr>
+                        <td class="label-cell">1 star:</td>
+                        <td class="line-cell">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: {% if total_counts > 0 %}{{ (one_star / total_counts) * 100 }}%{% else %}0{% endif %};"></div>
+                            </div>
+                        </td>
+                        <td class="count-cell">{{ one_star }}</td>
+                    </tr>
+                </table>
             </div>
+            <!-- End of Rating Breakdown Section -->
 
             {% set total_reviews = reviews|length %}
             

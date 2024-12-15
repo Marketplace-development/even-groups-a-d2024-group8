@@ -1233,8 +1233,25 @@ def reviews():
     total_rating = sum(float(review.rating) for review in reviews)
     average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
 
-    # Pass user to the template
-    return render_template('reviews.html', user=current_user, reviews=reviews, average_rating=average_rating)
+    # Count how many reviews for each rating 1-5
+    rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+    for rev in reviews:
+        rating_counts[int(rev.rating)] += 1
+
+    total_reviews = len(reviews) if reviews else 0
+    # Compute percentages
+    # Avoid division by zero if no reviews
+    rating_percentages = {}
+    for star in rating_counts:
+        rating_percentages[star] = (rating_counts[star] / total_reviews * 100) if total_reviews > 0 else 0
+
+    # Pass user and these stats to the template
+    return render_template('reviews.html', 
+                           user=current_user, 
+                           reviews=reviews, 
+                           average_rating=average_rating,
+                           rating_counts=rating_counts,
+                           rating_percentages=rating_percentages)
 
 @main.route('/reviews/<uuid:musician_id>')
 def view_reviews(musician_id):
@@ -1248,12 +1265,31 @@ def view_reviews(musician_id):
     current_user_id = uuid.UUID(session['user_id'])
     current_user = Profile.query.get(current_user_id)
 
-    # Fetch all reviews for this profile (could be musician or venue)
+    # Fetch all reviews for this musician (or venue)
     reviews = Review.query.filter_by(reviewee_id=musician_id).all()
 
     # Calculate the average rating
     total_rating = sum(float(review.rating) for review in reviews)
     average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
+
+    # Count how many reviews for each rating 1-5
+    rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+    for rev in reviews:
+        rating_counts[int(rev.rating)] += 1
+
+    total_reviews = len(reviews)
+    # Compute percentages
+    rating_percentages = {}
+    for star in rating_counts:
+        rating_percentages[star] = (rating_counts[star] / total_reviews * 100) if total_reviews > 0 else 0
+
+    # Compute max_count and total_counts here
+    five_stars = rating_counts[5]
+    four_stars = rating_counts[4]
+    three_stars = rating_counts[3]
+    two_stars = rating_counts[2]
+    one_star = rating_counts[1]
+    total_counts = five_stars + four_stars + three_stars + two_stars + one_star
 
     # Fetch the profile of the person being reviewed
     musician = Profile.query.get(musician_id)
@@ -1264,5 +1300,14 @@ def view_reviews(musician_id):
         reviews=reviews,
         average_rating=average_rating,
         musician=musician,
-        show_all=show_all
+        show_all=show_all,
+        rating_counts=rating_counts,
+        rating_percentages=rating_percentages,
+        total_reviews=total_reviews,
+        five_stars=five_stars,
+        four_stars=four_stars,
+        three_stars=three_stars,
+        two_stars=two_stars,
+        one_star=one_star,
+        total_counts=total_counts,
     )
