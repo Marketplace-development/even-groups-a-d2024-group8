@@ -244,7 +244,7 @@
                         {% for musician in profiles %}
                             <div class="profile-card">
                                 <div>
-                                    <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
+                                    <h3>{{ musician.band.band_name if musician.band else musician.soloist.artist_name }}</h3>
                                     <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
                                     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
                                     {% if musician.profile.rating and musician.profile.rating >= 4 %}
@@ -347,7 +347,7 @@
                     {% for musician in profiles %}
                         <div class="profile-card">
                             <div>
-                                <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
+                                <h3>{{ musician.band.band_name if musician.band else musician.soloist.artist_name }}</h3>
                                 <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
             
                                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">

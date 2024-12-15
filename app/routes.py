@@ -1060,17 +1060,18 @@ def recommended_page():
     print(f"Recommendations for User ID {user_profile_id}: {recommendations}")
 
     return render_template('my_recommendations.html', username=user_profile_id, recommendations=recommendations)
+    
 def get_recommendations(user_profile_id):
     """
-    Verkrijg muzikantaanbevelingen op basis van genre-naar-venue stijl matching.
+    Verkrijg muzikantaanbevelingen op basis van genre-naar-venue stijl matching en hoogste rating.
     
     1. Als er geen eerdere boekingen zijn, wordt er aanbevolen op basis van genre en venue stijlen.
-    2. Als er eerdere boekingen zijn, wordt er aanbevolen op basis van de meest geboekte genres.
+    2. Als er eerdere boekingen zijn, wordt er aanbevolen op basis van de meest geboekte genres, gesorteerd op rating.
     """
     # Controleer of de gebruiker eerdere boekingen heeft
     bookings = Booking.query.filter(Booking.booked_by == user_profile_id).all()
     
-    print(f"User ID: {user_profile_id}, Bookings Found: {len(bookings)}")  # Debug output
+    print(f"User ID: {user_profile_id}, Bookings Found: {len(bookings)}")
 
     if not bookings:
         recommended_musicians = []
@@ -1078,7 +1079,7 @@ def get_recommendations(user_profile_id):
         # Verkrijg alle venues en hun stijlen
         venues = Venue.query.all()
         
-        print(f"Total Venues Found: {len(venues)}")  # Debug output
+        print(f"Total Venues Found: {len(venues)}")
         
         for venue in venues:
             for genre, styles in genre_to_style.items():
@@ -1086,9 +1087,12 @@ def get_recommendations(user_profile_id):
                     musicians = Musician.query.filter(Musician.genre == genre).all()
                     recommended_musicians.extend(musicians)
 
-        # Verwijder duplicaten en beperk tot 3 aanbevelingen
-        recommended_musicians = list({m.profile_id: m for m in recommended_musicians}.values())[:3]
-        print(f"Recommended Musicians (no bookings): {len(recommended_musicians)}")  # Debug output
+        # Verwijder duplicaten
+        unique_musicians = {m.profile_id: m for m in recommended_musicians}.values()
+
+        # Sorteer op rating via het Profile object en beperk tot 3 aanbevelingen
+        recommended_musicians = sorted(unique_musicians, key=lambda m: m.profile.rating, reverse=True)[:3]
+        print(f"Recommended Musicians (no bookings): {len(recommended_musicians)}")
         return recommended_musicians
 
     else:
@@ -1096,30 +1100,34 @@ def get_recommendations(user_profile_id):
 
         # Tel de genres op basis van eerdere boekingen
         for booking in bookings:
-            musician = Musician.query.get(booking.musician_id)  # Verkrijg de muzikant van de boeking
+            musician = Musician.query.get(booking.musician_id)
             if musician:
                 genre = musician.genre
                 genre_count[genre] = genre_count.get(genre, 0) + 1
 
-        print(f"Genre Count from Previous Bookings: {genre_count}")  # Debug output
+        print(f"Genre Count from Previous Bookings: {genre_count}")
 
         # Bepaal het genre met de meeste boekingen
         if not genre_count:
-            print("No genres found from previous bookings.")  # Debug output
+            print("No genres found from previous bookings.")
             return []
 
         most_booked_genre = max(genre_count, key=genre_count.get)
-        print(f"Most Booked Genre: {most_booked_genre}")  # Debug output
+        print(f"Most Booked Genre: {most_booked_genre}")
 
         # Verkrijg aanbevelingen op basis van het meest geboekte genre
         recommended_musicians = Musician.query.filter(Musician.genre == most_booked_genre).all()
+        
+        # Verwijder duplicaten
+        unique_musicians = {m.profile_id: m for m in recommended_musicians}.values()
 
-        # Verwijder duplicaten en beperk tot 3 aanbevelingen
-        recommended_musicians = list({m.profile_id: m for m in recommended_musicians}.values())[:3]
-        print(f"Recommended Musicians (based on most booked genre): {len(recommended_musicians)}")  # Debug output
+        # Sorteer op rating via het Profile object en beperk tot 3 aanbevelingen
+        recommended_musicians = sorted(unique_musicians, key=lambda m: m.profile.rating, reverse=True)[:3]
+        
+        print(f"Recommended Musicians (based on most booked genre): {len(recommended_musicians)}")
         
         return recommended_musicians
-    
+
 @main.route('/bookings/<uuid:booking_id>/review', methods=['GET', 'POST'])
 def submit_review(booking_id):
     if 'user_id' not in session:
@@ -1211,3 +1219,25 @@ def reviews():
 
     # Pass user to the template
     return render_template('reviews.html', user=current_user, reviews=reviews, average_rating=average_rating)
+
+@main.route('/reviews/<uuid:musician_id>')
+def view_reviews(musician_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to view reviews.", "error")
+        return redirect(url_for('main.login'))
+
+    current_user_id = uuid.UUID(session['user_id'])
+    current_user = Profile.query.get(current_user_id)
+
+    # Haal alle reviews voor deze muzikant op
+    reviews = Review.query.filter_by(reviewee_id=musician_id).all()
+
+    # Bereken de gemiddelde beoordeling
+    total_rating = sum(float(review.rating) for review in reviews)
+    average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
+
+    # Haal de muzikant op
+    musician = Profile.query.get(musician_id)
+
+    # Render de template met de gegevens
+    return render_template('view_reviews.html', user=current_user, reviews=reviews, average_rating=average_rating, musician=musician)

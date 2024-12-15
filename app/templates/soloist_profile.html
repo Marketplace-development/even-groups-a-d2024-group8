@@ -108,6 +108,8 @@
 <!-- Other parts of the template remain the same -->
 
 <!-- Soloist Information -->
+        <p class="field"><strong>First Name:</strong> {{ user.first_name or 'Not Specified' }}</p>
+        <p class="field"><strong>Last Name:</strong> {{ user.last_name or 'Not Specified' }}</p>
         <p class="field"><strong>Date of Birth:</strong> {{ soloist.date_of_birth or 'Not Specified' }}</p>
         <p class="field"><strong>Genre:</strong> {{ user.musician.genre or 'Not Specified' }}</p>
         <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }} ({{ reviews_count }} review(s))</p>
@@ -154,6 +156,7 @@
                 {% if show_book_button %}
                     <a href="{{ url_for('main.request_booking', musician_id=user.profile_id) }}" class="button">Book Here</a>
                 {% endif %}
+                <a href="{{ url_for('main.view_reviews', musician_id=user.profile_id) }}" class="button">View Reviews</a>
             </div>            
         </div>
     </div>

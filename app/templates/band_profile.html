@@ -116,6 +116,8 @@
         <!-- Other parts of the template remain the same -->
 
 <!-- Band Information -->
+        <p class="field"><strong>First Name:</strong> {{ user.first_name or 'Not Specified' }}</p>
+        <p class="field"><strong>Last Name:</strong> {{ user.last_name or 'Not Specified' }}</p>
         <p class="field"><strong>Genre:</strong> {{ user.musician.genre or 'Not Specified' }}</p>
         <p class="field"><strong>Rating:</strong> {{ user.rating or 'Not Specified' }} ({{ reviews_count }} review(s))</p>       
         <p class="field"><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(user.musician.price_per_hour) if user.musician.price_per_hour else 'Not Specified' }}</p>
@@ -161,6 +163,7 @@
             {% if show_book_button %}
                 <a href="{{ url_for('main.request_booking', musician_id=user.profile_id) }}" class="button">Book Here</a>
             {% endif %}
+            <a href="{{ url_for('main.view_reviews', musician_id=user.profile_id) }}" class="button">View Reviews</a>
         </div>
     </div>
 </body>
