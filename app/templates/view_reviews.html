@@ -189,13 +189,13 @@
         </div>
         <div class="right-part">
             <div class="main-content">
-                <h1>Reviews voor {{ musician.name }}</h1>
+                <h1>Reviews of {{ musician.name }}</h1>
                 <div class="average-rating">
-                    <h2>Gemiddelde Beoordeling</h2>
+                    <h2>Average rating </h2>
                     <div class="stars-outer">
                         <div class="stars-inner" style="width: {{ '{:.2f}'.format(average_rating / 5 * 100) }}%;"></div>
                     </div>
-                    <p>({{ average_rating }} uit 5)</p>
+                    <p>({{ average_rating }} out of 5)</p>
                 </div>
                 {% if reviews %}
                     <div class="reviews-header">
