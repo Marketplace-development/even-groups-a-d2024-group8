@@ -657,7 +657,6 @@ def main_page():
 
     if user.profile_type == 'venue':
         # Show profiles of soloists and bands
-        # Fetch musician profiles
         musician_profiles = db.session.query(Musician).join(Profile).order_by(db.func.random()).all()
 
         processed_profiles = []
@@ -682,12 +681,15 @@ def main_page():
             if profile.profile_picture:
                 encoded_image = base64.b64encode(profile.profile_picture).decode('utf-8')
 
+            rating_val = float(profile.rating) if profile.rating else 0.0
+
             processed_profiles.append({
                 'id': str(musician.profile_id),
                 'display_name': display_name,
                 'genre': musician.genre,
-                'price_per_hour': musician.price_per_hour,
-                'rating': float(profile.rating) if profile.rating else 0.0,
+                'price_per_hour': float(musician.price_per_hour),
+                'equipment': musician.equipment,  # Boolean
+                'rating': rating_val,
                 'encoded_image': encoded_image,
             })
 
@@ -714,7 +716,8 @@ def search_profiles():
     if user.profile_type == 'venue':
         # Start the query with Musician joined with Profile
         query = db.session.query(Musician).join(Profile)
-        # Create aliases for Soloist and Band models
+
+        # Aliases for Soloist and Band
         soloist_alias = aliased(Soloist)
         band_alias = aliased(Band)
 
@@ -763,7 +766,17 @@ def search_profiles():
         if equipment:
             needs_equipment = equipment.lower() == 'yes'
             # If musician needs equipment, they do NOT have equipment
-            query = query.filter(Musician.equipment != needs_equipment)
+            # The logic here might need to be adjusted based on what equipment means:
+            # If "needs_equipment" = True means we want those who have equipment = True,
+            # but previously we did musician.equipment != needs_equipment
+            # If the original logic stands: If equipment needed = 'yes', we show those who DO have equipment?
+            # The previous code suggests it did the opposite. Let's fix the logic:
+            # The user probably wants that if equipment needed is Yes, show those with equipment = True
+            # if No, show those with equipment = False
+            # We'll correct this logic to:
+            # equipment = yes => musician.equipment == True
+            # equipment = no => musician.equipment == False
+            query = query.filter(Musician.equipment == needs_equipment)
             filters_applied = True
 
         min_rating = data.get('min_rating')
@@ -783,7 +796,7 @@ def search_profiles():
         output = []
         for musician in results:
             profile = musician.profile
-            # Determine display name as per logic above
+            # Determine display name
             display_name = None
             if profile.musician_type == 'band' and musician.band:
                 display_name = musician.band.band_name
@@ -798,20 +811,30 @@ def search_profiles():
                 encoded_image = base64.b64encode(profile.profile_picture).decode('utf-8')
 
             rating_val = float(profile.rating) if profile.rating else 0.0
-            details = f"Genre: {musician.genre}, Price: €{musician.price_per_hour}/hour"
+
+            # Provide the same fields as on main_page
+            # We'll separate them out instead of single details line:
+            # On the front end, we now rely on separate fields
+            # We'll add them as separate fields in JSON.
+            # The front-end code currently uses 'details' for genre and price, we'll add equipment too.
+            # But let's just provide separate fields and update front-end code accordingly.
+            genre = musician.genre
+            price_per_hour = float(musician.price_per_hour)
+            equipment_bool = musician.equipment  # True/False
 
             output.append({
                 'id': str(musician.profile_id),
-                'name': display_name,
-                'details': details,
-                'encoded_image': encoded_image,
-                'rating': rating_val
+                'display_name': display_name,
+                'genre': genre,
+                'price_per_hour': price_per_hour,
+                'equipment': equipment_bool,
+                'rating': rating_val,
+                'encoded_image': encoded_image
             })
 
         return jsonify(output)
 
     return jsonify([])  # Default empty result
-
 
 @main.route('/profile/<user_id>')
 def view_profile(user_id):

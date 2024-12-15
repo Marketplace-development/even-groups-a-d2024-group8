@@ -1,4 +1,3 @@
-<!-- main_page.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,19 +82,6 @@
             font-size: 1rem;
             padding: 5px;
         }
-        
-        .sub-side-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .search-bar select, .search-bar input, .search-bar button {
-            border-radius: 5px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            padding: 5px;
-        }
         .search-bar button {
             background-color: #4e008f;
             color: #fff;
@@ -106,52 +92,12 @@
         .search-bar button:hover {
             background-color: #6a00b5;
         }
-        .search-results {
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px;
-            background-color: #fff;
-        }
-        .profile-card {
+
+        .sub-side-bar {
             display: flex;
-            align-items: center;
-            background-color: #fff;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            align-items: flex-start;
         }
-        .profile-picture,
-        .no-picture {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-        .no-picture {
-            background: #ccc;
-        }
-
-        .info {
-            flex: 1;
-        }
-
-        .view-profile-button {
-            background-color: #6a00b5; 
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 1rem;
-            text-decoration: none; 
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .view-profile-button:hover {
-            background-color: #4e008f;
-        }
-
         .icon {
             width: 24px;
             height: 24px;
@@ -185,16 +131,16 @@
         .highly-rated {
             color: gold; 
             font-size: 24px; 
+            margin-top: 5px;
         }
         h2 {
             margin-left: 20px; 
         }
 
-        /* Rating stars */
         .stars-outer {
             display: inline-block;
             position: relative;
-            font-size: 18px;
+            font-size: 20px; 
             color: #e0e0e0;
             margin-top: 5px;
         }
@@ -218,6 +164,87 @@
             font-weight: 900;
         }
 
+        .search-results {
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        /* Grid layout for profiles: 4 per row */
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 250px);
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .profile-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile-picture,
+        .no-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+        }
+
+        .no-picture {
+            background: #ccc;
+        }
+
+        .profile-card h3 {
+            margin: 10px 0 5px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-card p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .view-profile-button {
+            display: inline-block;
+            background-color: #6a00b5; 
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none; 
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-profile-button:hover {
+            background-color: #4e008f;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .main-content::-webkit-scrollbar-track {
+            background: #f9f9f9;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 4px;
+        }
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: #b5b5b5;
+        }
     </style>
 </head>
 <body>
@@ -225,85 +252,101 @@
         <div class="side-bar">
             <div class="sub-side-bar">
                 <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                         class="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" 
+                              d="M15.75 6a3.75 3.75 0 
+                              1 1-7.5 0 3.75 3.75 0 0 1 
+                              7.5 0ZM4.501 20.118a7.5 
+                              7.5 0 0 1 14.998 0A17.933 
+                              17.933 0 0 1 12 
                               21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                    </svg>
+                    </svg>  
                     <a href="/profile" class="button">My Profile</a>
-                </div>
+                </div>        
                 <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5
-                              9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125
-                              1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621
-                              0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                         class="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" 
+                              d="m2.25 12 8.954-8.955c.44-.439 
+                              1.152-.439 1.591 0L21.75 
+                              12M4.5 9.75v10.125c0 
+                              .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 
+                              1.125-1.125h2.25c.621 0 
+                              1.125.504 1.125 1.125V21h4.125c.621 
+                              0 1.125-.504 1.125-1.125V9.75M8.25 
+                              21h8.25" />
+                    </svg>                      
                     <a href="/main_page" class="button">My Main Page</a>
-                </div>
+                </div>      
                 <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 6.042A8.967 8.967 0 0 0 6
-                              3.75c-1.052 0-2.062.18-3
-                              .512v14.25A8.987 8.987 0 0 1 6
-                              18c2.305 0 4.408.867 6 2.292m0-14.25a8.966
-                              8.966 0 0 1 6-2.292c1.052 0 2.062.18 3
-                              .512v14.25A8.987 8.987 0 0 0 18
-                              18a8.967 8.967 0 0 0-6
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                         class="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" 
+                              d="M12 6.042A8.967 8.967 
+                              0 0 0 6 3.75c-1.052 0-2.062.18-3 
+                              .512v14.25A8.987 8.987 
+                              0 0 1 6 18c2.305 0 
+                              4.408.867 6 2.292m0-14.25a8.966 
+                              8.966 0 0 1 6-2.292c1.052 0 
+                              2.062.18 3 .512v14.25A8.987 
+                              8.987 0 0 0 18 
+                              18a8.967 8.967 0 0 0-6 
                               2.292m0-14.25v14.25" />
-                    </svg>
-                    <a href="/bookings" class="button">My Bookings</a>
+                    </svg> 
+                    <a href="/bookings" class="button">My Bookings</a>                 
                 </div>
                 <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M11.48 3.499a.562.562 0 0 1 1.04
-                              0l2.125 5.111a.563.563 0 0 0
-                              .475.345l5.518.442c.499.04.701.663.321.988l-4.204
-                              3.602a.563.563 0 0
-                              0-.182.557l1.285 5.385a.562.562 0 0
-                              1-.84.61l-4.725-2.885a.562.562 0 0
-                              0-.586 0L6.982 20.54a.562.562 0 0
-                              1-.84-.61l1.285-5.386a.562.562 0 0
-                              0-.182-.557l-4.204-3.602a.562.562 0 0
-                              1 .321-.988l5.518-.442a.563.563 0 0
-                              0 .475-.345L11.48 3.5Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                         class="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" 
+                              d="M11.48 3.499a.562.562 0 0 
+                              1 1.04 0l2.125 5.111a.563.563 
+                              0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 
+                              3.602a.563.563 0 0 0-.182.557l1.285 
+                              5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 
+                              0 0-.586 0L6.982 
+                              20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 
+                              0 0 0-.182-.557l-4.204-3.602a.562.562 0 
+                              0 1 .321-.988l5.518-.442a.563.563 0 
+                              0 0 .475-.345L11.48 
+                              3.5Z" />
                     </svg>
                     <a href="/reviews" class="button">My Reviews</a>
                 </div>
                 {% if user.profile_type == 'venue' %}
                 <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9.813
-                              15.904 9 18.75l-.813-2.846a4.5 4.5 0 0
-                              0-3.09-3.09L2.25
-                              12l2.846-.813a4.5 4.5 0 0
-                              0 3.09-3.09L9 5.25l.813
-                              2.846a4.5 4.5 0 0 0 3.09
-                              3.09L15.75 12l-2.846.813a4.5 4.5 0 0
-                              0-3.09 3.09ZM18.259
-                              8.715 18 9.75l-.259-1.035a3.375
-                              3.375 0 0 0-2.455-2.456L14.25
-                              6l1.036-.259a3.375 3.375 0 0
-                              0 2.455-2.456L18
-                              2.25l.259 1.035a3.375 3.375 0 0 0
-                              2.456 2.456L21.75
-                              6l-1.035.259a3.375 3.375 0 0
-                              0-2.456 2.456ZM16.894
-                              20.567 16.5 21.75l-.394-1.183a2.25
-                              2.25 0 0 0-1.423-1.423L13.5
-                              18.75l1.183-.394a2.25 2.25 0 0
-                              0 1.423-1.423l.394-1.183.394
-                              1.183a2.25 2.25 0 0 0
-                              1.423 1.423l1.183.394-1.183.394a2.25
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                         class="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" 
+                              d="M9.813 15.904 9 
+                              18.75l-.813-2.846a4.5 4.5 
+                              0 0 0-3.09-3.09L2.25 
+                              12l2.846-.813a4.5 4.5 0 0 
+                              0 3.09-3.09L9 
+                              5.25l.813 2.846a4.5 4.5 0 
+                              0 0 3.09 3.09L15.75 
+                              12l-2.846.813a4.5 4.5 0 
+                              0 0-3.09 3.09ZM18.259 
+                              8.715 18 9.75l-.259-1.035a3.375 
+                              3.375 0 0 0-2.455-2.456L14.25 
+                              6l1.036-.259a3.375 
+                              3.375 0 0 0 2.455-2.456L18 
+                              2.25l.259 1.035a3.375 3.375 0 0 
+                              0 2.456 2.456L21.75 
+                              6l-1.035.259a3.375 3.375 0 0 
+                              0-2.456 2.456ZM16.894 
+                              20.567 16.5 21.75l-.394-1.183a2.25 
+                              2.25 0 0 0-1.423-1.423L13.5 
+                              18.75l1.183-.394a2.25 2.25 0 0 
+                              0 1.423-1.423l.394-1.183.394 
+                              1.183a2.25 2.25 0 0 0 1.423 
+                              1.423l1.183.394-1.183.394a2.25 
                               2.25 0 0 0-1.423 1.423Z" />
                     </svg>
                     <a href="/recommended" class="button">My Recommended</a>
@@ -311,19 +354,17 @@
                 {% endif %}
             </div>
             <div class="logout-sub-side-bar">
-                <div class="icon-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M15.75 9V5.25A2.25 2.25 0 0 0
-                              13.5 3h-6a2.25 2.25 0 0 0-2.25
-                              2.25v13.5A2.25 2.25 0 0 0 7.5
-                              21h6a2.25 2.25 0 0 0 2.25-2.25V15m3
-                              0 3-3m0 0-3-3m3
-                              3H9" />
-                    </svg>
-                    <a href="{{ url_for('main.logout') }}" class="button">Logout</a>
-                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                     viewBox="0 0 24 24" stroke-width="1.5" 
+                     stroke="currentColor" class="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" 
+                          d="M15.75 9V5.25A2.25 2.25 0 0 
+                          0 13.5 3h-6a2.25 2.25 0 0 
+                          0-2.25 2.25v13.5A2.25 2.25 0 0 0 
+                          7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 
+                          0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+                <a href="{{ url_for('main.logout') }}" class="button">Logout</a>
             </div>
         </div>
 
@@ -334,33 +375,33 @@
                     <div class="search-results" id="search-results">
                         {% for booking in bookings %}
                             <div class="profile-card">
-                                <div class="info">
-                                    <h3>Venue: {{ booking.venue.name_event }}</h3>                                       
-                                    <p>
-                                        Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}<br>
-                                        Duration: {{ booking.duration }}<br>
-                                        Price: {% if booking.payment and booking.payment.amount is not none %}
-                                                  €{{ '{:.2f}'.format(booking.payment.amount) }}
-                                               {% else %}
-                                                  Not Available
-                                               {% endif %}<br>
-                                        Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}<br>
-                                        Status: {{ booking.status }}
-                                    </p>                                        
-                                    {% if booking.venue.profile.rating and booking.venue.profile.rating >= 4 %}
-                                        <i class="fas fa-star highly-rated"></i> 
-                                        <span>Highly Rated!</span>
+                                {% if booking.venue.profile.profile_picture %}
+                                    <img src="data:image/jpeg;base64,{{ base64.b64encode(booking.venue.profile.profile_picture)|b64encode }}" alt="Profile Picture" class="profile-picture">
+                                {% else %}
+                                    <div class="no-picture"></div>
+                                {% endif %}
+                                <h3>{{ booking.venue.name_event }}</h3>
+                                <p>Booking Date: {{ booking.date_booking.strftime('%Y-%m-%d %H:%M') }}</p>
+                                <p>Duration: {{ booking.duration }}</p>
+                                <p>Price: 
+                                    {% if booking.payment and booking.payment.amount is not none %}
+                                        €{{ '{:.2f}'.format(booking.payment.amount) }}
+                                    {% else %}
+                                        Not Available
                                     {% endif %}
-                                </div>
-                                <div class="action-buttons">
-                                    {% if booking.status == 'Requested' %}
-                                        <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post" style="display: inline;">
-                                            <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
-                                            <button type="submit" name="response" value="Denied" class="view-profile-button">Deny</button>
-                                        </form>
-                                    {% endif %}
-                                    <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="view-profile-button">Profile</a>
-                                </div>
+                                </p>
+                                <p>Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}</p>
+                                <p>Status: {{ booking.status }}</p>
+                                {% if booking.venue.profile.rating and booking.venue.profile.rating >= 4 %}
+                                    <i class="fas fa-star highly-rated"></i><span>Highly Rated!</span>
+                                {% endif %}
+                                {% if booking.status == 'Requested' %}
+                                    <form action="{{ url_for('main.respond_booking', booking_id=booking.booking_id) }}" method="post" style="margin-top:10px;">
+                                        <button type="submit" name="response" value="Accepted" class="view-profile-button">Accept</button>
+                                        <button type="submit" name="response" value="Denied" class="view-profile-button" style="margin-left:10px;">Deny</button>
+                                    </form>
+                                {% endif %}
+                                <a href="{{ url_for('main.venue_profile', user_id=booking.venue.profile_id) }}" class="view-profile-button" style="margin-top:10px;">Profile</a>
                             </div>
                         {% endfor %}
                     </div>
@@ -394,7 +435,7 @@
                 </select>
                 <input type="number" placeholder="Max price per hour (€)" name="max_price" step="0.01">
                 <select name="equipment">
-                    <option value="">Equipment Needed</option>
+                    <option value="">Has Equipment</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                 </select>
@@ -410,31 +451,34 @@
             </form>            
 
             <div class="search-results" id="search-results">
-                {% for musician in profiles %}
-                <div class="profile-card">
-                    {% if musician.encoded_image %}
-                        <img src="data:image/jpeg;base64,{{ musician.encoded_image }}" alt="Profile Picture" class="profile-picture">
-                    {% else %}
-                        <div class="no-picture"></div>
-                    {% endif %}
-                    <div class="info">
+                <!-- Grid of profiles -->
+                <div class="profiles-grid" id="profiles-grid">
+                    {% for musician in profiles %}
+                    <div class="profile-card">
+                        {% if musician.encoded_image %}
+                            <img src="data:image/jpeg;base64,{{ musician.encoded_image }}" alt="Profile Picture" class="profile-picture">
+                        {% else %}
+                            <div class="no-picture"></div>
+                        {% endif %}
                         <h3>{{ musician.display_name }}</h3>
-                        <p>Genre: {{ musician.genre }}, Price: €{{ musician.price_per_hour }}/hour</p>
+                        <p>Genre: {{ musician.genre }}</p>
+                        <p>Price per hour: €{{ musician.price_per_hour }}</p>
+                        <p>Equipment: {{ 'Yes' if musician.equipment else 'No' }}</p>
                         
-                        {% set rating_val = musician.rating %}
+                        {% set rating_val = musician.rating if musician.rating else 0 %}
                         {% set star_width = ((rating_val / 5) * 100) ~ '%' %}
                         <div class="stars-outer">
                             <div class="stars-inner" style="width: {{ star_width }};"></div>
                         </div>
 
-                        {% if musician.rating >= 4 %}
+                        {% if rating_val >= 4 %}
                             <i class="fas fa-star highly-rated"></i>
-                            <span>Highly Rated!</span>
+                            <span>High!</span>
                         {% endif %}
+                        <a href="{{ url_for('main.view_profile', user_id=musician.id) }}" class="view-profile-button">View Profile</a>
                     </div>
-                    <a href="{{ url_for('main.view_profile', user_id=musician.id) }}" class="view-profile-button">View Profile</a>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
             {% endif %}
         </div>
@@ -456,38 +500,46 @@
             .then(response => response.json())
             .then(data => {
                 const searchResultsDiv = document.getElementById('search-results');
-                searchResultsDiv.innerHTML = ''; 
+                const profilesGrid = document.getElementById('profiles-grid');
+                profilesGrid.innerHTML = ''; 
                 if (data.length === 0) {
-                    searchResultsDiv.innerHTML = '<p>No results found.</p>';
+                    profilesGrid.innerHTML = '<p>No results found.</p>';
                     return;
                 }
         
                 data.forEach(profile => {
-                    const star_width = profile.rating ? ((profile.rating / 5) * 100) + '%' : '0%';
+                    const rating_val = profile.rating ? profile.rating : 0;
+                    const star_width = (rating_val > 0) ? ((rating_val / 5) * 100) + '%' : '0%';
 
                     const imgHtml = profile.encoded_image
                         ? `<img src="data:image/jpeg;base64,${profile.encoded_image}" alt="Profile Picture" class="profile-picture">`
                         : `<div class="no-picture"></div>`;
 
-                    const highlyRated = (profile.rating && profile.rating >= 4)
-                        ? `<i class="fas fa-star highly-rated"></i><span>Highly Rated!</span>`
+                    const highlyRated = (rating_val >= 4)
+                        ? `<i class="fas fa-star highly-rated"></i><span>Highly!</span>`
                         : '';
+
+                    // profile.details should contain Genre and Price per hour and other info, 
+                    // but now we format them like the snippet:
+                    const details = `
+                        <p>Genre: ${profile.genre}</p>
+                        <p>Price per hour: €${profile.price_per_hour}</p>
+                        <p>Equipment: ${profile.equipment ? 'Yes' : 'No'}</p>
+                        <div class="stars-outer">
+                            <div class="stars-inner" style="width: ${star_width};"></div>
+                        </div>
+                        ${highlyRated}
+                    `;
 
                     const profileDiv = document.createElement('div');
                     profileDiv.className = 'profile-card';
                     profileDiv.innerHTML = `
                         ${imgHtml}
-                        <div class="info">
-                            <h3>${profile.name}</h3>
-                            <p>${profile.details}</p>
-                            <div class="stars-outer">
-                                <div class="stars-inner" style="width: ${star_width};"></div>
-                            </div>
-                            ${highlyRated}
-                        </div>
+                        <h3>${profile.display_name}</h3>
+                        ${details}
                         <button onclick="viewProfile('${profile.id}')" class="view-profile-button">View Profile</button>
                     `;
-                    searchResultsDiv.appendChild(profileDiv);
+                    profilesGrid.appendChild(profileDiv);
                 });
             })
             .catch(error => {
