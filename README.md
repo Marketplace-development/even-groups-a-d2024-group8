@@ -197,8 +197,8 @@ If the user is a musician, their booking requests will be displayed.
 #### main.route('/upload_picture', methods=['GET', 'POST'])
 This route handles the upload of a user’s profile picture. If the user is logged in, they can upload a profile picture. The image is saved to the database, and the user is redirected to the main page. If the user skips the upload, they are redirected to the main page as well.
 
-#### main.route('/main_page')
-This route is the main dashboard page for logged-in users. It checks if the user is logged in, and if they are, it displays their profile and relevant content (musician or venue) on the main page. If the user is not logged in, they are redirected to the login page.
+#### @main.route('/main_page')
+This route serves the main page based on the logged-in user's profile type. If the user is a "venue", the route fetches random musician profiles (soloists and bands), displaying their name, genre, price, equipment, rating, and image (if available). For "musician" profiles, it shows requested bookings. If the user’s profile type is neither, a default view is rendered. All data is passed to the (main_page.html) template for display.
 
 #### main.route('/search_musicians', methods=['POST'])
 This route handles the search for musicians. It receives a JSON request with various filtering criteria (e.g., musician type, city, style, rating). It then queries the database and returns a list of musicians that match the filters, in JSON format, containing details like name, style, city, rating, hourly price and equipment needed. 
@@ -289,7 +289,10 @@ For POST requests, the route validates the rating (between 0 and 5) and creates 
 For GET requests, the (submit_review.html) template is rendered for the user to fill out. Successful submissions display a confirmation, redirecting the user back to the bookings page.
 
 #### @main.route('/reviews')
-This route allows users to view the reviews they have received. It first checks if the user is logged in, and if not, redirects them to the login page with an error message. After confirming the user is logged in, it fetches the reviews where the current user is the reviewee from the database. These reviews are then passed to the template for rendering, allowing the user to view their received feedback.
+This route handles the reviews page for logged-in users. If the user is not logged in, they are redirected to the login page with an error message. It fetches reviews where the current user is the reviewee and calculates the average rating based on all reviews. The route also counts the number of reviews for each rating (1-5) and calculates the percentage distribution for each rating. These statistics, along with the reviews themselves, are passed to the (reviews.html) template for display.
+
+#### @main.route('/reviews/<uuid:musician_id>')
+This route allows logged-in users to view reviews for a specific musician (or venue) based on the musician's ID. If the user is not logged in, they are redirected to the login page with an error message. The show_all query parameter determines if all reviews are displayed. The route fetches reviews for the musician, calculates the average rating, counts the number of reviews for each rating (1-5), and computes the percentage distribution of ratings. It also calculates the total review count and breaks down the ratings into individual categories. All these statistics, along with the reviews and musician's profile, are passed to the (view_reviews.html) template for rendering.
 
 ## ✏️ Templates
 
