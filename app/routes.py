@@ -697,7 +697,7 @@ def main_page():
     elif user.profile_type == 'musician':
         # Fetch bookings where the musician is the logged-in user and status is 'Requested'
         bookings = Booking.query.filter_by(musician_id=user_id, status='Requested').all()
-        return render_template('main_page.html', user=user, bookings=bookings)
+        return render_template('main_page.html', user=user, bookings=bookings, base64=base64)
     else:
         return render_template('main_page.html', user=user)
 

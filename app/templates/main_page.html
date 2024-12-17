@@ -460,6 +460,7 @@
                         {% else %}
                             <div class="no-picture"></div>
                         {% endif %}
+            
                         <h3>{{ musician.display_name }}</h3>
                         <p>Genre: {{ musician.genre }}</p>
                         <p>Price per hour: €{{ musician.price_per_hour }}</p>
@@ -470,13 +471,17 @@
                         <div class="stars-outer">
                             <div class="stars-inner" style="width: {{ star_width }};"></div>
                         </div>
-
-                        {% if rating_val >= 4 %}
-                            <i class="fas fa-star highly-rated"></i>
-                            <span>High!</span>
-                        {% endif %}
+            
                         <a href="{{ url_for('main.view_profile', user_id=musician.id) }}" class="view-profile-button">View Profile</a>
+                                               
+                        {% if musician.rating >= 4 %}
+                        <div class="highly-rated-container">
+                            <i class="fas fa-star highly-rated"></i>
+                            <span class="highly-rated-text">Highly rated!</span>
+                        </div>
+                        {% endif %}
                     </div>
+                    
                     {% endfor %}
                 </div>
             </div>
@@ -510,16 +515,16 @@
                 data.forEach(profile => {
                     const rating_val = profile.rating ? profile.rating : 0;
                     const star_width = (rating_val > 0) ? ((rating_val / 5) * 100) + '%' : '0%';
-
+        
                     const imgHtml = profile.encoded_image
                         ? `<img src="data:image/jpeg;base64,${profile.encoded_image}" alt="Profile Picture" class="profile-picture">`
                         : `<div class="no-picture"></div>`;
-
+        
                     const highlyRated = (rating_val >= 4)
-                        ? `<i class="fas fa-star highly-rated"></i><span>Highly!</span>`
+                        ? `<div class="highly-rated-container"><i class="fas fa-star highly-rated"></i><span class="highly-rated-text">Highly rated!</span></div>`
                         : '';
-
-                    // profile.details should contain Genre and Price per hour and other info, 
+        
+                    // profile.details should contain Genre and Price per hour and other info,
                     // but now we format them like the snippet:
                     const details = `
                         <p>Genre: ${profile.genre}</p>
@@ -528,9 +533,8 @@
                         <div class="stars-outer">
                             <div class="stars-inner" style="width: ${star_width};"></div>
                         </div>
-                        ${highlyRated}
                     `;
-
+        
                     const profileDiv = document.createElement('div');
                     profileDiv.className = 'profile-card';
                     profileDiv.innerHTML = `
@@ -538,6 +542,7 @@
                         <h3>${profile.display_name}</h3>
                         ${details}
                         <button onclick="viewProfile('${profile.id}')" class="view-profile-button">View Profile</button>
+                        ${highlyRated}
                     `;
                     profilesGrid.appendChild(profileDiv);
                 });
@@ -546,11 +551,12 @@
                 console.error('Error:', error);
                 alert('An error occurred while searching. Please try again.');
             });
-        }        
-
+        }
+        
         function viewProfile(profileId) {
             window.location.href = `/profile/${profileId}`;
-        }        
+        }
+           
     </script>
 </body>
 </html>
