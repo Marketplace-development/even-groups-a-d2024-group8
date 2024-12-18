@@ -393,9 +393,9 @@
                                 <p>Payment Method: {{ booking.payment.method if booking.payment and booking.payment.method else 'Not Selected' }}</p>
                                 <p>Status: {{ booking.status }}</p>
                                 {% if booking.note %}
-                                    <p><strong>Note: {{ booking.note }}</p>
+                                    <p>Note: {{ booking.note }}</p>
                                 {% else %}
-                                    <p><strong>Note: No additional notes provided.</p>
+                                    <p>Note: No additional notes provided.</p>
                                 {% endif %}
                                 {% if booking.venue.profile.rating and booking.venue.profile.rating >= 4 %}
                                     <i class="fas fa-star highly-rated"></i><span>Highly Rated!</span>
