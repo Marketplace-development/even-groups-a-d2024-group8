@@ -12,31 +12,39 @@ Finally, we developed a Flask application as the front-facing platform to realiz
 
 The project structure is as follows:
 
-EVEN-GROUPS-A-D2024-GROUP8/
-├── app/
-│   ├── templates/              # Folder for HTML templates
-│   │   ├── band_profile.html   # Band profile page
-│   │   ├── booking.html        # Booking details page
-│   │   ├── edit_band_profile.html # Edit profile page for bands
-│   │   ├── edit_soloist_profile.html # Edit profile page for soloists
-│   │   ├── edit_venue_profile.html  # Edit profile page for venues
-│   │   ├── index.html          # Homepage template
-│   │   ├── login.html          # Login page for users
-│   │   ├── main_page.html      # Main dashboard page after login
-│   │   ├── my_recommendations.html # Personalized recommendations page
-│   │   ├── mybooking.html      # User's booking management page
-│   │   ├── register.html       # Registration page for new users
-│   │   ├── soloist_profile.html # Soloist profile page
-│   │   ├── upload_picture.html # Profile picture upload page
-│   │   └── venue_profile.html  # Venue profile page
-│   ├── __init__.py             # App initialization file
-│   ├── config.py               # Configuration settings database
-│   ├── models.py               # Database models and ORM definitions
-│   └── routes.py               # Web application routes and logic
-├── venv/                       # Virtual environment for project dependencies
-├── requirements.txt            # Python dependencies (Flask, etc.)
-├── run.py                      # Entry point for running the application
-└── README.md                   # Project documentation
+EVEN-GROUPS-A-D2024-GROUP8/  
+├── app/  
+│   ├── templates/                 # Folder for HTML templates  
+│   │   ├── band_profile.html       # Band profile page  
+│   │   ├── booking.html            # Booking details page  
+│   │   ├── edit_band_profile.html  # Edit profile page for bands  
+│   │   ├── edit_soloist_profile.html  # Edit profile page for soloists  
+│   │   ├── edit_venue_profile.html # Edit profile page for venues  
+│   │   ├── index.html              # Homepage template  
+│   │   ├── login.html              # Login page for users  
+│   │   ├── main_page.html          # Main dashboard page after login  
+│   │   ├── my_recommendations.html # Personalized recommendations page  
+│   │   ├── mybooking.html          # User's booking management page  
+│   │   ├── register.html           # Registration page for new users  
+│   │   ├── soloist_profile.html    # Soloist profile page  
+│   │   ├── upload_picture.html     # Profile picture upload page  
+│   │   ├── venue_profile.html      # Venue profile page  
+│   ├── __init__.py                 # App initialization file  
+│   ├── config.py                   # Configuration settings database
+│   ├── models.py                   # Database models and ORM definitions  
+│   ├── routes.py                   # Web application routes and logic  
+├── venv/                           # Virtual environment for project dependencies  
+├── requirements.txt                # Python dependencies (Flask, etc.)  
+├── run.py                          # Entry point for running the application  
+├── README.md                       # Project documentation  
+
+
+
+
+
+
+Now we will further elaborate on each specific folder or file.
+
 
 
 
