@@ -473,7 +473,7 @@
                         {% set rating_val = musician.rating if musician.rating else 0 %}
                         {% set star_width = ((rating_val / 5) * 100) ~ '%' %}
                         <div class="stars-outer">
-                            <div class="stars-inner" style="width: {{ star_width | safe }};"></div>
+                            <div class="stars-inner" style="width: {{ star_width }};"></div>
                         </div>
             
                         <a href="{{ url_for('main.view_profile', user_id=musician.id) }}" class="view-profile-button">View Profile</a>
