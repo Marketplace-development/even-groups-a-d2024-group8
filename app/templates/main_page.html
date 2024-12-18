@@ -138,32 +138,31 @@
         }
 
         .stars-outer {
-            display: inline-block;
             position: relative;
-            font-size: 20px; 
-            color: #e0e0e0;
-            margin-top: 5px;
+            display: inline-block;
+            font-size: 20px; /* Adjust size of stars */
+            color: #e0e0e0; /* Unfilled star color */
+            line-height: 1;
+            width: 105px; /* Ensure this perfectly fits 5 stars (20px each + gaps) */
         }
+        
         .stars-inner {
             position: absolute;
             top: 0;
             left: 0;
             white-space: nowrap;
+            color: #6a00b5; /* Filled star color */
+            width: 0%; /* Set dynamically */
             overflow: hidden;
-            width: 0%;
-            color: #6a00b5;
         }
-        .stars-outer::before {
-            content: "\f005 \f005 \f005 \f005 \f005";
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-        }
+        
+        .stars-outer::before,
         .stars-inner::before {
-            content: "\f005 \f005 \f005 \f005 \f005";
-            font-family: 'Font Awesome 5 Free';
+            content: "\f005 \f005 \f005 \f005 \f005"; /* 5 stars */
+            font-family: "Font Awesome 5 Free";
             font-weight: 900;
         }
-
+           
         .search-results {
             flex: 1; 
             overflow-y: auto; 
@@ -438,7 +437,7 @@
                     <option value="R&B">R&B</option>
                     <option value="Other">Other</option>
                 </select>
-                <input type="number" placeholder="Max price per hour (€)" name="max_price" step="0.01">
+                <input type="numr" placeholder="Max price per hour (€)" name="max_price" step="0.01">
                 <select name="equipment">
                     <option value="">Has Equipment</option>
                     <option value="yes">Yes</option>
@@ -474,7 +473,7 @@
                         {% set rating_val = musician.rating if musician.rating else 0 %}
                         {% set star_width = ((rating_val / 5) * 100) ~ '%' %}
                         <div class="stars-outer">
-                            <div class="stars-inner" style="width: {{ star_width }};"></div>
+                            <div class="stars-inner" style="width: {{ star_width | safe }};"></div>
                         </div>
             
                         <a href="{{ url_for('main.view_profile', user_id=musician.id) }}" class="view-profile-button">View Profile</a>
@@ -486,7 +485,6 @@
                         </div>
                         {% endif %}
                     </div>
-                    
                     {% endfor %}
                 </div>
             </div>
