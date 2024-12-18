@@ -205,7 +205,7 @@ This route handles the search for musicians. It receives a JSON request with var
 #### main.route('/profile')
 This route handles the user's profile page. It checks if the user is logged in. If the user is logged in, it redirects them to their specific profile page based on their profile type. If the user is a musician with a soloist type, they are redirected to their soloist profile. If the user is a musician with a band type, they are redirected to their band profile. If the user is a venue, they are redirected to their venue profile. If the user is not logged in or their profile type is not recognized, they are redirected to the main page.
 
-#### @main.route('/band_profile/<user_id>')
+#### main.route('/band_profile/<user_id>')
 This function displays a band profile page.
 It first checks if the user is logged in; if not, they are redirected to the login page. It then retrieves the user and band details using the provided user_id. If either is missing, an error message is shown, and the user is redirected to the main page.
 The function checks if the profile belongs to the logged-in user and sets a flag (is_own_profile) accordingly. If a profile picture exists, it is encoded in Base64 for display.
@@ -235,13 +235,13 @@ This route renders the page for editing a soloist profile. It retrieves the user
 #### main.route('/update_soloist_profile/<user_id>', methods=['POST'])  
 This route processes the updating of the soloist profile when the user submits the edit form. It first retrieves the user and soloist data from the database based on the provided user_id. If the user or soloist cannot be found, an error message is shown, and the user is redirected. The form data is then processed, and fields such as artist name, date of birth, genre, and price per hour are updated. The route also handles musician-specific information such as song links, equipment, and bio updates. The date of birth is parsed and validated to ensure the correct format. If any errors occur in processing numeric fields (like price per hour), an error message is displayed, and the user is redirected to correct their input. If a new profile picture is uploaded, it replaces the existing one. After all updates are made, the changes are committed to the database, and a success message is shown. The user is redirected to their updated soloist profile page.
 
-#### @main.route('/search_profiles', methods ['POST'])
+#### main.route('/search_profiles', methods ['POST'])
 This route allows venue profiles to search for musicians based on various criteria provided in a JSON payload. If the user is not logged in, an error response is returned. The logged-in user's profile is fetched to verify their existence and profile type. Only venue profiles can access this functionality.  
 When the profile type is "venue", the code constructs a query to search for musicians by joining the Musician and Profile tables, with optional joins to Soloist and Band aliases. Filters are applied based on the user-provided criteria, such as musician type, name, city, style, maximum price, equipment availability, and minimum rating. If no filters are applied, a random selection of musicians is returned as a fallback.  
 The query results are processed to format the output. For each musician, the route determines their display name, encodes their profile picture (if available) to Base64, and includes relevant details like genre, price per hour, equipment availability, and rating. These details are sent back as a JSON response, enabling the front-end to render the search results effectively.  
 If no musicians match the search criteria, an empty list is returned as the default response.
 
-#### @main.route('/profile/<user_id>')
+#### main.route('/profile/<user_id>')
 This route is responsible for displaying the profile page for a specific user, determined by the user_id provided in the URL. First, the function retrieves the user profile from the database using the user_id. If the profile is not found, the user is redirected to the main page with an error message.
 The function checks whether the logged-in user is viewing their own profile by comparing the logged_in_user_id (from the session) with the user_id in the URL. If the logged-in user is the same as the user being viewed, a flag is_own_profile is set to True. The logged-in user's profile data is then retrieved.
 If the profile type is 'musician', the function determines whether the logged-in user is a venue and not viewing their own profile, in which case a "Book Here" button is shown. The profile picture is passed to the template for display.
@@ -249,13 +249,13 @@ For musicians, the profile could either be a soloist or a band. If the user is a
 For venue profiles, the function similarly retrieves the venue’s details and renders the (venue_profile.html template). The profile picture is passed to the template. It also checks if the logged-in user is viewing their own profile, indicated by the is_own_profile flag.
 If the profile type is invalid or not recognized, the user is redirected to the main page with an error message.
 
-#### @main.route('/request_booking/<musician_id>', methods=['GET', 'POST']) 
+#### main.route('/request_booking/<musician_id>', methods=['GET', 'POST']) 
 This route allows venues to request a booking for a musician. If the user is not logged in or is not a venue profile, they are redirected with an error message. The musician profile is retrieved, and if not found, the user is redirected with an error.  
 For POST requests, the form data (date, duration, and payment method) is validated. The date is parsed, and the duration is checked to ensure valid time format and positive values. The total price is calculated based on the musician's hourly rate. If validation passes, a new booking is created with the status "Requested", and a payment object is also created.  
 The booking and payment objects are committed to the database, and if successful, the user is notified and redirected to the main page. If an error occurs, the transaction is rolled back and an error message is displayed.  
 For GET requests, the (booking.html) template is rendered to allow the user to fill out the booking form.
 
-#### @main.route('/respond_booking <uuid:booking_id>', methods=['POST'])
+#### main.route('/respond_booking <uuid:booking_id>', methods=['POST'])
  This route is used for a musician to respond to a booking request. It first checks if the user is logged in by looking for the user_id in the session. If the user is not logged in, they are redirected to the login page with an error message.
 The function then retrieves the user's profile and the booking details based on the given booking_id. If the booking is not found, the user is redirected to the main page with an error message.
 The function ensures that only the musician associated with the booking can respond. If the logged-in user is not the musician linked to the booking, they are redirected with an error message.
@@ -263,16 +263,14 @@ When the form is submitted, the function checks whether the response is valid (e
 If the response is valid, the booking status is updated to reflect the musician's decision. The changes are saved to the database, and if successful, a confirmation message is shown. If there is an error during the update, the changes are rolled back, and the user receives an error message.
 The user is redirected to the main page after the response is processed.
 
-#### @main.route('/bookings') 
-this route is used to display a user's booking information. It first checks if the user is logged in by looking for the user_id in the session. If the user is not logged in, they are redirected to the login page with an error message.
+#### main.route('/bookings') 
+This route is used to display a user's booking information. It first checks if the user is logged in by looking for the user_id in the session. If the user is not logged in, they are redirected to the login page with an error message.
 Once logged in, the user's profile is retrieved. If the user is a venue, the function fetches all the bookings requested by that venue, ordered by the booking date in descending order. If the user is a musician, the function retrieves all the bookings that have been accepted for that musician, also ordered by date in descending order.
 If the user’s profile type is invalid, the user is redirected to the main page with an error message.
 The function renders the (mybooking.html) template, passing the list of bookings and the user profile information to be displayed on the page.
+The dictionary genre_to_style is a mapping of music genres to types of venues where those genres are typically played. For example, "Pop" music is associated with "Dance Club" and "Wine Bar" venues, while "Jazz" is linked to "Jazz Lounge" and "Restaurant" venues. We will use this dictionary later on in (@main.route('/recommended'))
 
-
-- The dictionary genre_to_style is a mapping of music genres to types of venues where those genres are typically played. For example, "Pop" music is associated with "Dance Club" and "Wine Bar" venues, while "Jazz" is linked to "Jazz Lounge" and "Restaurant" venues. We will use this dictionary later on in (@main.route('/recommended'))
-
-#### @main.route('/recommended')
+#### main.route('/recommended')
 
 - This is the algorithm we implemented in our app.
 
@@ -282,15 +280,15 @@ The get_recommendations(user_profile_id) function generates musician recommendat
 When previous bookings have been made, the function analyzes the genres of the booked musicians and identifies the most frequently booked genre. Recommendations are then drawn from musicians within that genre, sorted by profile rating, and limited to the top-rated results.  
 The function ensures uniqueness in recommendations by eliminating duplicates.
 
-#### @main.route('/bookings/<uuid:booking_id>/review', methods=['GET', 'POST'])
+#### main.route('/bookings/<uuid:booking_id>/review', methods=['GET', 'POST'])
 This route allows users involved in a specific booking to submit a review. If the user is not logged in or unauthorized, they are redirected with an error message. The booking and user profiles are validated to ensure the user is part of the booking.
 For POST requests, the route validates the rating (between 0 and 5) and creates a review with the appropriate reviewer and reviewee roles. The review is saved to the database, and the reviewee's average rating is updated based on all existing reviews.
 For GET requests, the (submit_review.html) template is rendered for the user to fill out. Successful submissions display a confirmation, redirecting the user back to the bookings page.
 
-#### @main.route('/reviews')
+#### main.route('/reviews')
 This route handles the reviews page for logged-in users. If the user is not logged in, they are redirected to the login page with an error message. It fetches reviews where the current user is the reviewee and calculates the average rating based on all reviews. The route also counts the number of reviews for each rating (1-5) and calculates the percentage distribution for each rating. These statistics, along with the reviews themselves, are passed to the (reviews.html) template for display.
 
-#### @main.route('/reviews/<uuid:musician_id>')
+#### main.route('/reviews/<uuid:musician_id>')
 This route allows logged-in users to view reviews for a specific musician (or venue) based on the musician's ID. If the user is not logged in, they are redirected to the login page with an error message. The show_all query parameter determines if all reviews are displayed. The route fetches reviews for the musician, calculates the average rating, counts the number of reviews for each rating (1-5), and computes the percentage distribution of ratings. It also calculates the total review count and breaks down the ratings into individual categories. All these statistics, along with the reviews and musician's profile, are passed to the (view_reviews.html) template for rendering.
 
 ## ✏️ Templates
@@ -376,12 +374,8 @@ The main content area presents the user's bookings. If bookings are available, t
 The sidebar is fixed on the left side, while the main content area is scrollable on the right, providing a clear, organized view of the bookings without losing access to the navigation options.
 
 #### my_recommendations.html
-The recommended musicians are displayed with a profile card containing their full name, genre, price per hour, and a "View Profile" button. This button leads users to the musician's detailed profile, where they can view more information and take further actions.
-Additionally, the page uses flash messages to show success or error notifications. For example, users may see a notification when an action related to recommendations is completed successfully or if an error occurs. These messages are styled according to the type of feedback and are managed through the flash-messages list in your CSS.
-
-### Revised Explanation
 The my_recommendations.html page displays a list of recommended musicians. It features two main sections: a sidebar for navigation and a main content area for recommendations. 
-The sidebar includes navigation buttons for "My Profile," "My Bookings," "My Reviews," "My Recommended," and a logout option, each represented with an icon. 
+The sidebar includes navigation buttons for "My Profile", "My Bookings", "My Reviews", "My Recommended", and a logout option, each represented with an icon. 
 The main content area shows musician recommendations in a card format. Each card displays the musician's name, genre, price per hour, and a "View Profile" button linking to their profile. If no recommendations are available, the page displays a message indicating this. 
 
 #### reviews.html
