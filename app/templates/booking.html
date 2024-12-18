@@ -103,22 +103,6 @@
             <p><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(musician.price_per_hour) }}</p>
         </div>
     
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul style="list-style: none; padding: 0; margin-bottom: 15px;">
-                    {% for category, message in messages %}
-                        <li class="flash-message 
-                            {% if category == 'error' %}flash-error
-                            {% elif category == 'success' %}flash-success
-                            {% else %}flash-info{% endif %}">
-                            {{ message }}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-    
         <form action="{{ url_for('main.request_booking', musician_id=musician.profile_id) }}" method="POST" class="booking-form">
             <label for="date_booking">Date and Time of Performance:</label>
             <input type="datetime-local" id="date_booking" name="date_booking" required>
@@ -127,7 +111,6 @@
             <input type="text" id="duration" name="duration" placeholder="e.g., 02:30" required oninput="calculatePrice()">
             <p class="hint">Enter the duration in hours and minutes (e.g., 02:30 for 2 hours 30 minutes).</p>
     
-            <!-- Price Display -->
             <div class="price-display" id="price_display">Price: €0.00</div>
     
             <label for="payment_method">Payment Method:</label>
@@ -148,7 +131,7 @@
     </div>    
 
     <script>
-        const pricePerHour = {{musician.price_per_hour}}; // Fetch the musician's price per hour
+        const pricePerHour = parseFloat("{{ musician.price_per_hour if musician.price_per_hour else '0' }}");
 
         function calculatePrice() {
             const durationInput = document.getElementById('duration').value;

@@ -375,7 +375,7 @@
                         {% for booking in bookings %}
                             <div class="profile-card">
                                 {% if booking.venue.profile.profile_picture %}
-                                    <img src="data:image/jpeg;base64,{{ base64.b64encode(booking.venue.profile.profile_picture)|b64encode }}" alt="Profile Picture" class="profile-picture">
+                                <img src="data:image/jpeg;base64,{{ booking.venue.profile.profile_picture | b64encode }}" alt="Profile Picture" class="profile-picture">                           
                                 {% else %}
                                     <div class="no-picture"></div>
                                 {% endif %}
