@@ -107,10 +107,13 @@
         }
         .image-container img {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1); /* Reset initial zoom */
             cursor: grab;
-            max-width: none;
+            max-width: 100%; /* Prevent image overflow */
+            max-height: 100%; /* Fit image inside the container */
+            object-fit: cover; /* Ensure the image fills the circle nicely */
         }
         .button-group {
             display: flex;

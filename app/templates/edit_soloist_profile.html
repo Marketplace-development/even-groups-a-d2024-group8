@@ -8,14 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #3a007d, #6a00b5); /* Gradient background */
+            background: linear-gradient(135deg, #3a007d, #6a00b5); 
             font-family: 'DM Sans', sans-serif;
             color: #fff;
             margin: 0;
             padding: 0;
         }
         .profile-box {
-            background-color: #fff; /* White box */
+            background-color: #fff; 
             border-radius: 15px;
             padding: 20px;
             width: 80%;
@@ -27,7 +27,7 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background-color: #ccc; /* Placeholder */
+            background-color: #ccc; 
             margin: 20px auto;
             background-image: url("data:image/jpeg;base64,{{ profile_picture }}");
             background-size: cover;
@@ -56,13 +56,13 @@
         }
         textarea {
             width: 100%;
-            max-width: calc(100% - 30px); /* Prevents overflow of the bio box */
-            min-height: 100px; /* Reasonable height for bio input */
+            max-width: calc(100% - 30px); 
+            min-height: 100px; 
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-            resize: none; /* Prevent resizing */
+            resize: none; 
             font-family: 'DM Sans', sans-serif;
             font-size: 1rem;
         }
@@ -81,7 +81,7 @@
             background-color: #4e008f;
         }
         input, select, textarea {
-            width: 90%; /* Slightly smaller than parent box */
+            width: 90%; 
             padding: 10px;
             margin: 10px 0 auto;
             border: 1px solid #ccc;
@@ -89,12 +89,12 @@
             display: block;
         }
         select:hover {
-            border: 2px solid #6a00b5; /* Purple border on hover */
+            border: 2px solid #6a00b5; 
             outline: none;
-            transition: border 0.3s ease; /* Smooth transition */
+            transition: border 0.3s ease; 
         }
         textarea {
-            resize: none; /* Prevent resizing */
+            resize: none; 
         }
         .image-container {
             width: 200px;
@@ -107,27 +107,30 @@
         }
         .image-container img {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1); /* Reset initial zoom */
             cursor: grab;
-            max-width: none;
+            max-width: 100%; /* Prevent image overflow */
+            max-height: 100%; /* Fit image inside the container */
+            object-fit: cover; /* Ensure the image fills the circle nicely */
         }
         .button-group {
             display: flex;
-            justify-content: center; /* Center buttons */
-            gap: 20px; /* Add spacing between buttons */
-            margin-top: 30px; /* Move buttons lower */
+            justify-content: center; 
+            gap: 20px; 
+            margin-top: 30px; 
         }
         .choose-image-btn {
             display: block;
-            margin: 10px auto; /* Center button below the picture */
+            margin: 10px auto; 
         }
     </style>
 </head>
 <body>
     <form action="{{ url_for('main.update_soloist_profile', user_id=soloist.profile_id) }}" method="post" enctype="multipart/form-data">
         <div class="profile-box">
-            <!-- Profile Picture -->
+ 
             <div class="image-container" id="image-container">
                 <img id="preview" 
                      src="data:image/jpeg;base64,{{ profile_picture }}" 
@@ -136,18 +139,18 @@
                 <input type="file" name="profile_picture" accept="image/*" onchange="previewFile()" style="display: none;">
             </div>
             <button type="button" class="choose-image-btn" onclick="document.querySelector('input[type=file]').click()">Choose Image</button>
-            <!-- Bio -->
+
             <p class="field">
                 <label for="bio"><strong>Bio:</strong></label>
                 <textarea id="bio" name="bio" placeholder="Write about your venue...">{{ user.bio or '' }}</textarea>
             </p>
-            <!-- Artist Name -->
+
             <p class="field">
                 <label for="artist_name"><strong>Artist Name:</strong></label>
                 <input type="text" id="artist_name" name="artist_name" value="{{ soloist.artist_name or '' }}" required>
             </p>
 
-            <!-- Date of Birth -->
+
             <p class="field">
                 <label for="date_of_birth"><strong>Date of Birth:</strong></label>
                 <input type="date" id="date_of_birth" name="date_of_birth" value="{{ soloist.date_of_birth or '' }}" required>
@@ -212,7 +215,6 @@
                 </div>
             </div>
 
-            <!-- Contact Information -->
             <div class="section">
                 <h2>Contact Info</h2>
                 <div class="box">
@@ -235,7 +237,7 @@
                 </div>
             </div>
 
-            <!-- Buttons -->
+
             <div class="button-group">
                 <button type="submit">Save Changes</button>
                 <a href="{{ url_for('main.soloist_profile', user_id=soloist.profile_id) }}" class="button">Return</a>
@@ -247,7 +249,6 @@
         const preview = document.getElementById('preview');
         let scale = 1;
 
-        // Display the existing profile picture if available
         document.addEventListener('DOMContentLoaded', function () {
             if ("{{ profile_picture }}") {
                 preview.src = "data:image/jpeg;base64,{{ profile_picture }}";
@@ -264,7 +265,7 @@
                 preview.src = e.target.result;
                 preview.style.display = 'block';
                 preview.style.transform = 'translate(-50%, -50%) scale(1)';
-                scale = 1; // Reset scale
+                scale = 1; 
             };
 
             if (file) {
@@ -275,7 +276,7 @@
         container.addEventListener('wheel', function (e) {
             e.preventDefault();
             const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            scale = Math.min(Math.max(0.5, scale + delta), 2); // Limit zoom between 0.5x and 2x
+            scale = Math.min(Math.max(0.5, scale + delta), 2); 
             preview.style.transform = `translate(-50%, -50%) scale(${scale})`;
         });
 
