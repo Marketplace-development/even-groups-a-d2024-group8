@@ -73,6 +73,25 @@
         .booking-form button:hover {
             background-color: #4e008f;
         }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -83,17 +102,34 @@
             <p><strong>Genre:</strong> {{ musician.genre }}</p>
             <p><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(musician.price_per_hour) }}</p>
         </div>
+    
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul style="list-style: none; padding: 0; margin-bottom: 15px;">
+                    {% for category, message in messages %}
+                        <li class="flash-message 
+                            {% if category == 'error' %}flash-error
+                            {% elif category == 'success' %}flash-success
+                            {% else %}flash-info{% endif %}">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    
         <form action="{{ url_for('main.request_booking', musician_id=musician.profile_id) }}" method="POST" class="booking-form">
             <label for="date_booking">Date and Time of Performance:</label>
             <input type="datetime-local" id="date_booking" name="date_booking" required>
-
+    
             <label for="duration">Duration (HH:MM):</label>
             <input type="text" id="duration" name="duration" placeholder="e.g., 02:30" required oninput="calculatePrice()">
             <p class="hint">Enter the duration in hours and minutes (e.g., 02:30 for 2 hours 30 minutes).</p>
-
+    
             <!-- Price Display -->
             <div class="price-display" id="price_display">Price: €0.00</div>
-
+    
             <label for="payment_method">Payment Method:</label>
             <select id="payment_method" name="payment_method" required>
                 <option value="" disabled selected>Select a payment method</option>
@@ -103,13 +139,13 @@
                 <option value="Bancontact">Bancontact</option>
                 <option value="Other">Other</option>
             </select>
-
+    
             <label for="message">Additional Notes:</label>
             <textarea id="message" name="message" rows="4" placeholder="Any additional details or requests..."></textarea>
-
+    
             <button type="submit">Submit Booking Request</button>
         </form>
-    </div>
+    </div>    
 
     <script>
         const pricePerHour = {{musician.price_per_hour}}; // Fetch the musician's price per hour

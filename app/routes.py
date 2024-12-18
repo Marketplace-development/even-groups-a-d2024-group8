@@ -959,7 +959,8 @@ def request_booking(musician_id):
         except ValueError as e:
             print(f"ValueError: {e}")
             flash(str(e), "error")
-            return redirect(url_for('main.request_booking', musician_id=musician_id))
+            return render_template('booking.html', musician=musician)
+
         
         status = 'Requested'
         # Create a new booking with status 'Requested'
@@ -996,8 +997,8 @@ def request_booking(musician_id):
             db.session.rollback()
             flash(f"An error occurred while requesting the booking: {e}", "error")
             print(f"Error during commit: {e}")
+            return render_template('booking.html', musician=musician)
 
-        return redirect(url_for('main.main_page'))
 
     else:
         # GET request, render booking.html

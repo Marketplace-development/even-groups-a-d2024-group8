@@ -83,12 +83,18 @@
         }
 
         .profile-card {
+            display: flex; /* Flexbox for card layout */
+            flex-direction: column; /* Stack items vertically */
+            justify-content: space-between; /* Space items evenly */
+            align-items: center; /* Center-align content */
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 250px; 
+            width: 250px;
+            height: 500px; /* Fixed height for all cards */
+            box-sizing: border-box; /* Padding included in height */
         }
 
         .profile-pic,
@@ -178,7 +184,7 @@
             font-size: 20px;
             color: #e0e0e0;
             line-height: 1;
-            margin: 10px 0;
+            margin: 10px auto 0;
             vertical-align: middle;
             width: max-content;
         }
@@ -204,6 +210,33 @@
             font-family: 'Font Awesome 5 Free';
             font-weight: 900;
             display: inline-block;
+        }
+
+        .highly-rated {
+            color: gold;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        .highly-rated-container {
+            min-height: 30px; /* Ensures consistent space for all cards */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px; /* Space between star icon and text */
+            font-size: 1rem;
+            visibility: hidden; /* Default hidden */
+        }
+
+        .highly-rated-container i,
+        .highly-rated-container span {
+            visibility: visible; /* Make content visible if present */
+        }
+
+        .highly-rated-text {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
         }
 
         .main-content::-webkit-scrollbar {
@@ -371,26 +404,33 @@
                 {% if recommendations %}
                     <div class="recommendation-container">
                         {% for musician in recommendations %}
-                            <div class="profile-card">
-                                {% if musician.encoded_picture %}
-                                    <img src="{{ musician.encoded_picture }}" alt="Profile Picture" class="profile-pic">
-                                {% else %}
-                                    <div class="no-picture"></div>
-                                {% endif %}
-                                <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
-                                <p>Genre: {{ musician.genre }}</p>
-                                <p>Price per hour: €{{ musician.price_per_hour }}</p>
-                                <p>Equipment: {{ 'Yes' if musician.equipment else 'No' }}</p>
-
-                                {% set rating_val = musician.profile.rating if musician.profile.rating is not none else 0 %}
-                                {% set star_width = rating_val > 0 and (rating_val / 5 * 100) ~ '%' or '0%' %}
-                                <!-- Place stars below Equipment and before the button -->
-                                <div class="stars-outer">
-                                    <div class="stars-inner" style="width: {{ star_width }};"></div>
-                                </div>
-                                
-                                <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
+                        <div class="profile-card">
+                            {% if musician.encoded_picture %}
+                                <img src="{{ musician.encoded_picture }}" alt="Profile Picture" class="profile-pic">
+                            {% else %}
+                                <div class="no-picture"></div>
+                            {% endif %}
+                            <h3>{{ musician.profile.first_name }} {{ musician.profile.last_name }}</h3>
+                            <p>Genre: {{ musician.genre }}</p>
+                            <p>Price per hour: €{{ musician.price_per_hour }}</p>
+                            <p>Equipment: {{ 'Yes' if musician.equipment else 'No' }}</p>
+                        
+                            {% set rating_val = musician.profile.rating if musician.profile.rating is not none else 0 %}
+                            {% set star_width = ((rating_val / 5) * 100) ~ '%' %}
+                            <div class="stars-outer">
+                                <div class="stars-inner" style="width: {{ star_width }};"></div>
                             </div>
+                            
+                            <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
+                            
+                            <!-- Ensure the 'highly-rated-container' is always present -->
+                            <div class="highly-rated-container">
+                                {% if rating_val >= 4 %}
+                                    <i class="fas fa-star highly-rated"></i>
+                                    <span class="highly-rated-text">Highly rated!</span>
+                                {% endif %}
+                            </div>            
+                        </div>                        
                         {% endfor %}
                     </div>
                 {% else %}

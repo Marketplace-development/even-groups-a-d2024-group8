@@ -25,8 +25,7 @@ EVEN-GROUPS-A-D2024-GROUP8/
 │   │   ├── main_page.html          # Main dashboard page after login  
 │   │   ├── my_recommendations.html # Personalized recommendations page  
 │   │   ├── mybooking.html          # User's booking management page  
-│   │   ├── register.html           # Registration page for new users  
-│   │   ├── side_bar.html           # Sidebar navigation template  
+│   │   ├── register.html           # Registration page for new users   
 │   │   ├── soloist_profile.html    # Soloist profile page  
 │   │   ├── upload_picture.html     # Profile picture upload page  
 │   │   ├── venue_profile.html      # Venue profile page  

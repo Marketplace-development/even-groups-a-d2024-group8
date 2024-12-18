@@ -135,6 +135,7 @@
                     <a href="{{ url_for('main.edit_venue_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
                 {% endif %}
                 <a href="{{ url_for('main.main_page') }}" class="button">Go Back to Main Page</a>
+                <a href="{{ url_for('main.view_reviews', musician_id=user.profile_id) }}" class="button">View Reviews</a>
             </div>            
         </div>
     </div>
