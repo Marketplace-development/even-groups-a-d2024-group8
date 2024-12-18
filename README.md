@@ -31,7 +31,7 @@ EVEN-GROUPS-A-D2024-GROUP8/
 │   │   ├── venue_profile.html      # Venue profile page  
 │   ├── __init__.py                 # App initialization file  
 │   ├── config.py                   # Configuration settings database
- │   ├── models.py                   # Database models and ORM definitions  
+  │   ├── models.py                   # Database models and ORM definitions  
 │   ├── routes.py                   # Web application routes and logic  
 ├── venv/                           # Virtual environment for project dependencies  
 ├── requirements.txt                # Python dependencies (Flask, etc.)  
