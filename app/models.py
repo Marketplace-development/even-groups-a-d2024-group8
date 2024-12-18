@@ -102,6 +102,7 @@ class Booking(db.Model):
     date_booking = db.Column(db.TIMESTAMP(timezone=True))
     booked_by = db.Column(UUID(as_uuid=True), db.ForeignKey('profile.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
     booked_in = db.Column(UUID(as_uuid=True), db.ForeignKey('venue.profile_id', ondelete='SET NULL', onupdate='CASCADE'))
+    note = db.Column(db.String(255),nullable=True, default=None)
 
     musician = db.relationship('Musician', backref=db.backref('bookings', lazy=True))
     venue = db.relationship('Venue', backref=db.backref('venue_bookings', lazy=True), foreign_keys=[venue_id])

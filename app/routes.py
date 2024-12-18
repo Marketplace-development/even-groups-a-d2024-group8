@@ -930,6 +930,7 @@ def request_booking(musician_id):
         date_booking_str = request.form.get('date_booking')
         duration_str = request.form.get('duration')
         method_str = request.form.get('payment_method')
+        note_str = request.form.get('note')
 
         print(f"Received form data: date_booking={date_booking_str}, duration={duration_str}, payment_method={method_str}")
 
@@ -971,7 +972,8 @@ def request_booking(musician_id):
             date_booking=date_booking,
             duration=duration,
             booked_by=logged_in_user_id,
-            booked_in=logged_in_user_id
+            booked_in=logged_in_user_id,
+            note=note_str
         )
 
         print(f"New booking object created: {new_booking}")
@@ -993,6 +995,8 @@ def request_booking(musician_id):
             db.session.commit()
             flash("Booking request sent successfully!", "success")
             print("Booking and payment successfully committed.")
+            return redirect(url_for('main.main_page'))
+
         except Exception as e:
             db.session.rollback()
             flash(f"An error occurred while requesting the booking: {e}", "error")
