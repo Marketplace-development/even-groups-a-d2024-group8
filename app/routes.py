@@ -253,12 +253,14 @@ def upload_picture():
                 user.profile_picture = profile_picture.read()  # Save the image to the database
                 db.session.commit()
                 flash("Profile picture uploaded successfully!", "success")
+                return redirect(url_for('main.main_page'))  # Redirect only on success
             else:
                 flash("No profile picture uploaded.", "error")
+                # Do not redirect; render the same page to show the error
+                return render_template('upload_picture.html')
         elif 'skip' in request.form:  # Skip button was pressed
             flash("Skipped uploading profile picture.", "info")
-        
-        return redirect(url_for('main.main_page'))  # Redirect to the main page
+            return redirect(url_for('main.main_page'))  # Redirect when skipping
 
     return render_template('upload_picture.html')
 

@@ -81,11 +81,45 @@
         .upload-box button:hover {
             background-color: #4e008f;
         }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 <body>
     <div class="upload-box">
         <h1>Upload Profile Picture</h1>
+                <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul style="list-style: none; padding: 0; margin-bottom: 15px;">
+                {% for category, message in messages %}
+                    <li class="flash-message 
+                        {% if category == 'error' %}flash-error
+                        {% elif category == 'success' %}flash-success
+                        {% else %}flash-info{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
         <form method="POST" enctype="multipart/form-data">
             <div class="image-container" id="image-container">
                 <!-- SVG Icon placed here inside the image container -->

@@ -100,6 +100,25 @@
             outline: none;
             box-shadow: 0 0 10px rgba(106, 0, 181, 0.3);
         }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
     </style>
     <script>
         function handleDropdownChange() {
@@ -183,6 +202,22 @@
     <div class="register-box">
         <h1>Register</h1>
         <hr>
+                <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul style="list-style: none; padding: 0; margin-bottom: 15px;">
+                {% for category, message in messages %}
+                    <li class="flash-message 
+                        {% if category == 'error' %}flash-error
+                        {% elif category == 'success' %}flash-success
+                        {% else %}flash-info{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        
         <form method="post" action="{{ url_for('main.register') }}">
             <div class="dropdown-container">
                 <label for="profile-type-dropdown">Profile Type:</label>
