@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>MelodyMatch - Top 3 Recommendations</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for stars -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 
     <style>
@@ -83,18 +82,18 @@
         }
 
         .profile-card {
-            display: flex; /* Flexbox for card layout */
-            flex-direction: column; /* Stack items vertically */
-            justify-content: space-between; /* Space items evenly */
-            align-items: center; /* Center-align content */
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            align-items: center; 
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 250px;
-            height: 500px; /* Fixed height for all cards */
-            box-sizing: border-box; /* Padding included in height */
+            height: 500px; 
+            box-sizing: border-box; 
         }
 
         .profile-pic,
@@ -177,7 +176,6 @@
             color: #721c24;
         }
 
-        /* Stars styling */
         .stars-outer {
             display: block;
             position: relative;
@@ -198,7 +196,7 @@
             width: 0%;
             color: #6a00b5;
         }
-        /* EXACT 5 stars, no spaces: */
+
         .stars-outer::before {
             content: "\f005\f005\f005\f005\f005";
             font-family: 'Font Awesome 5 Free';
@@ -219,18 +217,18 @@
         }
 
         .highly-rated-container {
-            min-height: 30px; /* Ensures consistent space for all cards */
+            min-height: 30px; 
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px; /* Space between star icon and text */
+            gap: 5px; 
             font-size: 1rem;
-            visibility: hidden; /* Default hidden */
+            visibility: hidden; 
         }
 
         .highly-rated-container i,
         .highly-rated-container span {
-            visibility: visible; /* Make content visible if present */
+            visibility: visible;
         }
 
         .highly-rated-text {
@@ -259,7 +257,7 @@
         <div class="side-bar">
             <div class="sub-side-bar">
                 <div class="icon-link">
-                    <!-- Keep icons and left bar same -->
+
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
                          viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
                          class="icon">
@@ -422,8 +420,7 @@
                             </div>
                             
                             <a href="{{ url_for('main.view_profile', user_id=musician.profile_id) }}" class="view-profile-button">View Profile</a>
-                            
-                            <!-- Ensure the 'highly-rated-container' is always present -->
+
                             <div class="highly-rated-container">
                                 {% if rating_val >= 4 %}
                                     <i class="fas fa-star highly-rated"></i>

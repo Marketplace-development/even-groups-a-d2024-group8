@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>MelodyMatch - Main</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for stars and icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 
     <style>
@@ -140,10 +139,10 @@
         .stars-outer {
             position: relative;
             display: inline-block;
-            font-size: 20px; /* Adjust size of stars */
-            color: #e0e0e0; /* Unfilled star color */
+            font-size: 20px; 
+            color: #e0e0e0; 
             line-height: 1;
-            width: 105px; /* Ensure this perfectly fits 5 stars (20px each + gaps) */
+            width: 105px; 
         }
         
         .stars-inner {
@@ -151,14 +150,14 @@
             top: 0;
             left: 0;
             white-space: nowrap;
-            color: #6a00b5; /* Filled star color */
-            width: 0%; /* Set dynamically */
+            color: #6a00b5; 
+            width: 0%; 
             overflow: hidden;
         }
         
         .stars-outer::before,
         .stars-inner::before {
-            content: "\f005 \f005 \f005 \f005 \f005"; /* 5 stars */
+            content: "\f005 \f005 \f005 \f005 \f005"; 
             font-family: "Font Awesome 5 Free";
             font-weight: 900;
         }
@@ -170,7 +169,6 @@
             background-color: #fff;
         }
 
-        /* Grid layout for profiles: 4 per row */
         .profiles-grid {
             display: grid;
             grid-template-columns: repeat(4, 250px);
@@ -455,7 +453,6 @@
             </form>            
 
             <div class="search-results" id="search-results">
-                <!-- Grid of profiles -->
                 <div class="profiles-grid" id="profiles-grid">
                     {% for musician in profiles %}
                     <div class="profile-card">
@@ -527,8 +524,6 @@
                         ? `<div class="highly-rated-container"><i class="fas fa-star highly-rated"></i><span class="highly-rated-text">Highly rated!</span></div>`
                         : '';
         
-                    // profile.details should contain Genre and Price per hour and other info,
-                    // but now we format them like the snippet:
                     const details = `
                         <p>Genre: ${profile.genre}</p>
                         <p>Price per hour: €${profile.price_per_hour}</p>

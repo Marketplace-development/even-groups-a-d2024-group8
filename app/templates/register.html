@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <!-- Import DM Sans font -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -131,17 +130,14 @@
             musicianFields.style.display = profileType === 'musician' ? 'block' : 'none';
             venueFields.style.display = profileType === 'venue' ? 'block' : 'none';
 
-            // Adjust required attributes for venue
             const venueNameInput = document.querySelector('input[name="venue_name"]');
             if (profileType === 'venue') {
                 venueNameInput.required = true;
 
-                // Remove required attributes from musician fields
                 setMusicianFieldsRequired(false);
             } else {
                 venueNameInput.required = false;
 
-                // Set required attributes for musician fields
                 setMusicianFieldsRequired(true);
             }
         }
@@ -155,7 +151,6 @@
                 soloistFields.style.display = 'block';
                 bandFields.style.display = 'none';
 
-                // Adjust required attributes for soloist
                 document.querySelector('input[name="date_of_birth"]').required = true;
                 document.querySelector('input[name="band_name"]').required = false;
                 document.querySelector('input[name="num_members_in_band"]').required = false;
@@ -163,7 +158,6 @@
                 soloistFields.style.display = 'none';
                 bandFields.style.display = 'block';
 
-                // Adjust required attributes for band
                 document.querySelector('input[name="band_name"]').required = true;
                 document.querySelector('input[name="num_members_in_band"]').required = true;
                 document.querySelector('input[name="date_of_birth"]').required = false;
@@ -171,17 +165,14 @@
         }
 
         function setMusicianFieldsRequired(isRequired) {
-            // Set or remove 'required' attribute for musician fields
             document.querySelector('input[name="price_per_hour"]').required = isRequired;
             document.querySelector('select[name="equipment"]').required = isRequired;
 
-            // For soloist fields
             const dateOfBirthInput = document.querySelector('input[name="date_of_birth"]');
             if (dateOfBirthInput) {
                 dateOfBirthInput.required = isRequired && document.getElementById('musician-role-dropdown').value === 'soloist';
             }
 
-            // For band fields
             const bandNameInput = document.querySelector('input[name="band_name"]');
             const numMembersInput = document.querySelector('input[name="num_members_in_band"]');
             if (bandNameInput && numMembersInput) {
@@ -191,7 +182,6 @@
             }
         }
 
-        // Initialize required attributes on page load
         window.onload = function() {
             handleDropdownChange();
             handleMusicianRoleChange();
@@ -202,7 +192,6 @@
     <div class="register-box">
         <h1>Register</h1>
         <hr>
-                <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul style="list-style: none; padding: 0; margin-bottom: 15px;">
@@ -227,7 +216,6 @@
                 </select>
             </div>
 
-            <!-- Musician Role Dropdown -->
             <div class="dropdown-container" id="musician-role-dropdown-container">
                 <label for="musician-role-dropdown">Musician Role:</label>
                 <select id="musician-role-dropdown" class="dropdown-select" onchange="handleMusicianRoleChange()" name="musician_role">
@@ -242,7 +230,6 @@
             <label for="last_name">Last Name:</label>
             <input type="text" name="last_name" required placeholder="Enter Your Last Name">
 
-            <!-- Venue Fields -->
             <div id="venue_fields" style="display: none;">
                 <label for="venue_name">Venue Name:</label>
                 <input type="text" name="venue_name" placeholder="Enter Your Venue Name">
@@ -263,9 +250,7 @@
                 </select>
             </div>
 
-            <!-- Musician Fields -->
             <div id="musician_fields">
-                <!-- Soloist Fields -->
                 <div id="soloist_fields">
                     <label for="artist_name">Artist Name:</label>
                     <input type="text" id="artist_name" name="artist_name" placeholder="Enter Your Artist Name">
@@ -274,7 +259,6 @@
                     <input type="date" id="date_of_birth" name="date_of_birth">
                 </div>
 
-                <!-- Band Fields -->
                 <div id="band_fields" style="display: none;">
                     <label for="band_name">Band Name:</label>
                     <input type="text" id="band_name" name="band_name" placeholder="Enter Your Band Name">
@@ -283,7 +267,6 @@
                     <input type="number" id="num_members_in_band" name="num_members_in_band" min="1" placeholder="0">
                 </div>
 
-                <!-- Additional Musician Fields -->
                 <label for="genre">Genre (Optional):</label>
                 <select id="genre" class="dropdown-select" name="genre">
                     <option value="" selected>Choose a Genre</option>
@@ -316,13 +299,11 @@
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required placeholder="Enter Your Email">
 
-            <!-- Expanded Address Input -->
             <div class="address-fields">
                 <label for="country">Country :</label>
                 <select id="country" class="dropdown-select" name="country" required>
                     <option value="">Select Country</option>
                     <option value="Belgium">Belgium</option>
-                    <!-- Add other countries as needed -->
                 </select>
             
                 <label for="city">City :</label>
