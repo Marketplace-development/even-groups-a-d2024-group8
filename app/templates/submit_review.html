@@ -11,7 +11,7 @@
             height: 100%;
             width: 100%;
             font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(135deg, #3a007d, #6a00b5); /* Consistent gradient */
+            background: linear-gradient(135deg, #3a007d, #6a00b5);
             color: #fff;
         }
         .container {
@@ -34,7 +34,7 @@
         }
         .review-form select,
         .review-form textarea {
-            width: 95%; /* Almost as wide as the container */
+            width: 95%; 
             padding: 8px;
             margin-bottom: 10px;
             border-radius: 5px;
@@ -42,13 +42,13 @@
             font-size: 1rem;
         }
         .review-form textarea {
-            resize: none; /* Prevent manual resizing */
-            overflow: hidden; /* Hide scrollbar */
-            min-height: 100px; /* Set initial minimum height */
+            resize: none; 
+            overflow: hidden; 
+            min-height: 100px; 
         }
         .review-form button {
             display: block;
-            width: 95%; /* Match the width of select and textarea */
+            width: 95%;
             background-color: #6a00b5;
             color: #fff;
             border: none;
@@ -56,7 +56,7 @@
             font-size: 1rem;
             border-radius: 5px;
             cursor: pointer;
-            margin: 0 auto; /* Center the button */
+            margin: 0 auto; 
         }
         .review-form button:hover {
             background-color: #4e008f;
@@ -67,7 +67,6 @@
     <div class="container">
         <h1>Consider Giving a Review!</h1>
         <form method="POST" class="review-form">
-            <!-- Rating Dropdown with Stars -->
             <select name="rating" id="rating" required>
                 <option value="" disabled selected>Select a rating</option>
                 {% for i in range(1, 6) %}
@@ -75,7 +74,6 @@
                 {% endfor %}
             </select>
 
-            <!-- Auto-expanding Textarea -->
             <textarea name="comment" id="comment" placeholder="Write your feedback here..." oninput="autoGrow(this)"></textarea>
 
             <button type="submit">Submit Review</button>
@@ -84,7 +82,7 @@
 
     <script>
         function autoGrow(element) {
-            element.style.height = '100px'; // Reset to initial height
+            element.style.height = '100px';
             element.style.height = (element.scrollHeight) + 'px';
         }
     </script>

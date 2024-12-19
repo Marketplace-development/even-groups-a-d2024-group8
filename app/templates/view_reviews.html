@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Reviews</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Include Font Awesome for star icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
         html, body {
@@ -17,7 +16,6 @@
             overflow: hidden; 
         }
         
-        /* Container that holds everything */
         .outer-container {
             display: flex;
             justify-content: center;
@@ -28,7 +26,6 @@
             overflow: auto;
         }
 
-        /* The big grey box */
         .grey-box {
             background: #f5f5f5;
             border-radius: 10px;
@@ -48,7 +45,6 @@
             color: #333;
         }
 
-        /* Average rating stars: larger size (30px) */
         .stars-outer {
             display: inline-block;
             position: relative;
@@ -112,7 +108,6 @@
             margin-bottom: 10px;
         }
 
-        /* Review stars: 75% of 30px ~ 22px */
         .review-rating .stars-outer {
             display: inline-block;
             position: relative;
@@ -163,7 +158,6 @@
             background-color: #4e008f;
         }
 
-        /* Scrollbar styling for .outer-container */
         .outer-container::-webkit-scrollbar {
             width: 8px;
         }
@@ -187,19 +181,17 @@
             margin-top: 30px;
         }
 
-        /* Rating breakdown section */
         .rating-breakdown {
             margin-top: 40px;
             font-size: 1.3rem;
             color: #333;
         }
 
-        /* We'll use a table-like layout to align everything perfectly */
         .rating-breakdown-table {
             border-spacing: 0;
             border-collapse: collapse;
             width: 100%;
-            max-width: 600px; /* Bigger width */
+            max-width: 600px; 
         }
 
         .rating-breakdown-table td {
@@ -215,7 +207,7 @@
         }
         
         .line-cell {
-            width: 400px; /* Larger line length */
+            width: 400px;
             position: relative;
         }
 
@@ -263,10 +255,8 @@
                 {% endif %}
             </h1>
 
-            <!-- Rating Breakdown Section -->
             <div class="rating-breakdown">
                 <table class="rating-breakdown-table">
-                    <!-- Average row -->
                     <tr>
                         <td class="label-cell">Average:</td>
                         <td>
@@ -278,7 +268,6 @@
                             <span style="vertical-align:middle;">({{ average_rating }} out of 5)</span>
                         </td>
                     </tr>
-                    <!-- 5 stars row -->
                     <tr>
                         <td class="label-cell">5 stars:</td>
                         <td class="line-cell">
@@ -288,7 +277,7 @@
                         </td>
                         <td class="count-cell">{{ five_stars }}</td>
                     </tr>
-                    <!-- 4 stars row -->
+
                     <tr>
                         <td class="label-cell">4 stars:</td>
                         <td class="line-cell">
@@ -298,7 +287,7 @@
                         </td>
                         <td class="count-cell">{{ four_stars }}</td>
                     </tr>
-                    <!-- 3 stars row -->
+
                     <tr>
                         <td class="label-cell">3 stars:</td>
                         <td class="line-cell">
@@ -308,7 +297,7 @@
                         </td>
                         <td class="count-cell">{{ three_stars }}</td>
                     </tr>
-                    <!-- 2 stars row -->
+
                     <tr>
                         <td class="label-cell">2 stars:</td>
                         <td class="line-cell">
@@ -318,7 +307,7 @@
                         </td>
                         <td class="count-cell">{{ two_stars }}</td>
                     </tr>
-                    <!-- 1 star row -->
+
                     <tr>
                         <td class="label-cell">1 star:</td>
                         <td class="line-cell">
@@ -330,7 +319,7 @@
                     </tr>
                 </table>
             </div>
-            <!-- End of Rating Breakdown Section -->
+
 
             {% set total_reviews = reviews|length %}
             
