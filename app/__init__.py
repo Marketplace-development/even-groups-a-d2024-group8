@@ -23,7 +23,6 @@ def create_app():
         from .routes import main
         app.register_blueprint(main)
 
-        # Register the b64encode filter
         app.jinja_env.filters['b64encode'] = b64encode
 
     return app

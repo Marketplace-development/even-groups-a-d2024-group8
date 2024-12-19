@@ -15,29 +15,24 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    # Check if the user is logged in
     if 'user_id' in session:
         try:
             user_id = uuid.UUID(session['user_id'])
             user = Profile.query.get(user_id)
 
-            # If the user exists, redirect to the main page
             if user:
                 return redirect(url_for('main.main_page'))
         except Exception as e:
-            # Clear invalid session data if there's an issue
             session.pop('user_id', None)
 
-    # Render the index.html for guests
     return render_template('index.html')
 
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        new_user = None  # Initialize new_user to avoid linter warnings
+        new_user = None  
         try:
-            # Collect common form data
             email = request.form.get('email')
             profile_type = request.form.get('profile_type')
             first_name = request.form.get('first_name')
@@ -49,18 +44,15 @@ def register():
             phone_number = request.form.get('phone_number')
             bio = request.form.get('bio')
 
-            # Validate required common fields
             if not email or not profile_type or not first_name or not last_name:
                 flash("Please fill out all required fields.", "error")
                 return redirect(url_for('main.register'))
 
-            # Check if email is already registered
             existing_user = Profile.query.filter_by(email=email).first()
             if existing_user:
                 flash("Email already registered. Please use a different email.", "error")
                 return redirect(url_for('main.register'))
 
-            # Create new user
             new_user = Profile(
                 email=email,
                 first_name=first_name,
@@ -76,7 +68,6 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            # Add musician-specific or venue-specific data
             if profile_type == 'musician':
                 musician_role = request.form.get('musician_role')
                 genre = request.form.get('genre')
@@ -84,7 +75,6 @@ def register():
                 link_to_songs = request.form.get('link_to_songs')
                 equipment = request.form.get('equipment')
 
-                # Validate musician-specific fields
                 if not musician_role or price_per_hour is None or equipment is None:
                     flash("Please fill out all required musician fields.", "error")
                     return redirect(url_for('main.register'))
@@ -97,10 +87,9 @@ def register():
                     flash("Invalid price per hour.", "error")
                     return redirect(url_for('main.register'))
 
-                # Create musician record
                 musician = Musician(
                     profile_id=new_user.profile_id,
-                    genre=genre,  # Genre is optional
+                    genre=genre,
                     price_per_hour=price_per_hour,
                     link_to_songs=link_to_songs,
                     equipment=has_equipment
@@ -108,7 +97,6 @@ def register():
                 db.session.add(musician)
                 db.session.commit()
 
-                # Create role-specific record
                 if musician_role == 'soloist':
                     artist_name = request.form.get('artist_name')
                     date_of_birth = request.form.get('date_of_birth')
@@ -153,7 +141,6 @@ def register():
                     flash("Invalid musician role selected.", "error")
                     return redirect(url_for('main.register'))
 
-                # Update musician type and commit
                 new_user.musician_type = musician_role
                 db.session.commit()
 
@@ -161,7 +148,6 @@ def register():
                 venue_name = request.form.get('venue_name')
                 venue_style = request.form.get('venue_style', 'Not specified')
 
-                # Validate venue-specific fields
                 if not venue_name:
                     flash("Venue name is required.", "error")
                     return redirect(url_for('main.register'))
@@ -177,11 +163,9 @@ def register():
                 flash("Invalid profile type selected.", "error")
                 return redirect(url_for('main.register'))
 
-            # Save session and redirect to upload_picture
             session['user_id'] = str(new_user.profile_id)
             session['profile_type'] = new_user.profile_type
 
-            # Redirect to upload_picture for both musicians and venues
             flash("Registration successful! Please upload your profile picture.", "success")
             return redirect(url_for('main.upload_picture'))
 
@@ -191,11 +175,11 @@ def register():
         except SQLAlchemyError as e:
             db.session.rollback()
             flash("A database error occurred. Please try again.", "error")
-            print(f"SQLAlchemy error: {e}")  # This will print the error to your server logs, which can help in debugging.
+            print(f"SQLAlchemy error: {e}")  
         except Exception as e:
             db.session.rollback()
             flash(f"An unexpected error occurred: {str(e)}. Please try again.", "error")
-            print(f"Unexpected error: {e}")  # Debugging line
+            print(f"Unexpected error: {e}")
             return redirect(url_for('main.register'))
 
     return render_template('register.html')
@@ -208,7 +192,7 @@ def login():
         if user:
             session['user_id'] = str(user.profile_id)
             session['profile_type'] = user.profile_type
-            return redirect(url_for('main.main_page'))  # Redirect to main_page.html after login
+            return redirect(url_for('main.main_page'))  
         else:
             flash('Invalid email. Please try again.', 'error')
             return redirect(url_for('main.login'))
@@ -247,20 +231,19 @@ def upload_picture():
     user = Profile.query.get(uuid.UUID(session['user_id']))
 
     if request.method == 'POST':
-        if 'submit' in request.form:  # Submit button was pressed
+        if 'submit' in request.form:  
             if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
                 profile_picture = request.files['profile_picture']
-                user.profile_picture = profile_picture.read()  # Save the image to the database
+                user.profile_picture = profile_picture.read() 
                 db.session.commit()
                 flash("Profile picture uploaded successfully!", "success")
-                return redirect(url_for('main.main_page'))  # Redirect only on success
+                return redirect(url_for('main.main_page')) 
             else:
                 flash("No profile picture uploaded.", "error")
-                # Do not redirect; render the same page to show the error
                 return render_template('upload_picture.html')
-        elif 'skip' in request.form:  # Skip button was pressed
+        elif 'skip' in request.form:  
             flash("Skipped uploading profile picture.", "info")
-            return redirect(url_for('main.main_page'))  # Redirect when skipping
+            return redirect(url_for('main.main_page'))
 
     return render_template('upload_picture.html')
 
@@ -274,7 +257,6 @@ def profile():
     user_id = session['user_id']
     user = Profile.query.get(user_id)
 
-    # Haal het aantal reviews op
     reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
 
     if not user:
@@ -293,64 +275,53 @@ def profile():
 
 @main.route('/band_profile/<user_id>')
 def band_profile(user_id):
-    # Controleer of de gebruiker is ingelogd
     if 'user_id' not in session:
         flash("You must be logged in to view this page.", "error")
         return redirect(url_for('main.login'))
 
-    # Haal de ingelogde gebruiker op
     logged_in_user_id = session['user_id']
 
-    # Haal de gebruiker en bandgegevens op
     user = Profile.query.get(user_id)
     band = Band.query.get(user_id)
 
-    # Haal het aantal reviews op
     reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
 
     
-    # Controleer of de gebruiker en band bestaan
     if not user or not band:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Bereken of het de eigen pagina is
     is_own_profile = (str(user_id) == logged_in_user_id)
 
-    # Convert profile picture to Base64 if it exists
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render de template
+
     return render_template(
         'band_profile.html',
         user=user,
         band=band,
         profile_picture=profile_picture,
         is_own_profile=is_own_profile,
-        reviews_count=reviews_count  # Zorg ervoor dat de naam van de variabele overeenkomt
+        reviews_count=reviews_count 
     )
 
 
 
 @main.route('/edit_band_profile/<user_id>')
 def edit_band_profile(user_id):
-    # Fetch user and band data
     user = Profile.query.get(user_id)
     band = Band.query.get(user_id)
 
-    # Handle cases where the user or band is not found
     if not user or not band:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Convert the profile picture to Base64 if it exists
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render the edit_band_profile.html with all necessary data
     return render_template('edit_band_profile.html', user=user, band=band, profile_picture=profile_picture)
 
 
@@ -363,7 +334,7 @@ def update_band_profile(user_id):
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update band-specific fields
+
     band.band_name = request.form.get('band_name', band.band_name)
     num_members = request.form.get('num_members_in_band', band.num_members_in_band)
     try:
@@ -372,21 +343,20 @@ def update_band_profile(user_id):
         flash("Invalid value for number of band members. Please enter a valid integer.", "error")
         return redirect(url_for('main.edit_band_profile', user_id=user_id))
 
-    # Update musician-specific fields
+
     musician = getattr(user, 'musician', None)
     if musician:
         musician.genre = request.form.get('genre', musician.genre)
         price_per_hour = request.form.get('price_per_hour', None)
         if price_per_hour:
             try:
-                musician.price_per_hour = float(price_per_hour)  # Convert to float
+                musician.price_per_hour = float(price_per_hour)  
             except ValueError:
                 flash("Invalid value for Price per Hour. Please enter a valid number.", "error")
                 return redirect(url_for('main.edit_band_profile', user_id=user_id))
         musician.link_to_songs = request.form.get('link_to_songs', musician.link_to_songs)
         musician.equipment = request.form.get('equipment', 'false').lower() == 'true'
 
-    # Update user-specific fields
     user.bio = request.form.get('bio', user.bio)
     user.country = request.form.get('country', user.country)
     user.city = request.form.get('city', user.city)
@@ -397,13 +367,11 @@ def update_band_profile(user_id):
     user.phone_number = request.form.get('phone_number', user.phone_number)
     user.email = request.form.get('email', user.email)
 
-    # Handle profile picture if uploaded
     if 'profile_picture' in request.files:
         profile_picture = request.files['profile_picture']
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
-    # Commit changes to the database
     db.session.commit()
 
     flash("Profile updated successfully!", "success")
@@ -412,36 +380,27 @@ def update_band_profile(user_id):
 
 @main.route('/venue_profile/<user_id>')
 def venue_profile(user_id):
-    # Controleer of de gebruiker is ingelogd
     if 'user_id' not in session:
         flash("You must be logged in to view this page.", "error")
         return redirect(url_for('main.login'))
 
-    # Haal de ingelogde gebruiker op
     logged_in_user_id = session['user_id']
 
-    # Haal de gebruiker en venue-gegevens op
     user = Profile.query.get(user_id)
     venue = Venue.query.get(user_id)
 
-    # Haal het aantal reviews op
     reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
 
-
-    # Controleer of de gebruiker en venue bestaan
     if not user or not venue:
         flash("Venue profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Bereken of het de eigen pagina is
     is_own_profile = (str(user_id) == logged_in_user_id)
 
-    # Convert profile picture to Base64 als die bestaat
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render de venue_profile template
     return render_template(
         'venue_profile.html',
         user=user,
@@ -465,31 +424,27 @@ def edit_venue_profile(user_id):
         flash("Venue profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Convert profile picture to Base64 if it exists
+
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render edit_venue_profile.html
+
     return render_template('edit_venue_profile.html', user=user, venue=venue, profile_picture=profile_picture)
 
 
 @main.route('/update_venue_profile/<user_id>', methods=['POST'])
 def update_venue_profile(user_id):
-    # Haal de gebruiker en venuegegevens op
     user = Profile.query.get(user_id)
     venue = Venue.query.get(user_id)
 
-    # Controleer of de gebruiker en venue bestaan
     if not user or not venue:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update de velden van de venue
-    venue.name_event = request.form.get('name_event', venue.name_event)  # Update venue name
-    venue.style = request.form.get('venue_style', venue.style)  # Update venue style
+    venue.name_event = request.form.get('name_event', venue.name_event) 
+    venue.style = request.form.get('venue_style', venue.style) 
 
-    # Update de profielvelden van de gebruiker
     user.bio = request.form.get('bio', user.bio)
     user.country = request.form.get('country', user.country)
     user.city = request.form.get('city', user.city)
@@ -500,57 +455,45 @@ def update_venue_profile(user_id):
     user.phone_number = request.form.get('phone_number', user.phone_number)
     user.email = request.form.get('email', user.email)
 
-    # Verwerk de geüploade profielfoto (indien aanwezig)
     if 'profile_picture' in request.files:
         profile_picture = request.files['profile_picture']
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
-    # Commit wijzigingen naar de database
     db.session.commit()
 
-    # Toon een succesmelding en stuur de gebruiker door naar de profielpagina
     flash("Profile updated successfully!", "success")
     return redirect(url_for('main.venue_profile', user_id=user_id))
 
 
 @main.route('/soloist_profile/<user_id>')
 def soloist_profile(user_id):
-    # Controleer of de gebruiker is ingelogd
     if 'user_id' not in session:
         flash("You must be logged in to view this page.", "error")
         return redirect(url_for('main.login'))
 
-    # Haal de ingelogde gebruiker op
     logged_in_user_id = session['user_id']
 
-    # Haal de gebruiker en soloist gegevens op
     user = Profile.query.get(user_id)
     soloist = Soloist.query.get(user_id)
 
-    # Haal het aantal reviews op
     reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
-    
-    # Controleer of de gebruiker en soloist bestaan
+
     if not user or not soloist:
         flash("Soloist profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Bereken of het de eigen pagina is
     is_own_profile = (str(user_id) == logged_in_user_id)
 
-    # Toon de "Book Here" knop alleen als een venue een soloist bekijkt
     show_book_button = (
         logged_in_user_id != user_id and 
         Profile.query.get(logged_in_user_id).profile_type == 'venue'
     )
 
-    # Converteer profielafbeelding naar Base64 als deze bestaat
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render de template
     return render_template(
         'soloist_profile.html',
         user=user,
@@ -574,12 +517,10 @@ def edit_soloist_profile(user_id):
         flash("Soloist profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Convert profile picture to Base64 if it exists
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # Render edit_soloist_profile.html
     return render_template('edit_soloist_profile.html', user=user, soloist=soloist, profile_picture=profile_picture)
 
 
@@ -591,15 +532,12 @@ def update_soloist_profile(user_id):
     user = Profile.query.get(user_id)
     soloist = Soloist.query.get(user_id)
 
-    # Handle cases where the user or soloist is not found
     if not user or not soloist:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update soloist-specific fields
     soloist.artist_name = request.form.get('artist_name', soloist.artist_name)
 
-    # Parse and validate the date of birth
     date_of_birth = request.form.get('date_of_birth')
     if date_of_birth:
         try:
@@ -608,23 +546,21 @@ def update_soloist_profile(user_id):
             flash("Invalid date format for Date of Birth. Please use YYYY-MM-DD.", "error")
             return redirect(url_for('main.edit_soloist_profile', user_id=user_id))
 
-    # Update musician-specific fields
     musician = getattr(user, 'musician', None)
     if not musician:
         flash("Musician details are missing. Please contact support.", "error")
         return redirect(url_for('main.edit_soloist_profile', user_id=user.profile_id))
 
-# Update musician-specific fields
-    musician.genre = request.form.get('genre', musician.genre)  # Ensure form field name matches
+    musician.genre = request.form.get('genre', musician.genre) 
     price_per_hour = request.form.get('price_per_hour', None)
     if price_per_hour:
         try:
-            musician.price_per_hour = float(price_per_hour)  # Convert to float for numeric columns
+            musician.price_per_hour = float(price_per_hour)  
         except ValueError:
             flash("Invalid value for Price per Hour. Please enter a valid number.", "error")
             return redirect(url_for('main.edit_soloist_profile', user_id=user.profile_id))
     musician.link_to_songs = request.form.get('link_to_songs', musician.link_to_songs)
-    musician.equipment = request.form.get('equipment', 'false').lower() == 'true'  # Convert to boolean
+    musician.equipment = request.form.get('equipment', 'false').lower() == 'true' 
     user.bio = request.form.get('bio', user.bio)
     user.country = request.form.get('country', user.country)
     user.city = request.form.get('city', user.city)
@@ -635,13 +571,11 @@ def update_soloist_profile(user_id):
     user.phone_number = request.form.get('phone_number', user.phone_number)
     user.email = request.form.get('email', user.email)
 
-    # Handle profile picture if uploaded
     if 'profile_picture' in request.files:
         profile_picture = request.files['profile_picture']
         if profile_picture:
             user.profile_picture = profile_picture.read()
 
-    # Commit changes to the database
     db.session.commit()
 
     flash("Profile updated successfully!", "success")
@@ -658,14 +592,12 @@ def main_page():
     user = Profile.query.get(user_id)
 
     if user.profile_type == 'venue':
-        # Show profiles of soloists and bands
         musician_profiles = db.session.query(Musician).join(Profile).order_by(db.func.random()).all()
 
         processed_profiles = []
         for musician in musician_profiles:
             profile = musician.profile
 
-            # Determine display name
             display_name = None
             if profile.musician_type == 'band':
                 if musician.band:
@@ -675,10 +607,8 @@ def main_page():
                     display_name = musician.soloist.artist_name
 
             if not display_name:
-                # fallback to first_name + last_name
                 display_name = f"{profile.first_name} {profile.last_name}"
 
-            # Encode image if available
             encoded_image = None
             if profile.profile_picture:
                 encoded_image = base64.b64encode(profile.profile_picture).decode('utf-8')
@@ -690,14 +620,13 @@ def main_page():
                 'display_name': display_name,
                 'genre': musician.genre,
                 'price_per_hour': float(musician.price_per_hour),
-                'equipment': musician.equipment,  # Boolean
+                'equipment': musician.equipment,  
                 'rating': rating_val,
                 'encoded_image': encoded_image,
             })
 
         return render_template('main_page.html', user=user, profiles=processed_profiles)
     elif user.profile_type == 'musician':
-        # Fetch bookings where the musician is the logged-in user and status is 'Requested'
         bookings = Booking.query.filter_by(musician_id=user_id, status='Requested').all()
         return render_template('main_page.html', user=user, bookings=bookings, base64=base64)
     else:
@@ -716,14 +645,10 @@ def search_profiles():
         return jsonify({'error': 'User not found'}), 404
 
     if user.profile_type == 'venue':
-        # Start the query with Musician joined with Profile
-        query = db.session.query(Musician).join(Profile)
 
-        # Aliases for Soloist and Band
         soloist_alias = aliased(Soloist)
         band_alias = aliased(Band)
 
-        # Outer join to Soloist and Band
         query = query.outerjoin(soloist_alias, Musician.profile_id == soloist_alias.profile_id)
         query = query.outerjoin(band_alias, Musician.profile_id == band_alias.profile_id)
 
@@ -767,17 +692,6 @@ def search_profiles():
         equipment = data.get('equipment')
         if equipment:
             needs_equipment = equipment.lower() == 'yes'
-            # If musician needs equipment, they do NOT have equipment
-            # The logic here might need to be adjusted based on what equipment means:
-            # If "needs_equipment" = True means we want those who have equipment = True,
-            # but previously we did musician.equipment != needs_equipment
-            # If the original logic stands: If equipment needed = 'yes', we show those who DO have equipment?
-            # The previous code suggests it did the opposite. Let's fix the logic:
-            # The user probably wants that if equipment needed is Yes, show those with equipment = True
-            # if No, show those with equipment = False
-            # We'll correct this logic to:
-            # equipment = yes => musician.equipment == True
-            # equipment = no => musician.equipment == False
             query = query.filter(Musician.equipment == needs_equipment)
             filters_applied = True
 
@@ -798,7 +712,6 @@ def search_profiles():
         output = []
         for musician in results:
             profile = musician.profile
-            # Determine display name
             display_name = None
             if profile.musician_type == 'band' and musician.band:
                 display_name = musician.band.band_name
@@ -807,22 +720,15 @@ def search_profiles():
             if not display_name:
                 display_name = f"{profile.first_name} {profile.last_name}"
 
-            # Encode image if available
             encoded_image = None
             if profile.profile_picture:
                 encoded_image = base64.b64encode(profile.profile_picture).decode('utf-8')
 
             rating_val = float(profile.rating) if profile.rating else 0.0
 
-            # Provide the same fields as on main_page
-            # We'll separate them out instead of single details line:
-            # On the front end, we now rely on separate fields
-            # We'll add them as separate fields in JSON.
-            # The front-end code currently uses 'details' for genre and price, we'll add equipment too.
-            # But let's just provide separate fields and update front-end code accordingly.
             genre = musician.genre
             price_per_hour = float(musician.price_per_hour)
-            equipment_bool = musician.equipment  # True/False
+            equipment_bool = musician.equipment 
 
             output.append({
                 'id': str(musician.profile_id),
@@ -836,36 +742,28 @@ def search_profiles():
 
         return jsonify(output)
 
-    return jsonify([])  # Default empty result
+    return jsonify([])  
 
 @main.route('/profile/<user_id>')
 def view_profile(user_id):
-    # Haal profiel op
     user = Profile.query.get(uuid.UUID(user_id))
 
-    # Controleer of het profiel bestaat
     if not user:
         flash("Profile not found", "error")
         return redirect(url_for('main.main_page'))
 
-    # Verkrijg de ingelogde gebruiker (uit de sessie)
     logged_in_user_id = uuid.UUID(session['user_id'])
     logged_in_user = Profile.query.get(logged_in_user_id)
-    
-    # Haal het aantal reviews op voor het profiel
+
     reviews_count = Review.query.filter_by(reviewee_id=user.profile_id).count()
 
-    # Controleer of de ingelogde gebruiker het eigen profiel bekijkt
-    is_own_profile = (logged_in_user_id == uuid.UUID(user_id))  # True als dit het eigen profiel is
+    is_own_profile = (logged_in_user_id == uuid.UUID(user_id)) 
 
-    # Base64 voor profielafbeeldingen
     profile_picture = None
     if user.profile_picture:
         profile_picture = base64.b64encode(user.profile_picture).decode('utf-8')
 
-    # **Logica voor Musicians**
     if user.profile_type == 'musician':
-        # Toon "Book Here" knop alleen als de ingelogde gebruiker een venue is en niet het eigen profiel bekijkt
         show_book_button = logged_in_user.profile_type == 'venue' and not is_own_profile
 
         if user.musician_type == 'soloist':
@@ -891,7 +789,6 @@ def view_profile(user_id):
                 reviews_count=reviews_count
             )
 
-    # **Logica voor Venues**
     elif user.profile_type == 'venue':
    
 
@@ -904,7 +801,6 @@ def view_profile(user_id):
             reviews_count = reviews_count
         )
 
-    # Als het profieltype niet geldig is, terug naar de hoofdpagina
     flash("Invalid profile type", "error")
     return redirect(url_for('main.main_page'))
 
@@ -928,7 +824,6 @@ def request_booking(musician_id):
         return redirect(url_for('main.main_page'))
 
     if request.method == 'POST':
-        # Get form data
         date_booking_str = request.form.get('date_booking')
         duration_str = request.form.get('duration')
         method_str = request.form.get('payment_method')
@@ -936,13 +831,10 @@ def request_booking(musician_id):
 
         print(f"Received form data: date_booking={date_booking_str}, duration={duration_str}, payment_method={method_str}")
 
-        # Validate and parse form data
         try:
-            # Parse date_booking
             date_booking = datetime.strptime(date_booking_str, '%Y-%m-%dT%H:%M')
             print(f"Parsed date_booking: {date_booking}")
 
-            # Parse and validate duration
             if not duration_str or ':' not in duration_str:
                 raise ValueError("Invalid duration format. Please use HH:MM.")
 
@@ -955,9 +847,8 @@ def request_booking(musician_id):
                 raise ValueError("Duration must be greater than zero.")
             print(f"Duration validated: {duration}")
 
-            # Calculate total price based on standard pricing
             total_hours = hours + minutes / 60
-            total_price = Decimal(total_hours) * Decimal(musician.price_per_hour)  # Gebruik de prijs per uur van de muzikant
+            total_price = Decimal(total_hours) * Decimal(musician.price_per_hour) 
 
         except ValueError as e:
             print(f"ValueError: {e}")
@@ -966,7 +857,6 @@ def request_booking(musician_id):
 
         
         status = 'Requested'
-        # Create a new booking with status 'Requested'
         new_booking = Booking(
             musician_id=uuid.UUID(musician_id),
             venue_id=logged_in_user_id,
@@ -979,20 +869,19 @@ def request_booking(musician_id):
         )
 
         print(f"New booking object created: {new_booking}")
-
-        # Create the payment object 
+ 
         total_hours = hours + minutes / 60
         total_price = Decimal(total_hours) * Decimal(musician.price_per_hour)
         new_payment = Payment(
             method=method_str,
-            amount= total_price  # Stel standaardbedrag in
+            amount= total_price  
         )
 
         try:
             print("Attempting to commit booking and payment...")
             db.session.add(new_booking)
-            db.session.flush()  # Zorg ervoor dat de booking_id beschikbaar is voor de betaling
-            new_payment.booking_id = new_booking.booking_id  # Koppel de betaling aan de boeking
+            db.session.flush()  
+            new_payment.booking_id = new_booking.booking_id  
             db.session.add(new_payment)
             db.session.commit()
             flash("Booking request sent successfully!", "success")
@@ -1007,12 +896,10 @@ def request_booking(musician_id):
 
 
     else:
-        # GET request, render booking.html
         print("Rendering booking.html")
         return render_template('booking.html', musician=musician)      
 
 
-# routes.py
 @main.route('/respond_booking/<uuid:booking_id>', methods=['POST'])
 def respond_booking(booking_id):
     if 'user_id' not in session:
@@ -1027,18 +914,15 @@ def respond_booking(booking_id):
         flash("Booking not found.", "error")
         return redirect(url_for('main.main_page'))
 
-    # Ensure that only the musician associated with the booking can respond
     if booking.musician_id != user_id:
         flash("You are not authorized to respond to this booking.", "error")
         return redirect(url_for('main.main_page'))
 
-    # Get the response from the form
     response = request.form.get('response')
     if response not in ['Accepted', 'Denied']:
         flash("Invalid response.", "error")
         return redirect(url_for('main.main_page'))
 
-    # Update the booking status
     try:
         booking.status = response
         db.session.commit()
@@ -1059,10 +943,8 @@ def bookings():
     user = Profile.query.get(user_id)
 
     if user.profile_type == 'venue':
-        # Get bookings requested by this venue
         bookings = Booking.query.filter_by(venue_id=user_id).order_by(Booking.date_booking.desc()).all()
     elif user.profile_type == 'musician':
-        # Get all bookings for this musician
         bookings = Booking.query.filter_by(musician_id=user_id).order_by(Booking.date_booking.desc()).all()
     else:
         flash("Invalid user type.", "error")
@@ -1070,7 +952,6 @@ def bookings():
 
     return render_template('mybooking.html', bookings=bookings, user=user)
 
-# Define the genre to style mapping
 genre_to_style = {
     'Pop': ['Dance Club', 'Wine Bar'],
     'Rock': ['Beach Bar', 'Dance Club'],
@@ -1095,18 +976,16 @@ def recommended_page():
         return redirect(url_for('main.login'))
 
     logged_in_user_id = uuid.UUID(session['user_id'])
-    user = Profile.query.get(logged_in_user_id)  # Fetch current user
+    user = Profile.query.get(logged_in_user_id)  
 
     recommendations = get_recommendations(logged_in_user_id)
 
-    # Process each musician's profile_picture
     processed_recommendations = []
     for musician in recommendations:
         if musician.profile.profile_picture:
             encoded_image = base64.b64encode(musician.profile.profile_picture).decode('utf-8')
             musician.encoded_picture = f"data:image/jpeg;base64,{encoded_image}"
         else:
-            # No picture means encoded_picture is None
             musician.encoded_picture = None
         processed_recommendations.append(musician)
 
@@ -1121,7 +1000,7 @@ def get_recommendations(user_profile_id):
     1. Als er geen eerdere boekingen zijn, wordt er aanbevolen op basis van genre en venue stijlen.
     2. Als er eerdere boekingen zijn, wordt er aanbevolen op basis van de meest geboekte genres, gesorteerd op rating.
     """
-    # Controleer of de gebruiker eerdere boekingen heeft
+
     bookings = Booking.query.filter(Booking.booked_by == user_profile_id).all()
     
     print(f"User ID: {user_profile_id}, Bookings Found: {len(bookings)}")
@@ -1129,7 +1008,7 @@ def get_recommendations(user_profile_id):
     if not bookings:
         recommended_musicians = []
         
-        # Verkrijg alle venues en hun stijlen
+
         venues = Venue.query.all()
         
         print(f"Total Venues Found: {len(venues)}")
@@ -1140,10 +1019,8 @@ def get_recommendations(user_profile_id):
                     musicians = Musician.query.filter(Musician.genre == genre).all()
                     recommended_musicians.extend(musicians)
 
-        # Verwijder duplicaten
         unique_musicians = {m.profile_id: m for m in recommended_musicians}.values()
 
-        # Sorteer op rating via het Profile object en beperk tot 3 aanbevelingen
         recommended_musicians = sorted(unique_musicians, key=lambda m: m.profile.rating, reverse=True)[:3]
         print(f"Recommended Musicians (no bookings): {len(recommended_musicians)}")
         return recommended_musicians
@@ -1151,7 +1028,6 @@ def get_recommendations(user_profile_id):
     else:
         genre_count = {}
 
-        # Tel de genres op basis van eerdere boekingen
         for booking in bookings:
             musician = Musician.query.get(booking.musician_id)
             if musician:
@@ -1160,7 +1036,6 @@ def get_recommendations(user_profile_id):
 
         print(f"Genre Count from Previous Bookings: {genre_count}")
 
-        # Bepaal het genre met de meeste boekingen
         if not genre_count:
             print("No genres found from previous bookings.")
             return []
@@ -1168,13 +1043,10 @@ def get_recommendations(user_profile_id):
         most_booked_genre = max(genre_count, key=genre_count.get)
         print(f"Most Booked Genre: {most_booked_genre}")
 
-        # Verkrijg aanbevelingen op basis van het meest geboekte genre
         recommended_musicians = Musician.query.filter(Musician.genre == most_booked_genre).all()
-        
-        # Verwijder duplicaten
+
         unique_musicians = {m.profile_id: m for m in recommended_musicians}.values()
 
-        # Sorteer op rating via het Profile object en beperk tot 3 aanbevelingen
         recommended_musicians = sorted(unique_musicians, key=lambda m: m.profile.rating, reverse=True)[:3]
         
         print(f"Recommended Musicians (based on most booked genre): {len(recommended_musicians)}")
@@ -1191,12 +1063,10 @@ def submit_review(booking_id):
     current_user = Profile.query.get(current_user_id)
     booking = Booking.query.get_or_404(booking_id)
 
-    # Ensure the current user is involved in this booking
     if booking.booked_by != current_user_id and booking.musician_id != current_user_id:
         flash('You are not authorized to review this booking.', 'error')
         return redirect(url_for('main.bookings'))
 
-    # Check if a review already exists from this reviewer for this booking
     existing_review = Review.query.filter_by(
         booking_id=booking_id,
         reviewer_id=current_user_id
@@ -1209,7 +1079,6 @@ def submit_review(booking_id):
         rating = request.form.get('rating')
         comment = request.form.get('comment')
 
-        # Validate the rating
         try:
             rating = float(rating)
             if rating < 0.0 or rating > 5.0:
@@ -1218,7 +1087,6 @@ def submit_review(booking_id):
             flash('Invalid rating. Please select a rating between 0 and 5.', 'error')
             return render_template('submit_review.html', booking=booking)
 
-        # Determine roles and IDs
         if current_user.profile_type == 'venue':
             role_reviewer = 'Venue'
             reviewee_id = booking.musician_id
@@ -1229,7 +1097,6 @@ def submit_review(booking_id):
             flash('Invalid profile type for reviewing.', 'error')
             return redirect(url_for('main.bookings'))
 
-        # Create the review
         review = Review(
             booking_id=booking_id,
             reviewer_id=current_user_id,
@@ -1263,26 +1130,20 @@ def reviews():
     current_user_id = uuid.UUID(session['user_id'])
     current_user = Profile.query.get(current_user_id)
 
-    # Fetch reviews where the current user is the reviewee
     reviews = Review.query.filter_by(reviewee_id=current_user_id).all()
 
-    # Calculate the average rating
     total_rating = sum(float(review.rating) for review in reviews)
     average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
 
-    # Count how many reviews for each rating 1-5
     rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
     for rev in reviews:
         rating_counts[int(rev.rating)] += 1
 
     total_reviews = len(reviews) if reviews else 0
-    # Compute percentages
-    # Avoid division by zero if no reviews
     rating_percentages = {}
     for star in rating_counts:
         rating_percentages[star] = (rating_counts[star] / total_reviews * 100) if total_reviews > 0 else 0
 
-    # Pass user and these stats to the template
     return render_template('reviews.html', 
                            user=current_user, 
                            reviews=reviews, 
@@ -1302,25 +1163,20 @@ def view_reviews(musician_id):
     current_user_id = uuid.UUID(session['user_id'])
     current_user = Profile.query.get(current_user_id)
 
-    # Fetch all reviews for this musician (or venue)
     reviews = Review.query.filter_by(reviewee_id=musician_id).all()
 
-    # Calculate the average rating
     total_rating = sum(float(review.rating) for review in reviews)
     average_rating = round(total_rating / len(reviews), 2) if reviews else 0.0
 
-    # Count how many reviews for each rating 1-5
     rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
     for rev in reviews:
         rating_counts[int(rev.rating)] += 1
 
     total_reviews = len(reviews)
-    # Compute percentages
     rating_percentages = {}
     for star in rating_counts:
         rating_percentages[star] = (rating_counts[star] / total_reviews * 100) if total_reviews > 0 else 0
 
-    # Compute max_count and total_counts here
     five_stars = rating_counts[5]
     four_stars = rating_counts[4]
     three_stars = rating_counts[3]
@@ -1328,7 +1184,6 @@ def view_reviews(musician_id):
     one_star = rating_counts[1]
     total_counts = five_stars + four_stars + three_stars + two_stars + one_star
 
-    # Fetch the profile of the person being reviewed
     musician = Profile.query.get(musician_id)
 
     return render_template(
