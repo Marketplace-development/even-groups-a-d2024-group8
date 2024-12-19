@@ -43,13 +43,13 @@
         .booking-form textarea {
             width: 100%;
             padding: 8px;
-            margin-bottom: 5px; /* Adjusted margin to reduce space */
+            margin-bottom: 5px; 
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 1rem;
         }
         .booking-form .hint {
-            margin-top: -5px; /* Negative margin to bring closer to input field */
+            margin-top: -5px;
             font-size: 0.9rem;
             color: #555;
         }
@@ -102,8 +102,7 @@
             <p><strong>Genre:</strong> {{ musician.genre }}</p>
             <p><strong>Price per Hour:</strong> €{{ '{:.2f}'.format(musician.price_per_hour) }}</p>
         </div>
-        
-        <!-- Flash messages -->
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul style="list-style: none; padding: 0; margin-bottom: 15px;">

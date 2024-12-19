@@ -26,7 +26,7 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background-color: #ccc; /* Placeholder for image */
+            background-color: #ccc; 
             margin: 20px auto;
             background-image: url("data:image/jpeg;base64,{{ profile_picture }}");
             background-size: cover;
@@ -72,29 +72,29 @@
         .button-group {
             display: flex;
             justify-content: center;
-            gap: 20px; /* Space between buttons */
+            gap: 20px; 
             margin-top: 20px;
         }
         
         .button {
-        display: inline-flex; /* Gebruik inline-flex voor flexibele uitlijning */
-        justify-content: center; /* Centreer de tekst horizontaal */
-        align-items: center; /* Centreer de tekst verticaal */
-        background-color: #6a00b5; /* Paarse achtergrondkleur */
-        color: #fff; /* Witte tekst */
+        display: inline-flex; 
+        justify-content: center; 
+        align-items: center; 
+        background-color: #6a00b5; 
+        color: #fff; 
         border: none;
-        padding: 10px 20px; /* Consistente binnenmarge */
-        border-radius: 5px; /* Afgeronde hoeken */
-        font-size: 1rem; /* Standaard tekstgrootte */
-        text-decoration: none; /* Verwijder onderstreping */
+        padding: 10px 20px; 
+        border-radius: 5px;
+        font-size: 1rem; 
+        text-decoration: none; 
         cursor: pointer;
-        transition: background-color 0.3s; /* Vloeiende overgang bij hover */
-        min-height: 50px; /* Zorg voor consistente hoogte */
-        box-sizing: border-box; /* Inclusief padding en border in hoogte/breedte */
+        transition: background-color 0.3s; 
+        min-height: 50px; 
+        box-sizing: border-box; 
         }
         
         .button:hover {
-            background-color: #4e008f; /* Darker purple */
+            background-color: #4e008f; 
         }
         
     </style>
@@ -102,20 +102,15 @@
 <body>
     <div class="profile-box">
         <div class="profile-picture"></div>
-        <!-- IF ELSE 
-         IF foto -> toon foto-->
+       
         
         <h1>{{ band.band_name or 'Band Profile' }}</h1>
-        
-        <!-- Bio Section -->
+
         <div class="bio-box">
             {{ user.bio or 'No bio provided.' }}
         </div>
 
-        <!-- Band Information --><!-- Band Information -->
-        <!-- Other parts of the template remain the same -->
 
-<!-- Band Information -->
         <p class="field"><strong>First Name:</strong> {{ user.first_name or 'Not Specified' }}</p>
         <p class="field"><strong>Last Name:</strong> {{ user.last_name or 'Not Specified' }}</p>
         <p class="field"><strong>Genre:</strong> {{ user.musician.genre or 'Not Specified' }}</p>
@@ -125,10 +120,6 @@
         <p class="field"><strong>Link to Songs:</strong> <a href="{{ user.musician.link_to_songs }}" target="_blank">{{ user.musician.link_to_songs or 'Not Specified' }}</a></p>
         <p class="field"><strong>Number of Band Members:</strong> {{ band.num_members_in_band or 'Not Specified' }}</p>
 
-<!-- Rest of the template -->
-
-        
-        <!-- Address Section -->
         <div class="section">
             <h2>Address</h2>
             <div class="box">
@@ -139,7 +130,6 @@
             </div>
         </div>
 
-        <!-- Contact Information Section -->
         <div class="section">
             <h2>Contact Info</h2>
             <div class="box">
@@ -150,11 +140,6 @@
             </div>
         </div>
 
-        <!-- Button Group -->
-        <!-- ... existing HTML code ... -->
-
-<!-- Button Group -->
-        <!-- Button Group -->
         <div class="button-group">
             {% if is_own_profile %}
             <a href="{{ url_for('main.edit_band_profile', user_id=user.profile_id) }}" class="button">Edit Profile</a>
