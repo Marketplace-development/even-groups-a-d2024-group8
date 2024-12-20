@@ -1,0 +1,108 @@
+-- Create the schema
+CREATE SCHEMA public;
+
+-- Enable the pgcrypto extension for UUID generation
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Profile Table with auto-generated UUID
+CREATE TABLE public.Profile (
+    profile_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    country TEXT NOT NULL,
+    city TEXT NOT NULL,
+    street_name TEXT,
+    house_number TEXT,
+    email TEXT NOT NULL UNIQUE,
+    phone_number TEXT,
+    bio TEXT,
+    profile_picture BYTEA,
+    rating DECIMAL(2, 1) DEFAULT 0.0 CHECK (rating >= 0.0 AND rating <= 5.0),
+    profile_type TEXT NOT NULL CHECK (profile_type IN ('musician', 'venue')),
+    musician_type TEXT
+);
+
+-- Musician Table
+CREATE TABLE public.Musician (
+    profile_id UUID PRIMARY KEY,
+    genre TEXT NOT NULL CHECK (genre IN (
+        'Pop', 'Rock', 'Hip-Hop/Rap', 'Jazz', 'Electronic Dance Music (EDM)',
+        'Classical', 'Reggae', 'Blues', 'Country', 'R&B', 'Other'
+    )),
+    price_per_hour DECIMAL(10, 2) NOT NULL,
+    link_to_songs TEXT,
+    equipment BOOLEAN NOT NULL,
+    FOREIGN KEY (profile_id) REFERENCES public.Profile (profile_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Soloist Table
+CREATE TABLE public.Soloist (
+    profile_id UUID PRIMARY KEY,
+    date_of_birth DATE NOT NULL,
+    artist_name TEXT,
+    FOREIGN KEY (profile_id) REFERENCES public.Musician (profile_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Band Table
+CREATE TABLE public.Band (
+    profile_id UUID PRIMARY KEY,
+    band_name TEXT,
+    num_members_in_band INT NOT NULL DEFAULT 1 CHECK (num_members_in_band > 0),
+    FOREIGN KEY (profile_id) REFERENCES public.Musician (profile_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Venue Table
+CREATE TABLE public.Venue (
+    profile_id UUID PRIMARY KEY,
+    name_event TEXT NOT NULL,
+    style TEXT NOT NULL DEFAULT 'Not specified' CHECK (style IN (
+        'Traditional Pub', 'Modern Cocktailbar', 'Jazz Lounge', 'Industrial Bar',
+        'Beach Bar', 'Art Café', 'Dance Club', 'Restaurant', 'Wine Bar', 'Other', 'Not specified'
+    )),
+    FOREIGN KEY (profile_id) REFERENCES public.Profile (profile_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Booking Table
+CREATE TABLE public.Booking (
+    booking_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    musician_id UUID NOT NULL,
+    venue_id UUID NOT NULL,
+    status TEXT NOT NULL CHECK (status IN (
+        'Completed', 'Requested', 'Processing', 'Failed', 'Accepted', 'Denied', 'Cancelled', 'Confirmed'
+    )),
+    duration INTERVAL,
+    date_booking TIMESTAMP WITH TIME ZONE,
+    booked_by UUID,
+    booked_in UUID,
+    note TEXT,
+    FOREIGN KEY (musician_id) REFERENCES public.Musician (profile_id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES public.Venue (profile_id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (booked_by) REFERENCES public.Profile (profile_id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (booked_in) REFERENCES public.Venue (profile_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Payment Table
+CREATE TABLE public.Payment (
+    payment_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    booking_id UUID NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    method TEXT NOT NULL CHECK (method IN ('Cash', 'Mobile payment', 'Credit card', 'Bancontact', 'Other')),
+    date_payment TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'Processing' CHECK (status IN ('Completed', 'Processing', 'Failed')),
+    FOREIGN KEY (booking_id) REFERENCES public.Booking (booking_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Review Table
+CREATE TABLE public.Review (
+    review_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    booking_id UUID NOT NULL,
+    reviewer_id UUID NOT NULL,
+    reviewee_id UUID NOT NULL,
+    rating DECIMAL(2, 1) NOT NULL CHECK (rating >= 0.0 AND rating <= 5.0),
+    comment TEXT,
+    role_reviewer TEXT NOT NULL CHECK (role_reviewer IN ('Musician', 'Venue')),
+    date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES public.Booking (booking_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (reviewer_id) REFERENCES public.Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (reviewee_id) REFERENCES public.Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
