@@ -632,7 +632,6 @@ def main_page():
     else:
         return render_template('main_page.html', user=user)
 
-
 @main.route('/search_profiles', methods=['POST'])
 def search_profiles():
     if 'user_id' not in session:
@@ -645,19 +644,25 @@ def search_profiles():
         return jsonify({'error': 'User not found'}), 404
 
     if user.profile_type == 'venue':
-
+        # Initialize query
+        query = db.session.query(Musician).join(Profile)
+        
+        # Create aliases for soloists and bands
         soloist_alias = aliased(Soloist)
         band_alias = aliased(Band)
-
         query = query.outerjoin(soloist_alias, Musician.profile_id == soloist_alias.profile_id)
         query = query.outerjoin(band_alias, Musician.profile_id == band_alias.profile_id)
 
+        # Filters
         filters_applied = False
+
+        # Filter by musician type
         musician_type = data.get('musician_type')
         if musician_type:
             query = query.filter(Profile.musician_type == musician_type)
             filters_applied = True
 
+        # Filter by name
         name = data.get('name')
         if name:
             name = f"%{name}%"
@@ -670,16 +675,19 @@ def search_profiles():
             )
             filters_applied = True
 
+        # Filter by city
         city = data.get('city')
         if city:
             query = query.filter(Profile.city.ilike(f"%{city}%"))
             filters_applied = True
 
+        # Filter by style/genre
         style = data.get('style')
         if style:
             query = query.filter(Musician.genre == style)
             filters_applied = True
 
+        # Filter by max price
         max_price = data.get('max_price')
         if max_price:
             try:
@@ -687,28 +695,33 @@ def search_profiles():
                 query = query.filter(Musician.price_per_hour <= max_price_float)
                 filters_applied = True
             except ValueError:
-                pass
+                pass  # Skip if max_price is invalid
 
+        # Filter by equipment
         equipment = data.get('equipment')
         if equipment:
             needs_equipment = equipment.lower() == 'yes'
             query = query.filter(Musician.equipment == needs_equipment)
             filters_applied = True
 
+        # Filter by minimum rating
         min_rating = data.get('min_rating')
         if min_rating:
             try:
                 min_rating_value = float(min_rating)
-                query = query.filter(func.coalesce(Profile.rating, 0) >= min_rating_value)
+                query = query.filter(func.coalesce(Profile.rating, 0.0) >= min_rating_value)
                 filters_applied = True
             except ValueError:
-                pass
+                pass  # Skip if min_rating is invalid
 
+        # Fetch results
         results = query.all()
 
+        # Fallback for random musicians if no filters are applied
         if not filters_applied:
-            results = db.session.query(Musician).join(Profile).order_by(db.func.random()).limit(5).all()
+            results = db.session.query(Musician).join(Profile).order_by(func.random()).limit(5).all()
 
+        # Construct response
         output = []
         for musician in results:
             profile = musician.profile
@@ -720,29 +733,26 @@ def search_profiles():
             if not display_name:
                 display_name = f"{profile.first_name} {profile.last_name}"
 
+            # Encode image if exists
             encoded_image = None
             if profile.profile_picture:
                 encoded_image = base64.b64encode(profile.profile_picture).decode('utf-8')
 
-            rating_val = float(profile.rating) if profile.rating else 0.0
-
-            genre = musician.genre
-            price_per_hour = float(musician.price_per_hour)
-            equipment_bool = musician.equipment 
-
+            # Add musician details to output
             output.append({
                 'id': str(musician.profile_id),
                 'display_name': display_name,
-                'genre': genre,
-                'price_per_hour': price_per_hour,
-                'equipment': equipment_bool,
-                'rating': rating_val,
+                'genre': musician.genre,
+                'price_per_hour': float(musician.price_per_hour),
+                'equipment': musician.equipment,
+                'rating': float(profile.rating) if profile.rating else 0.0,
                 'encoded_image': encoded_image
             })
 
         return jsonify(output)
 
-    return jsonify([])  
+    return jsonify([])
+
 
 @main.route('/profile/<user_id>')
 def view_profile(user_id):
